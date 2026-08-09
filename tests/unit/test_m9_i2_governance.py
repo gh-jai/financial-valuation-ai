@@ -1,4 +1,5 @@
 import hashlib
+import json
 import re
 from pathlib import Path
 
@@ -9,7 +10,9 @@ ROOT = Path(__file__).resolve().parents[2]
 CONTRACT = ROOT / "docs/milestones/M9-I2-issuer-resolution-contract-lock.md"
 APPROVAL = ROOT / "docs/milestones/M9-I2-contract-lock-review-approval-record.md"
 CLOSURE = ROOT / "docs/milestones/M9-I2-post-owner-approval-snapshot-closure.md"
+OWNER_ATTESTATION = ROOT / "docs/milestones/M9-I2-contract-owner-attestation.md"
 CONTRACT_SHA256 = "9326b6c76dcfe3061c5e356b5141d9f458d57694cb4e6b01b6470b0bf044d84e"
+SUBJECT_COMMIT_SHA = "743159d08ab05541a8d4fe25859bc9f9a49c5287"
 HASH_RE = re.compile(r"^[0-9a-f]{64}$")
 
 
@@ -36,6 +39,15 @@ def manifest_entries(text: str) -> list[tuple[str, str]]:
         assert HASH_RE.fullmatch(digest)
         entries.append((digest, path))
     return entries
+
+
+def owner_attestation() -> dict[str, object]:
+    text = OWNER_ATTESTATION.read_text(encoding="utf-8")
+    match = re.search(r"```yaml\n(.*?)\n```", text, re.DOTALL)
+    assert match
+    parsed = yaml.safe_load(match.group(1))
+    assert isinstance(parsed, dict)
+    return parsed
 
 
 def test_frozen_contract_hash_is_unchanged() -> None:
@@ -213,6 +225,86 @@ def test_exception_states_are_distinct_and_fail_closed_on_change() -> None:
     assert "Any subject-file change invalidates the snapshot attestation" in normalized
     assert "returns the changed package to `NOT_CLOSED`" in normalized
     assert "later carrier-only update may reference the second immutable event" in normalized
+
+
+def test_contract_owner_attestation_binds_complete_exception_evidence() -> None:
+    attestation = owner_attestation()
+    event = attestation["event"]
+    assert isinstance(event, dict)
+
+    required_fields = {
+        "schema_version",
+        "event_id",
+        "exception_id",
+        "decision_kind",
+        "occurred_at",
+        "actor_id",
+        "actor_role",
+        "actor_type",
+        "repository",
+        "baseline_sha",
+        "subject_kind",
+        "subject_id",
+        "subject_commit_sha",
+        "contract_path",
+        "contract_sha256",
+        "snapshot_id",
+        "decision",
+        "eligibility_reason",
+        "shared_actor_disclosure",
+        "separation_waiver_scope",
+        "ci_evidence",
+        "local_validation_evidence",
+        "finding_disposition",
+        "residual_risk_acceptance",
+        "authority_boundary",
+        "evidence_ref",
+        "evidence_sha256",
+        "previous_event_hash",
+    }
+    assert set(event) == required_fields
+    assert all(value not in (None, "", "pending", "PENDING") for value in event.values())
+    assert event["decision_kind"] == "contract_owner_attestation"
+    assert event["decision"] == "owner_approved_with_exception"
+    assert event["subject_commit_sha"] == SUBJECT_COMMIT_SHA
+    assert event["contract_sha256"] == CONTRACT_SHA256
+    assert event["subject_id"] == CONTRACT_SHA256
+    assert event["evidence_sha256"] == CONTRACT_SHA256
+    assert event["snapshot_id"] == "not_applicable_for_contract_owner_attestation"
+    assert event["previous_event_hash"] == "GENESIS"
+    assert re.fullmatch(r"\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z", event["occurred_at"])
+
+    ci = event["ci_evidence"]
+    assert ci["workflow_run_id"] == 31313816548
+    assert ci["workflow_run_number"] == 66
+    assert ci["head_sha"] == SUBJECT_COMMIT_SHA
+    assert ci["status"] == "completed"
+    assert ci["conclusion"] == "success"
+    assert {job["python_version"] for job in ci["matrix_jobs"]} == {"3.10", "3.12"}
+    assert all(job["conclusion"] == "success" for job in ci["matrix_jobs"])
+
+
+def test_contract_owner_attestation_event_hash_recomputes() -> None:
+    attestation = owner_attestation()
+    canonical = json.dumps(
+        attestation["event"], sort_keys=True, separators=(",", ":"), ensure_ascii=False
+    ).encode("utf-8")
+    assert HASH_RE.fullmatch(attestation["event_hash"])
+    assert hashlib.sha256(canonical).hexdigest() == attestation["event_hash"]
+
+
+def test_local_attestation_candidate_does_not_advance_governance_state() -> None:
+    attestation_text = OWNER_ATTESTATION.read_text(encoding="utf-8")
+    approval = APPROVAL.read_text(encoding="utf-8")
+    closure = closure_text()
+
+    assert "Artifact state: `local_candidate_not_yet_immutable`" in attestation_text
+    assert "This local file is not yet an immutable public attestation" in attestation_text
+    assert "Status: `candidate`" in approval
+    assert "immutable `contract_owner_attestation`" in approval
+    assert "Status: `NOT_CLOSED`" in closure
+    assert "`snapshot_closure_attestation` is necessarily absent" in closure
+    assert "CLOSED_WITH_SINGLE_MAINTAINER_EXCEPTION` claim" in attestation_text
 
 
 def test_hook_count_includes_repository_policy_once() -> None:
