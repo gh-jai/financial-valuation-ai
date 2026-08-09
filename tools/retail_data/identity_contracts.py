@@ -45,6 +45,51 @@ HASH_FIELDS = {
 
 _KEBAB = re.compile(r"^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$")
 
+_LOCKED_MATCH_RANKS = (
+    ("cik_exact", 0, 0),
+    ("ticker_current_exact", 0, 1),
+    ("legal_name_exact", 0, 2),
+    ("ticker_historical_exact", 10, 3),
+    ("declared_alias_exact", 10, 4),
+)
+
+_LOCKED_SCOPE_RULES = (
+    ("unsupported-financial", 10, (("regulated_capital_model_required", "equals", True),), "unsupported", "SCOPE-UNSUPPORTED-FINANCIAL"),
+    ("unsupported-reit", 20, (("issuer_class", "equals", "reit"),), "unsupported", "SCOPE-UNSUPPORTED-REIT"),
+    ("unsupported-fund", 30, (("issuer_class", "equals", "fund"),), "unsupported", "SCOPE-UNSUPPORTED-FUND"),
+    ("unsupported-etf", 31, (("issuer_class", "equals", "etf"),), "unsupported", "SCOPE-UNSUPPORTED-FUND"),
+    ("unsupported-investment-company", 32, (("issuer_class", "equals", "investment_company"),), "unsupported", "SCOPE-UNSUPPORTED-FUND"),
+    ("unsupported-non-operating-vehicle", 33, (("issuer_class", "equals", "non_operating_holding_vehicle"),), "unsupported", "SCOPE-UNSUPPORTED-FUND"),
+    ("unsupported-spac", 40, (("issuer_class", "equals", "spac_blank_check"),), "unsupported", "SCOPE-UNSUPPORTED-SPAC"),
+    ("unsupported-natural-resource", 50, (("reserve_real_option_required", "equals", True),), "unsupported", "SCOPE-UNSUPPORTED-NATURAL-RESOURCE"),
+    ("unsupported-non-us", 60, (("primary_listing_country", "not_equals", "US"),), "unsupported", "SCOPE-UNSUPPORTED-NON-US"),
+    ("unsupported-private", 61, (("public_company_status", "equals", "private"),), "unsupported", "SCOPE-UNSUPPORTED-PRIVATE"),
+    ("unsupported-non-usd", 70, (("primary_reporting_currency", "not_equals", "USD"),), "unsupported", "SCOPE-UNSUPPORTED-NON-USD"),
+    (
+        "in-scope-pending-review",
+        100,
+        (
+            ("public_company_status", "equals", "active"),
+            ("primary_listing_country", "equals", "US"),
+            ("primary_reporting_currency", "equals", "USD"),
+            ("issuer_class", "equals", "operating_non_financial"),
+            ("regulated_capital_model_required", "equals", False),
+            ("reserve_real_option_required", "equals", False),
+        ),
+        "eligible_for_data_review",
+        "SCOPE-IN-SCOPE-PENDING-REVIEW",
+    ),
+)
+
+_LOCKED_DEFERRED_ROWS = (
+    "M8-LIFECYCLE-CYCLICAL",
+    "M8-LIFECYCLE-DECLINING",
+    "M8-LIFECYCLE-DISTRESSED",
+    "M8-LIFECYCLE-GROWTH",
+    "M8-LIFECYCLE-MATURE",
+    "M8-LIFECYCLE-YOUNG",
+)
+
 
 class IdentityContractError(ValueError):
     """Raised when an M9-I2 artifact fails its strict, default-deny contract."""
@@ -356,6 +401,12 @@ def validate_identity_policy(value: Mapping[str, Any], at: datetime) -> None:
         lambda item: (item["rank"], item["precedence"], item["match_kind"]),
         "match ranks",
     )
+    actual_ranks = tuple(
+        (item["match_kind"], item["rank"], item["precedence"])
+        for item in value["match_ranks"]
+    )
+    if actual_ranks != _LOCKED_MATCH_RANKS:
+        raise IdentityContractError("identity policy rank and precedence table is not contract-locked")
     for field in (
         "allowed_query_kinds",
         "allowed_match_kinds",
@@ -380,6 +431,25 @@ def validate_scope_registry(value: Mapping[str, Any], at: datetime) -> None:
     _require_sorted_unique(
         value["deferred_matrix_rows"], lambda item: item["row_id"], "deferred rows"
     )
+    actual_rules = tuple(
+        (
+            rule["rule_id"],
+            rule["priority"],
+            tuple(
+                (predicate["field"], predicate["operator"], predicate["value"])
+                for predicate in rule["predicates"]
+            ),
+            rule["outcome"],
+            rule["reason_code"],
+        )
+        for rule in value["rules"]
+    )
+    if actual_rules != _LOCKED_SCOPE_RULES:
+        raise IdentityContractError(
+            "scope registry rule semantics are not contract-locked or are contradictory"
+        )
+    if tuple(item["row_id"] for item in value["deferred_matrix_rows"]) != _LOCKED_DEFERRED_ROWS:
+        raise IdentityContractError("scope registry deferred M8 rows are not contract-locked")
     required_reasons = {
         "SCOPE-IN-SCOPE-PENDING-REVIEW",
         "SCOPE-UNSUPPORTED-FINANCIAL",

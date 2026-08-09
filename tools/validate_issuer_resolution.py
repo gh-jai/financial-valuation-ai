@@ -31,6 +31,63 @@ SCHEMAS = {
 VALIDATOR_ID = "m9-i2-independent-validator"
 VALIDATOR_VERSION = "0.1.0"
 
+_LOCKED_MATCH_RANKS = (
+    ("cik_exact", 0, 0),
+    ("ticker_current_exact", 0, 1),
+    ("legal_name_exact", 0, 2),
+    ("ticker_historical_exact", 10, 3),
+    ("declared_alias_exact", 10, 4),
+)
+
+_LOCKED_SCOPE_RULES = (
+    ("unsupported-financial", 10, (("regulated_capital_model_required", "equals", True),), "unsupported", "SCOPE-UNSUPPORTED-FINANCIAL"),
+    ("unsupported-reit", 20, (("issuer_class", "equals", "reit"),), "unsupported", "SCOPE-UNSUPPORTED-REIT"),
+    ("unsupported-fund", 30, (("issuer_class", "equals", "fund"),), "unsupported", "SCOPE-UNSUPPORTED-FUND"),
+    ("unsupported-etf", 31, (("issuer_class", "equals", "etf"),), "unsupported", "SCOPE-UNSUPPORTED-FUND"),
+    ("unsupported-investment-company", 32, (("issuer_class", "equals", "investment_company"),), "unsupported", "SCOPE-UNSUPPORTED-FUND"),
+    ("unsupported-non-operating-vehicle", 33, (("issuer_class", "equals", "non_operating_holding_vehicle"),), "unsupported", "SCOPE-UNSUPPORTED-FUND"),
+    ("unsupported-spac", 40, (("issuer_class", "equals", "spac_blank_check"),), "unsupported", "SCOPE-UNSUPPORTED-SPAC"),
+    ("unsupported-natural-resource", 50, (("reserve_real_option_required", "equals", True),), "unsupported", "SCOPE-UNSUPPORTED-NATURAL-RESOURCE"),
+    ("unsupported-non-us", 60, (("primary_listing_country", "not_equals", "US"),), "unsupported", "SCOPE-UNSUPPORTED-NON-US"),
+    ("unsupported-private", 61, (("public_company_status", "equals", "private"),), "unsupported", "SCOPE-UNSUPPORTED-PRIVATE"),
+    ("unsupported-non-usd", 70, (("primary_reporting_currency", "not_equals", "USD"),), "unsupported", "SCOPE-UNSUPPORTED-NON-USD"),
+    (
+        "in-scope-pending-review",
+        100,
+        (
+            ("public_company_status", "equals", "active"),
+            ("primary_listing_country", "equals", "US"),
+            ("primary_reporting_currency", "equals", "USD"),
+            ("issuer_class", "equals", "operating_non_financial"),
+            ("regulated_capital_model_required", "equals", False),
+            ("reserve_real_option_required", "equals", False),
+        ),
+        "eligible_for_data_review",
+        "SCOPE-IN-SCOPE-PENDING-REVIEW",
+    ),
+)
+
+_LOCKED_DEFERRED_ROWS = (
+    "M8-LIFECYCLE-CYCLICAL",
+    "M8-LIFECYCLE-DECLINING",
+    "M8-LIFECYCLE-DISTRESSED",
+    "M8-LIFECYCLE-GROWTH",
+    "M8-LIFECYCLE-MATURE",
+    "M8-LIFECYCLE-YOUNG",
+)
+
+_SCOPE_MESSAGES = {
+    "SCOPE-UNSUPPORTED-FINANCIAL": "The issuer requires an unsupported financial valuation model.",
+    "SCOPE-UNSUPPORTED-REIT": "REIT issuers are outside the approved structural scope.",
+    "SCOPE-UNSUPPORTED-FUND": "Fund and non-operating vehicles are outside structural scope.",
+    "SCOPE-UNSUPPORTED-SPAC": "SPAC and blank-check issuers are outside structural scope.",
+    "SCOPE-UNSUPPORTED-NATURAL-RESOURCE": "Reserve real-option cases are outside scope.",
+    "SCOPE-UNSUPPORTED-NON-US": "Non-US primary listings are outside structural scope.",
+    "SCOPE-UNSUPPORTED-NON-USD": "Non-USD reporting issuers are outside structural scope.",
+    "SCOPE-UNSUPPORTED-PRIVATE": "Private companies are outside structural scope.",
+    "SCOPE-INSUFFICIENT-EVIDENCE": "Structural identity evidence is missing or contradictory.",
+}
+
 
 def _plain(value: Any) -> Any:
     if isinstance(value, Mapping):
@@ -168,6 +225,127 @@ def _subject(kind: str, identifier: str, digest: str) -> dict[str, str]:
     return {"artifact_kind": kind, "artifact_id": identifier, "artifact_hash": digest}
 
 
+def _scope_rule_tuple(rule: Mapping[str, Any]) -> tuple[Any, ...]:
+    return (
+        rule["rule_id"],
+        rule["priority"],
+        tuple(
+            (predicate["field"], predicate["operator"], predicate["value"])
+            for predicate in rule["predicates"]
+        ),
+        rule["outcome"],
+        rule["reason_code"],
+    )
+
+
+def _scope_matches(identity: Mapping[str, Any], predicates: Sequence[Mapping[str, Any]]) -> bool:
+    for predicate in predicates:
+        field = predicate["field"]
+        if field not in identity:
+            return False
+        if predicate["operator"] == "equals" and identity[field] != predicate["value"]:
+            return False
+        if predicate["operator"] == "not_equals" and identity[field] == predicate["value"]:
+            return False
+    return True
+
+
+def _scope_error(code: str, identity_id: str) -> dict[str, Any]:
+    return {
+        "code": code,
+        "message": _SCOPE_MESSAGES[code],
+        "severity": "blocking",
+        "retryable": False,
+        "artifact_refs": [identity_id],
+        "next_action": "verify_identity" if code == "SCOPE-INSUFFICIENT-EVIDENCE" else "stop",
+    }
+
+
+def _independent_scope(
+    identity: Mapping[str, Any], registry: Mapping[str, Any], policy: Mapping[str, Any], at: datetime
+) -> dict[str, Any]:
+    observed = _utc(identity["identity_observed_at"])
+    age = int((at - observed).total_seconds())
+    if age < 0 or age > policy["max_identity_age_seconds"]:
+        raise ValueError("identity is not fresh at scope evaluation")
+    if identity["listing_status"] != "active" or identity["listing_effective_to"] is not None:
+        raise ValueError("identity is not actively listed at scope evaluation")
+
+    required = {
+        "public_company_status",
+        "primary_listing_country",
+        "primary_reporting_currency",
+        "issuer_class",
+        "regulated_capital_model_required",
+        "reserve_real_option_required",
+        "exchange_code",
+    }
+    recognized = (
+        identity.get("issuer_class") in policy["issuer_classes"]
+        and identity.get("public_company_status") in policy["public_company_statuses"]
+        and identity.get("exchange_code") in policy["synthetic_exchange_codes"]
+    )
+    financial_classes = {
+        "bank",
+        "deposit_taking",
+        "insurer",
+        "broker_dealer",
+        "other_regulated_capital_financial",
+    }
+    classification_consistent = not (
+        (
+            identity.get("issuer_class") == "operating_non_financial"
+            and identity.get("regulated_capital_model_required") is not False
+        )
+        or (
+            identity.get("issuer_class") in financial_classes
+            and identity.get("regulated_capital_model_required") is not True
+        )
+    )
+    matched = [
+        rule for rule in registry["rules"] if _scope_matches(identity, rule["predicates"])
+    ]
+    unsupported = [rule for rule in matched if rule["outcome"] == "unsupported"]
+    eligible = [rule for rule in matched if rule["outcome"] == "eligible_for_data_review"]
+    if required - identity.keys() or not recognized or not classification_consistent or (unsupported and eligible):
+        outcome = "insufficient_evidence"
+        rule_ids: list[str] = []
+        reasons = ["SCOPE-INSUFFICIENT-EVIDENCE"]
+        errors = [_scope_error(reasons[0], identity["verified_identity_id"])]
+        is_eligible = False
+    elif unsupported:
+        outcome = "unsupported"
+        rule_ids = [rule["rule_id"] for rule in unsupported]
+        reasons = [rule["reason_code"] for rule in unsupported]
+        errors = [_scope_error(code, identity["verified_identity_id"]) for code in reasons]
+        errors.sort(
+            key=lambda item: (
+                item["code"], item["message"], "|".join(item["artifact_refs"]), item["next_action"]
+            )
+        )
+        is_eligible = False
+    elif len(eligible) == 1:
+        outcome = "eligible_for_data_review"
+        rule_ids = [eligible[0]["rule_id"]]
+        reasons = [eligible[0]["reason_code"]]
+        errors = []
+        is_eligible = True
+    else:
+        outcome = "insufficient_evidence"
+        rule_ids = []
+        reasons = ["SCOPE-INSUFFICIENT-EVIDENCE"]
+        errors = [_scope_error(reasons[0], identity["verified_identity_id"])]
+        is_eligible = False
+    return {
+        "structural_rule_ids": rule_ids,
+        "deferred_matrix_row_ids": [item["row_id"] for item in registry["deferred_matrix_rows"]],
+        "reason_codes": reasons,
+        "blocking_errors": errors,
+        "outcome": outcome,
+        "eligible_for_m9_data_review": is_eligible,
+    }
+
+
 def validate_issuer_resolution(
     *,
     company_request: Mapping[str, Any],
@@ -267,6 +445,14 @@ def validate_issuer_resolution(
         )
         if policy["match_ranks"] != expected_ranks:
             findings.append(_finding("identity-policy rank order is not canonical", "identity_policy"))
+        actual_ranks = tuple(
+            (item["match_kind"], item["rank"], item["precedence"])
+            for item in policy["match_ranks"]
+        )
+        if actual_ranks != _LOCKED_MATCH_RANKS:
+            findings.append(_finding("identity-policy rank semantics are not contract-locked", "identity_policy"))
+        if catalog.get("adapter_id") not in policy.get("synthetic_adapter_ids", []):
+            findings.append(_finding("catalog adapter is not authorized by identity policy", "identity_catalog"))
         expected = _independent_matches(catalog, policy, request, at)
         actual = [
             (
@@ -329,6 +515,16 @@ def validate_issuer_resolution(
     identity = optional["verified_identity"]
     registry = optional["scope_registry"]
     decision = optional["scope_decision"]
+    if registry is not None:
+        try:
+            actual_rules = tuple(_scope_rule_tuple(rule) for rule in registry["rules"])
+            actual_rows = tuple(item["row_id"] for item in registry["deferred_matrix_rows"])
+            if actual_rules != _LOCKED_SCOPE_RULES:
+                findings.append(_finding("scope-registry semantics are not contract-locked", "scope_registry"))
+            if actual_rows != _LOCKED_DEFERRED_ROWS:
+                findings.append(_finding("scope-registry deferred rows are not contract-locked", "scope_registry"))
+        except (KeyError, TypeError, ValueError):
+            findings.append(_finding("scope-registry semantic closure failed", "scope_registry"))
     selectable = candidates.get("status") in {"unique_candidate", "selection_required"}
     if not selectable and any(item is not None for item in (selected, identity, decision)):
         findings.append(_finding("downstream artifact exists after blocking stop", "candidate_set"))
@@ -390,10 +586,20 @@ def validate_issuer_resolution(
                     or not _envelope_active(policy, _utc(identity["verified_at"]))
                 ):
                     findings.append(_finding("verified identity freshness mismatch", "verified_identity"))
+            identity_refs = {
+                "selection_id": selected.get("selection_id"),
+                "selection_hash": selected.get("selection_hash"),
+                "candidate_set_hash": candidates.get("candidate_set_hash"),
+                "selected_candidate_hash": selected.get("selected_candidate_hash"),
+                "freshness_policy_ref": policy.get("identity_policy_hash"),
+            }
+            if any(identity.get(field) != expected for field, expected in identity_refs.items()):
+                findings.append(_finding("verified identity references do not close", "verified_identity"))
     if decision is not None:
         if identity is None or registry is None:
             findings.append(_finding("scope decision lacks identity or registry", "scope_decision"))
         else:
+            decision_at: datetime | None = None
             try:
                 decision_at = _utc(decision["evaluated_at"])
                 decision_times_valid = (
@@ -412,20 +618,25 @@ def validate_issuer_resolution(
                 )
             except (KeyError, OSError, TypeError):
                 matrix_valid = False
-            supported = (
-                identity.get("listing_status") == "active"
-                and identity.get("primary_listing_country") == "US"
-                and identity.get("primary_reporting_currency") == "USD"
-                and identity.get("issuer_class") == "operating_non_financial"
-                and identity.get("regulated_capital_model_required") is False
-                and identity.get("reserve_real_option_required") is False
+            try:
+                if decision_at is None:
+                    raise ValueError("scope decision time is invalid")
+                expected_scope = _independent_scope(identity, registry, policy, decision_at)
+                scope_fields_valid = all(
+                    decision.get(field) == expected for field, expected in expected_scope.items()
+                )
+            except (KeyError, TypeError, ValueError):
+                scope_fields_valid = False
+            scope_refs_valid = (
+                decision.get("verified_identity_id") == identity.get("verified_identity_id")
+                and decision.get("verified_identity_hash") == identity.get("verified_identity_hash")
+                and decision.get("scope_registry_id") == registry.get("scope_registry_id")
+                and decision.get("scope_registry_version") == registry.get("scope_registry_version")
+                and decision.get("scope_registry_hash") == registry.get("scope_registry_hash")
             )
-            expected_outcome = "eligible_for_data_review" if supported else "unsupported"
             if (
-                decision.get("verified_identity_hash") != identity.get("verified_identity_hash")
-                or decision.get("scope_registry_hash") != registry.get("scope_registry_hash")
-                or decision.get("outcome") != expected_outcome
-                or decision.get("eligible_for_m9_data_review") is not supported
+                not scope_refs_valid
+                or not scope_fields_valid
                 or decision.get("lifecycle_route_status") != "not_evaluated"
                 or not decision_times_valid
                 or not matrix_valid

@@ -118,6 +118,22 @@ def test_exact_resolution_vectors_are_deterministic(query: dict, kind: str, arti
 def test_nfkc_casefold_and_whitespace_do_not_enable_fuzzy_matching(artifacts) -> None:
     kind, value = normalize_query(request({"kind": "company_name", "company_name": "  Ａｍｂｉｇｕｏｕｓ   SYNTHETIC industries  "}))
     assert (kind, value) == ("company_name", "ambiguous synthetic industries")
+
+
+def test_resolver_rejects_catalog_adapter_outside_policy_allowlist(artifacts) -> None:
+    catalog = copy.deepcopy(artifacts[0])
+    catalog["adapter_id"] = "unapproved-synthetic-adapter"
+    catalog = rehash_catalog(catalog)
+    with pytest.raises(ResolutionStop) as stopped:
+        resolve_issuer(
+            request({"kind": "ticker", "ticker": "ZXQA"}, "ADAPTER"),
+            catalog,
+            artifacts[1],
+            resolution_at=AT,
+            candidate_set_id="ICS-SYNTH-ADAPTER",
+        )
+    assert stopped.value.error.code == "IDENTITY-POLICY-DENIED"
+    assert stopped.value.error.artifact_refs == ("adapter:unapproved-synthetic-adapter",)
     no_match = resolve_issuer(request({"kind": "company_name", "company_name": "Northstar"}), artifacts[0], artifacts[1], resolution_at=AT, candidate_set_id="ICS-SYNTH-2")
     assert no_match["status"] == "not_found" and not no_match["candidates"]
 

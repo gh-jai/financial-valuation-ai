@@ -6,6 +6,7 @@ import pytest
 
 from tools.retail_data.identity_contracts import (
     IdentityContractError,
+    attach_hash,
     strict_load,
     validate_identity_catalog,
     validate_identity_policy,
@@ -71,3 +72,41 @@ def test_fixture_adapter_rejects_paths_unknown_ids_and_environment_shape() -> No
         with pytest.raises(ResolutionStop) as stopped:
             load_synthetic_catalog(value, AT)
         assert stopped.value.error.code == "IDENTITY-CATALOG-DENIED"
+
+
+def test_policy_rejects_schema_valid_rehashed_rank_semantic_drift() -> None:
+    policy = strict_load(POLICY)
+    policy["match_ranks"][1]["precedence"] = 2
+    policy["match_ranks"][2]["precedence"] = 1
+    policy["match_ranks"].sort(
+        key=lambda item: (item["rank"], item["precedence"], item["match_kind"])
+    )
+    mutated = attach_hash(
+        {key: value for key, value in policy.items() if key != "identity_policy_hash"},
+        "identity_policy_hash",
+    )
+    with pytest.raises(IdentityContractError, match="rank and precedence table"):
+        validate_identity_policy(mutated, AT)
+
+
+def test_scope_registry_rejects_rehashed_contradictory_rule_semantics() -> None:
+    registry = strict_load(SCOPE)
+    registry["rules"][8]["outcome"] = "eligible_for_data_review"
+    mutated = attach_hash(
+        {key: value for key, value in registry.items() if key != "scope_registry_hash"},
+        "scope_registry_hash",
+    )
+    with pytest.raises(IdentityContractError, match="contract-locked or are contradictory"):
+        validate_scope_registry(mutated, AT)
+
+
+def test_scope_registry_rejects_rehashed_deferred_row_substitution() -> None:
+    registry = strict_load(SCOPE)
+    registry["deferred_matrix_rows"][0]["row_id"] = "M8-LIFECYCLE-FICTIONAL"
+    registry["deferred_matrix_rows"].sort(key=lambda item: item["row_id"])
+    mutated = attach_hash(
+        {key: value for key, value in registry.items() if key != "scope_registry_hash"},
+        "scope_registry_hash",
+    )
+    with pytest.raises(IdentityContractError, match="deferred M8 rows"):
+        validate_scope_registry(mutated, AT)

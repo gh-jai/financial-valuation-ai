@@ -368,6 +368,10 @@ def resolve_issuer(
         validate_identity_policy(policy_plain, at)
     except IdentityContractError as exc:
         raise ResolutionStop(_error("IDENTITY-POLICY-DENIED", "policy:denied")) from exc
+    if catalog_plain["adapter_id"] not in policy_plain["synthetic_adapter_ids"]:
+        raise ResolutionStop(
+            _error("IDENTITY-POLICY-DENIED", f"adapter:{catalog_plain['adapter_id']}")
+        )
     if query_kind not in policy_plain["allowed_query_kinds"]:
         raise ResolutionStop(_error("IDENTITY-POLICY-DENIED", "policy:query-kind"))
     request_hash = canonical_sha256(request_plain)
