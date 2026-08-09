@@ -34,17 +34,32 @@ are post-M7 product and governance checkpoints, not a new operational implementa
 M9 planning baseline was merged through PR #19 as `d129d3e`. M9-I1 was subsequently reviewed,
 hardened, validated, and merged through PR #20 as `7b2b2d2`. It contains only offline errors,
 hashing, and default-deny registry primitives, so the project current state remains M7. The merge
-does not authorize M9-I2 through M9-I6, live retrieval, provider activation, real-company fixtures,
-user uploads, API, LLM, or UI work. Qualified legal/compliance, provider-license, privacy, security,
-accessibility, and real-company evidence remain later gates.
+does not authorize M9-I2 runtime, M9-I3 through M9-I6, live retrieval, provider activation,
+real-company fixtures, user uploads, API, LLM, or UI work. The first M9-I2 issuer-resolution
+contract candidate was independently reviewed and approved by the project owner on 2026-08-09,
+but a later documentation/governance review blocked repository publication. The revised exact-hash
+contract and external review/approval record passed independent review, and the project owner
+approved that exact SHA on 2026-08-09 for the contract boundary only. Neither approval authorizes
+implementation or publication. Package-final closure is not asserted by this status summary; it
+is controlled by the exact-snapshot evidence in
+`docs/milestones/M9-I2-post-owner-approval-snapshot-closure.md`. Qualified
+legal/compliance, provider-license, privacy, security, accessibility, and real-company evidence
+remain later gates.
 
 State terms used below are intentionally distinct:
 
 - **Current operational state:** M7 is the latest complete end-to-end implementation milestone.
 - **Merged post-M7 checkpoints:** M8's contract/review, the M9 planning baseline, and the bounded
   M9-I1 offline foundation are on `main`; none alone advances the current operational state.
-- **Unauthorized:** M9-I2 through M9-I6, issuer/data acquisition, live SEC/provider access, and
-  every later product or release capability.
+- **Owner-approved contract boundary:** the revised M9-I2 issuer-resolution contract is
+  frozen at exact SHA-256 `4c596e806896a9693dd95766b7f5d3207c7f0969ee69e4aeeed05ab5e1e016ad`
+  and has an independent `PASS` plus exact-SHA project-owner approval dated 2026-08-09. This does
+  not authorize publication or implementation.
+- **Post-owner-approval package closure:** this summary does not independently assert closure. The
+  authoritative state is the recomputable exact-snapshot manifest and reviewer attestation in
+  `docs/milestones/M9-I2-post-owner-approval-snapshot-closure.md`.
+- **Unauthorized:** M9-I2 runtime, M9-I3 through M9-I6, issuer/data acquisition, live SEC/provider
+  access, and every later product or release capability.
 
 Current mainline architecture:
 
@@ -455,7 +470,8 @@ authorized that planning on 2026-08-08; the decision did not authorize implement
 
 ### M9 — Public data ingestion and accounting normalization
 
-Status: Planning baseline and bounded M9-I1 offline foundation merged; operational state remains M7
+Status: Planning baseline and bounded M9-I1 offline foundation merged; revised M9-I2 exact-SHA
+contract boundary independently reviewed and owner-approved; operational state remains M7
 
 M9-I1 merge commit: `7b2b2d2481a6a95e76156fedf39975381811fdea`
 
@@ -463,6 +479,18 @@ Planning artifact:
 
 - `docs/milestones/M9-public-data-ingestion-normalization-plan.md`
 - `templates/m9-implementation-planning-review-checklist.md`
+
+Revised M9-I2 contract lock and governance record:
+
+- `docs/milestones/M9-I2-issuer-resolution-contract-lock.md`
+- `docs/milestones/M9-I2-contract-lock-review-approval-record.md`
+- `docs/milestones/M9-I2-post-owner-approval-snapshot-closure.md`
+- Contract SHA-256: `4c596e806896a9693dd95766b7f5d3207c7f0969ee69e4aeeed05ab5e1e016ad`
+- Current independent review: `PASS` on 2026-08-09
+- Current project-owner approval: `APPROVED` on 2026-08-09 for the contract boundary only; the prior
+  SHA approval is historical only
+- Package-final closure: do not infer from this summary; recompute and inspect the exact-snapshot
+  closure evidence record
 
 The approved baseline ends M9 at an independently validated normalized-financials handoff. It divides
 implementation into six separately approved slices covering primitives and registries, issuer
@@ -475,7 +503,9 @@ implementation-separated hash recomputation, a strict provider/license registry,
 FCFF/equity-bridge concept vocabulary. SEC entries remain pending, all storage/display/export/
 redistribution rights are false, and `live_activation` is `disabled`. There is no transport,
 provider payload, credential, issuer resolver, storage, normalization, API, CLI, LLM, UI, or
-valuation behavior. M9-I2 through M9-I6 remain unauthorized.
+valuation behavior. The revised M9-I2 contract lock has passed exact-SHA independent review and
+received contract-boundary owner approval; M9-I2 runtime and M9-I3 through M9-I6 remain
+unauthorized.
 
 ## Current governed artifact graph
 
@@ -510,13 +540,13 @@ Approved M1-M6 route → WFL-AGT-001 exact-hash orchestration → independent re
 
 Latest merged change CI:
 
-- GitHub Actions Validate run #60 for the PR #21 status-document synchronization
+- GitHub Actions Validate run #62 for the PR #22 handoff-document synchronization
 - Python 3.10: Passed
 - Python 3.12: Passed
 
-PR #21 merged the M7/M9-I1 status clarification as
-`e805b54dabef039cb1acfd9e72a40768ea9e74eb`. It changed only `PROJECT_STATUS.md` and did not alter
-the operational implementation, authorize M9-I2+, or add live-data capability.
+PR #22 merged the handoff-document synchronization as
+`3945e90559ec2e10771489078c9e8f52036209b7`. It did not alter the operational implementation,
+authorize M9-I2 runtime or later slices, or add live-data capability.
 
 M9-I1 passed local validation, independent code/governance review, and PR #20 remote matrix
 validation on Python 3.10 and Python 3.12 before merge commit `7b2b2d2`. This bounded offline
@@ -620,10 +650,15 @@ M3 failure probabilities and recovery values are deterministic reviewed assumpti
 
 M8's internal review, the M9 planning merge, and the bounded M9-I1 offline-foundation merge are
 complete. The project current state remains M7 because no issuer workflow or end-to-end M9 data
-ingestion capability exists. The next possible checkpoint is a separately authorized M9-I2 issuer-
-resolution contract and implementation. The M9-I1 merge must not be confused with authority to
-implement M9-I2+, retrieve live data, enable a provider, select an issuer, acquire pilot data, or
-distribute a retail report.
+ingestion capability exists. The first M9-I2 issuer-resolution contract candidate completed five
+independent review rounds and received exact-hash project-owner approval, but that SHA was later
+superseded for repository publication by a revised documentation/governance candidate. That
+revised exact SHA has now passed independent review and received project-owner approval for the
+contract boundary only. Package-final closure must be established only by the exact-snapshot
+evidence record, not by this summary. The next checkpoint requires separate authorization and must
+not be inferred from this approval. No contract state or M9-I1 merge
+authorizes live data, provider enablement, real issuer selection, pilot acquisition, or report
+distribution.
 
 Recommended sequencing:
 
@@ -635,8 +670,10 @@ M7: Merged implementation and remote Python 3.10/3.12 validation complete
 → M9: Public-data ingestion and accounting-normalization planning baseline
 → Planning review and approval complete
 → M9-I1 bounded offline primitives reviewed, validated, and merged through PR #20
+→ Initial M9-I2 contract SHA independently reviewed and approved, then superseded for publication
+→ Revised M9-I2 exact-SHA contract independently reviewed and owner-approved at the contract boundary
 → Current operational implementation state remains M7
-→ Separate authorization for M9-I2 and each later implementation slice
+→ Separate authorization remains required for M9-I2 implementation and each later slice
 ```
 
 M8 has locked:
@@ -678,6 +715,9 @@ Minimum startup instruction:
 Read PROJECT_STATUS.md, README.md, ROADMAP.md,
 docs/milestones/M8-retail-product-safety-contract.md,
 docs/milestones/M9-public-data-ingestion-normalization-plan.md,
+docs/milestones/M9-I2-issuer-resolution-contract-lock.md,
+docs/milestones/M9-I2-contract-lock-review-approval-record.md,
+docs/milestones/M9-I2-post-owner-approval-snapshot-closure.md,
 and the existing M1-M7 workflows before proposing or implementing M9.
 
 Do not alter completed milestone contracts without identifying a concrete defect.
@@ -686,5 +726,10 @@ Preserve composition with WFL-NAR-001, WFL-VAL-001, WFL-YNG-001,
 WFL-GRW-001, WFL-DST-001, WFL-CYC-001, and WFL-AGT-001.
 Do not treat draft M8 schemas as implemented ingestion or a retail-ready release.
 Treat M9-I1 only as a merged bounded offline foundation. The current operational implementation
-state remains M7. Do not infer M9-I2+ or live-network authority from the M9-I1 merge.
+state remains M7. Treat the revised M9-I2 contract lock at SHA-256
+4c596e806896a9693dd95766b7f5d3207c7f0969ee69e4aeeed05ab5e1e016ad as independently reviewed and
+owner-approved for the contract boundary only, as recorded in the external exact-SHA record. Do
+not infer package closure from this summary; verify it from the exact-snapshot closure evidence.
+Do not infer publication, M9-I2 implementation, M9-I3+, or live-network authority from any
+contract state or closure state.
 ```
