@@ -552,9 +552,10 @@ the suite to 125. M5 brought the merged suite to 179 passing tests. M6 brought t
 242 passing tests, and M7 brought it to 275. The merged P0+M8 contract checkpoint added 10 contract
 tests for 285; the cross-functional review added two conditional-schema regressions for 287. The
 merged M9 planning baseline adds five planning-contract tests for 292. The reconstructed M9-I1
-publication candidate adds 27 offline primitive and governance tests for a local total of 319,
-without changing M1-M8 valuation behavior. PR #19 planning CI passed before merge; I1 remote CI is
-not claimed until its Draft PR reports checks.
+publication candidate and review remediation add 33 offline primitive and governance tests for a
+total of 325, without changing M1-M8 valuation behavior. PR #19 planning CI passed before merge;
+Draft PR #20 Validate run #57 passed all validators, policy checks, and tests on Python 3.10 and
+3.12.
 
 ## Source and copyright policy
 

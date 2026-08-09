@@ -37,15 +37,18 @@ Network state: Denied; no transport implementation exists
 
 ## Exit-evidence checklist
 
-- [x] Canonical JSON unit vectors cover ordering, Unicode, compact encoding, mutation, invalid
-  types, unknown versions, and non-finite numbers.
+- [x] Canonical JSON unit vectors cover ordering, Unicode, compact encoding, general immutable
+  mappings, mutation, invalid types, unknown versions, and non-finite numbers.
 - [x] Production and implementation-separated SHA-256 implementations match the same vectors.
 - [x] Error tests cover stable shape, retry/action consistency, identifier safety, duplicate
-  references, bounded messages, nested secret fields, authorization headers, and query secrets.
+  references, invalid reference containers, bounded messages, nested secret fields, authorization
+  and cookie headers, session credentials, named credentials, and query secrets.
 - [x] Registry tests cover exact rights, default deny, status, expiry, territory, category,
-  unknown fields, duplicate identifiers, disabled live activation, and post-load mutation.
+  canonical registry identity/schema, endpoint-host allowlisting, unknown fields, duplicate
+  identifiers, disabled live activation, and post-load mutation.
 - [x] Committed registries contain only synthetic/governance metadata and no provider payload.
-- [x] Reconstructed candidate passes 319 tests, including all M1-M8 regressions.
+- [x] Review-remediated candidate passes 325 tests, including all M1-M8 regressions.
+- [x] Draft PR #20 Validate run #57 passes on Python 3.10 and 3.12.
 - [x] Human implementation review complete.
 - [x] Stage, commit, push, and Draft PR authorized.
 
