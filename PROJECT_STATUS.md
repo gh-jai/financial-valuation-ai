@@ -6,6 +6,10 @@ Repository: `gh-jai/financial-valuation-ai`
 
 ## Current state
 
+**Current operational implementation milestone: M7 — Governed agentization.**
+
+M7 remains the latest complete end-to-end implementation milestone.
+
 The repository has merged eight implementation milestones through delivery PR #16:
 
 - M0 — Repository foundation
@@ -25,19 +29,20 @@ M6 contract-first planning, source-fidelity/financial review, repository-wide im
 
 M7 governed agentization is complete and merged through PR #16. It adds 20 reviewed claims, four Knowledge artifacts, five Skills, five agents, five prompts, `WFL-AGT-001`, five strict schemas, a deny-by-default registry, exact-hash handoffs, two human-only approvals, append-only events, executor/reviewer separation, offline adapters, independent validation, and three synthetic governance benchmarks. PR #16 Actions run #48 passed on Python 3.10 and 3.12 and merged as `75503192255053bffa42f2a2debe9a2668fe6f96`. The merged suite reports 275 passing tests.
 
-P0 publication-state synchronization and the M8 cross-functional design review are complete. The
-M9 planning baseline was merged through PR #19 as `d129d3e`. The project owner separately
-authorized and approved the local M9-I1 implementation baseline, then authorized its publication
-steps. The resulting candidate contains only offline errors, hashing, and default-deny registry
-primitives. It does not authorize M9-I2 through M9-I6, live retrieval, provider activation,
-real-company fixtures, user uploads, API, LLM, or UI work. Qualified legal/compliance,
-provider-license, privacy, security, accessibility, and real-company evidence remain later gates.
+P0 publication-state synchronization and the M8 cross-functional design review are complete. These
+are post-M7 product and governance checkpoints, not a new operational implementation milestone. The
+M9 planning baseline was merged through PR #19 as `d129d3e`. M9-I1 was subsequently reviewed,
+hardened, validated, and merged through PR #20 as `7b2b2d2`. It contains only offline errors,
+hashing, and default-deny registry primitives, so the project current state remains M7. The merge
+does not authorize M9-I2 through M9-I6, live retrieval, provider activation, real-company fixtures,
+user uploads, API, LLM, or UI work. Qualified legal/compliance, provider-license, privacy, security,
+accessibility, and real-company evidence remain later gates.
 
 State terms used below are intentionally distinct:
 
-- **Merged:** M1-M8 and the M9 planning baseline are on `main`.
-- **Approved publication candidate:** M9-I1 is approved and reconstructed on its feature branch;
-  it is not part of `main` until a later merge decision.
+- **Current operational state:** M7 is the latest complete end-to-end implementation milestone.
+- **Merged post-M7 checkpoints:** M8's contract/review, the M9 planning baseline, and the bounded
+  M9-I1 offline foundation are on `main`; none alone advances the current operational state.
 - **Unauthorized:** M9-I2 through M9-I6, issuer/data acquisition, live SEC/provider access, and
   every later product or release capability.
 
@@ -59,7 +64,7 @@ Evidence
 → Exact-hash Human-Gated Agent Review and Memo
 ```
 
-The M9-I1 candidate adds a separate offline foundation before any issuer workflow:
+The merged M9-I1 slice adds a separate offline foundation before any issuer workflow:
 
 ```text
 Safe structured errors and bounded redaction
@@ -450,7 +455,9 @@ authorized that planning on 2026-08-08; the decision did not authorize implement
 
 ### M9 — Public data ingestion and accounting normalization
 
-Status: Planning baseline merged; M9-I1 implementation baseline approved for publication
+Status: Planning baseline and bounded M9-I1 offline foundation merged; operational state remains M7
+
+M9-I1 merge commit: `7b2b2d2481a6a95e76156fedf39975381811fdea`
 
 Planning artifact:
 
@@ -501,13 +508,15 @@ Approved M1-M6 route → WFL-AGT-001 exact-hash orchestration → independent re
 
 ## Validation and CI
 
-Latest merged implementation PR CI:
+Latest merged change CI:
 
-- GitHub Actions run 48
+- GitHub Actions Validate run #58
 - Python 3.10: Passed
 - Python 3.12: Passed
 
-The M7 implementation passed local validation and PR #16 remote matrix validation on Python 3.10 and Python 3.12 before merge commit `7550319`.
+M9-I1 passed local validation, independent code/governance review, and PR #20 remote matrix
+validation on Python 3.10 and Python 3.12 before merge commit `7b2b2d2`. This bounded offline
+foundation does not change M7's status as the latest complete operational implementation milestone.
 
 Validated controls include:
 
@@ -551,11 +560,10 @@ At M3 completion, the full suite reported 88 passing tests. M4 and its final rev
 the suite to 125. M5 brought the merged suite to 179 passing tests. M6 brought the merged suite to
 242 passing tests, and M7 brought it to 275. The merged P0+M8 contract checkpoint added 10 contract
 tests for 285; the cross-functional review added two conditional-schema regressions for 287. The
-merged M9 planning baseline adds five planning-contract tests for 292. The reconstructed M9-I1
-publication candidate and review remediation add 33 offline primitive and governance tests for a
-total of 325, without changing M1-M8 valuation behavior. PR #19 planning CI passed before merge;
-Draft PR #20 Validate run #57 passed all validators, policy checks, and tests on Python 3.10 and
-3.12.
+merged M9 planning baseline adds five planning-contract tests for 292. The merged M9-I1
+implementation and review remediation add 33 offline primitive and governance tests for a total of
+325, without changing M1-M8 valuation behavior. PR #19 planning CI passed before merge; final-head
+PR #20 Validate run #58 passed all validators, policy checks, and tests on Python 3.10 and 3.12.
 
 ## Source and copyright policy
 
@@ -606,11 +614,12 @@ M3 failure probabilities and recovery values are deterministic reviewed assumpti
 
 ## Recommended next milestone
 
-M8's internal review and the M9 planning merge are complete. M9-I1 implementation, baseline review,
-and publication authorization are complete. The next checkpoint after creating the Draft PR is its
-review; Mark Ready, approval, and merge each remain separate decisions. I1 approval must not be
-confused with authority to implement M9-I2+, retrieve live data, enable a provider, select an
-issuer, acquire pilot data, or distribute a retail report.
+M8's internal review, the M9 planning merge, and the bounded M9-I1 offline-foundation merge are
+complete. The project current state remains M7 because no issuer workflow or end-to-end M9 data
+ingestion capability exists. The next possible checkpoint is a separately authorized M9-I2 issuer-
+resolution contract and implementation. The M9-I1 merge must not be confused with authority to
+implement M9-I2+, retrieve live data, enable a provider, select an issuer, acquire pilot data, or
+distribute a retail report.
 
 Recommended sequencing:
 
@@ -621,8 +630,9 @@ M7: Merged implementation and remote Python 3.10/3.12 validation complete
 → Project-owner planning authorization complete
 → M9: Public-data ingestion and accounting-normalization planning baseline
 → Planning review and approval complete
-→ M9-I1 offline primitives approved for Draft PR publication
-→ Separate approval for each later implementation slice
+→ M9-I1 bounded offline primitives reviewed, validated, and merged through PR #20
+→ Current operational implementation state remains M7
+→ Separate authorization for M9-I2 and each later implementation slice
 ```
 
 M8 has locked:
@@ -671,6 +681,6 @@ Do not commit private source material.
 Preserve composition with WFL-NAR-001, WFL-VAL-001, WFL-YNG-001,
 WFL-GRW-001, WFL-DST-001, WFL-CYC-001, and WFL-AGT-001.
 Do not treat draft M8 schemas as implemented ingestion or a retail-ready release.
-Treat only M9-I1 as an approved offline implementation candidate. Do not infer M9-I2+ or
-live-network authority from its approval.
+Treat M9-I1 only as a merged bounded offline foundation. The current operational implementation
+state remains M7. Do not infer M9-I2+ or live-network authority from the M9-I1 merge.
 ```
