@@ -51,11 +51,13 @@ and judgment vertical slices. M7 completes the governed `Workflow -> Agent -> Pr
 without granting agents autonomous approval, private-source, network, shell, or trading authority.
 M8's cross-functional design review and the M9 planning baseline are merged. M9-I1 is a merged
 offline foundation containing errors, hashing, and default-deny registry primitives. The revised
-M9-I2 issuer-resolution contract bytes are frozen at an exact SHA, but the historical review and
-owner-approval assertions lack durable actor, UTC timestamp, immutable-reference, and event-chain
-evidence. Governance therefore fails closed to `candidate`; publication, runtime, M9-I3 through
-M9-I6, and every live-data capability remain separately gated. Package closure is `NOT_CLOSED` as
-recorded by the recomputable manifest and evidence assessment in
+M9-I2 issuer-resolution contract bytes now define a narrow single-maintainer
+documentation-governance exception without weakening runtime separation or later qualified-review
+gates. No immutable subject commit, exact-subject-commit remote CI evidence, or first-stage owner
+attestation exists yet, so governance still fails closed to `candidate`; publication, runtime,
+M9-I3 through M9-I6, and every live-data
+capability remain separately gated. Package closure is `NOT_CLOSED` as recorded by the recomputable
+manifest and evidence assessment in
 `docs/milestones/M9-I2-post-owner-approval-snapshot-closure.md`, not by this summary. M9-M14 are the
 retail-product delivery path; no live issuer ingestion or user interface exists. See
 [ROADMAP.md](ROADMAP.md) and [PROJECT_STATUS.md](PROJECT_STATUS.md).
@@ -99,10 +101,13 @@ Run `pre-commit install` once to enable local checks. See [CONTRIBUTING.md](CONT
   fixtures, uploads, normalization, API, LLM, and UI remain absent or unauthorized.
 - M9-I2 frozen contract candidate: deterministic offline issuer-resolution boundaries, exact-hash
   human selection, structural scope pre-screening, independent validation, synthetic-only
-  regression requirements, and an external exact-SHA review/approval state model. Historical
-  review and approval assertions are retained as provenance but do not satisfy that state model;
-  fresh durably evidenced review and owner approval are required. Package closure is
-  `NOT_CLOSED` in the separate exact-snapshot evidence record.
+  regression requirements, and an external exact-SHA governance state model. Historical review
+  and approval assertions remain non-authoritative. The preferred path uses independent review;
+  when no eligible reviewer is reasonably available, the contract permits an explicitly disclosed
+  `owner_approved_with_exception` path bound to exact-subject-commit CI, complete tests, zero
+  unresolved blocking/high/medium findings, residual-risk acceptance, and two ordered immutable
+  owner attestations. None of that evidence exists for the new bytes yet, so package closure
+  remains `NOT_CLOSED`.
   Publication and runtime implementation remain subject to separate explicit authorization; live
   access and real-company data remain unauthorized.
 

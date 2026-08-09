@@ -55,14 +55,14 @@ Implementation status: The bounded M9-I1 offline foundation is merged through PR
 JSON/SHA-256, implementation-separated hash recomputation, and strict provider/license and concept
 registries without transport or provider payloads. The first M9-I2 issuer-resolution contract SHA
 was recorded as reviewed and approved on 2026-08-09, then superseded for repository publication
-after documentation/governance findings. The revised contract is frozen at SHA-256
-`4c596e806896a9693dd95766b7f5d3207c7f0969ee69e4aeeed05ab5e1e016ad`, but its historical review
-and owner-approval assertions lack durable actor identifiers, UTC timestamps, immutable evidence
-references, and a verifiable event chain. It therefore fails closed to `candidate`; fresh durable
-review and owner approval are required. M9-I2 runtime and M9-I3 through M9-I6 remain unauthorized,
-and live SEC or provider access remains unauthorized. M9-I2 implementation has not started and
-would require separate authorization after contract approval. Package closure is `NOT_CLOSED` in
-the recomputable manifest and evidence assessment in
+after documentation/governance findings. The revised contract now defines a narrow
+single-maintainer documentation-governance exception while preserving M1-M7 runtime separation and
+later qualified-review gates. The new exact SHA is recorded in the governance record. No immutable
+subject commit, successful exact-subject-commit remote CI evidence, or first-stage immutable owner
+attestation exists for these bytes yet, so it fails closed to `candidate`. M9-I2 runtime and M9-I3
+through M9-I6 remain unauthorized, and live SEC or provider access remains unauthorized. M9-I2 implementation
+has not started and would require separate authorization after contract approval. Package closure
+is `NOT_CLOSED` in the recomputable manifest and evidence assessment in
 `docs/milestones/M9-I2-post-owner-approval-snapshot-closure.md`. Publication remains subject to
 separate explicit authorization.
 

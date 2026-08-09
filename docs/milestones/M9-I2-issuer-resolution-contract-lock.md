@@ -1,7 +1,7 @@
 # M9-I2 Issuer Resolution — Contract-Lock Candidate
 
-Status: Revised frozen candidate; independent review and project-owner approval pending; no implementation authority
-Contract version: 0.1.1-candidate
+Status: Revised frozen candidate; exact-SHA governance decision pending; no implementation authority
+Contract version: 0.1.2-candidate
 Canonical repository: `gh-jai/financial-valuation-ai`
 Canonical baseline: `main` at `3945e90559ec2e10771489078c9e8f52036209b7`
 Design authorization: Project owner, 2026-08-09
@@ -833,7 +833,9 @@ The contract may be recommended for approval only if independent review confirms
 6. the independent validator recomputes rather than delegates production behavior;
 7. all tests are offline and synthetic and no real/private/provider material is required;
 8. M9-I3 through M9-I6, live access, provider activation, and product interfaces remain excluded;
-9. M1-M7 composition, exact-hash handoffs, human approvals, and separation of duties remain intact;
+9. M1-M7 runtime composition, exact-hash handoffs, human approvals, and execution-time separation
+   of duties remain intact; the narrowly scoped documentation-governance exception in section 16
+   cannot satisfy or waive those runtime controls;
 10. M8-C01 through M8-C07 remain active and unsatisfied unless separately evidenced later.
 
 ## 16. External review and approval state
@@ -844,25 +846,70 @@ authoritative governance state is recorded separately in
 `docs/milestones/M9-I2-contract-lock-review-approval-record.md` and is valid only when that record
 names this repository-relative path and the SHA-256 of these exact UTF-8 bytes.
 
-The external state machine is:
+The default external state path is:
 
-1. `candidate`: the contract bytes are frozen, but no independent-review verdict applies to their
-   exact SHA-256; implementation and publication are not authorized;
+1. `candidate`: the contract bytes are frozen, but no qualifying governance verdict applies to
+   their exact SHA-256; implementation and publication are not authorized;
 2. `independently_reviewed`: an independent reviewer records `PASS` against the exact contract
    SHA-256 and review baseline; project-owner approval is still absent, and implementation and
    publication remain unauthorized;
 3. `owner_approved`: the project owner explicitly approves that same exact SHA-256 after the
-   independent `PASS`; this approves only the contract boundary;
+   independent `PASS`; this approves only the contract boundary; and
 4. `superseded`: any byte change, replacement candidate, later owner decision, or incompatible
    baseline invalidates reliance on the earlier state for the changed artifact. Prior review and
    approval remain historical evidence but never transfer to a new SHA-256.
 
-The review/approval record must preserve the prior SHA lineage, the independent verdict and date,
-the project-owner decision and date, and any publication blocker. Missing, contradictory, pending,
-or hash-mismatched fields fail closed to `candidate`. Status prose elsewhere in the repository is
-informational and cannot replace the exact-SHA-bound record.
+### 16.1 Single-maintainer documentation-governance exception
 
-Project-owner approval of an exact SHA-256 would approve only the M9-I2 contract boundary.
+When the canonical repository is genuinely operated by one maintainer and no eligible independent
+reviewer is reasonably available, the project owner may explicitly choose a narrow alternative
+state, `owner_approved_with_exception`. This state never means `independently_reviewed`, and the
+record must use the exact phrase `single-maintainer exception` rather than implying separation of
+duties that did not occur.
+
+The exception is valid only through two ordered public attestations: first a
+`contract_owner_attestation` bound to the unchanged contract SHA, then a
+`snapshot_closure_attestation` bound to the final subject manifest after the approval record has
+been updated. Each attestation must record all of the following:
+
+- a unique exception/event ID, bounded decision kind, an RFC 3339 UTC timestamp, the stable
+  owner/maintainer actor ID, and an explicit statement that the same actor authored or remediated
+  the reviewed bytes;
+- the canonical repository, baseline commit, immutable subject commit, contract path, exact
+  contract SHA-256, and snapshot ID when the decision kind is `snapshot_closure_attestation`;
+- a reason why no eligible independent reviewer was reasonably available and an explicit waiver
+  of reviewer/author separation for this documentation decision only;
+- successful exact-subject-commit CI with immutable workflow-run identifiers/URLs, the complete local test
+  result and environment, and confirmation that no unresolved blocking, high, or medium finding
+  remains;
+- the accepted residual risk, the decision and its narrow authority boundary, an immutable public
+  evidence reference and evidence SHA-256, a prior-event hash or genesis marker, and a recomputable
+  event hash. The evidence reference must identify an immutable Git object, such as an annotated
+  tag object or dedicated evidence commit; a mutable PR body or ordinary comment is insufficient;
+  and
+- an explicit acknowledgment that the exception does not authorize implementation, publication,
+  live/provider access, real-company data, later M9 work, release, or any legal, privacy, security,
+  accessibility, or provider-license approval.
+
+The first attestation may advance only the contract to `owner_approved_with_exception`. After the
+approval record is updated to reference that immutable event, the second attestation may close only
+the exact recomputed subject snapshot as `CLOSED_WITH_SINGLE_MAINTAINER_EXCEPTION`. The closure
+carrier is deliberately outside the subject manifest and may be updated afterward to reference the
+second attestation without changing the attested snapshot; any subject-file change requires a new
+snapshot attestation.
+
+The exception is per contract SHA and per exact documentation snapshot. It is not a repository-wide
+precedent, cannot be inferred from repository ownership, and cannot be backfilled from an earlier
+self-review. A qualifying independent reviewer may still replace the exception path before the
+first owner decision.
+
+The review/approval record must preserve prior SHA lineage, the selected default or exception path,
+the exact verdict/decision evidence, and every publication blocker. Missing, contradictory,
+pending, or hash-mismatched fields fail closed to `candidate`. Status prose elsewhere in the
+repository is informational and cannot replace the exact-SHA-bound record.
+
+Project-owner approval of an exact SHA-256, including `owner_approved_with_exception`, would
+approve only the M9-I2 contract boundary.
 Separate, explicit authorization would still be required for implementation, staging, committing,
 pushing, creating a Draft PR, Mark Ready, approval, merge, M9-I3 or later work, any live-readiness
 test, provider use, real-company data, and release.
