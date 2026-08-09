@@ -49,9 +49,16 @@ Here, **Source** means the redistributable metadata record. A private local inpu
 M0 established repository governance and provenance. M1-M6 added bounded deterministic valuation
 and judgment vertical slices. M7 completes the governed `Workflow -> Agent -> Prompt -> Test` path
 without granting agents autonomous approval, private-source, network, shell, or trading authority.
-M8's cross-functional design review and the M9 planning baseline are merged. M9-I1 is an approved
-publication candidate containing offline errors, hashing, and default-deny registry primitives.
-M9-I2 through M9-I6 and every live-data capability remain separately gated. M9-M14 are the
+M8's cross-functional design review and the M9 planning baseline are merged. M9-I1 is a merged
+offline foundation containing errors, hashing, and default-deny registry primitives. The revised
+M9-I2 issuer-resolution contract bytes now define a narrow single-maintainer
+documentation-governance exception without weakening runtime separation or later qualified-review
+gates. A verified immutable first-stage owner attestation and exact-subject-commit CI advance only
+the contract to `owner_approved_with_exception`; publication, runtime,
+M9-I3 through M9-I6, and every live-data
+capability remain separately gated. Package closure is `NOT_CLOSED` as recorded by the recomputable
+manifest and evidence assessment in
+`docs/milestones/M9-I2-post-owner-approval-snapshot-closure.md`, not by this summary. M9-M14 are the
 retail-product delivery path; no live issuer ingestion or user interface exists. See
 [ROADMAP.md](ROADMAP.md) and [PROJECT_STATUS.md](PROJECT_STATUS.md).
 
@@ -88,9 +95,21 @@ Run `pre-commit install` once to enable local checks. See [CONTRIBUTING.md](CONT
 - M8 reviewed contract: retail product scope, five real-data interface contracts, safe-stop policy, threat model, pilot/holdout gates, and seven mandatory later-stage conditions.
 - M9 planning: reviewed and merged baseline for six separately approved public-data and
   normalization slices.
-- M9-I1 candidate: immutable safe errors, bounded secret redaction, versioned canonical JSON and
+- M9-I1 merged foundation: immutable safe errors, bounded secret redaction, versioned canonical JSON and
   SHA-256, implementation-separated recomputation, strict provider/license policy, and a bounded
   concept vocabulary. Network transport, issuer resolution, provider activation, real-company
   fixtures, uploads, normalization, API, LLM, and UI remain absent or unauthorized.
+- M9-I2 frozen contract: deterministic offline issuer-resolution boundaries, exact-hash
+  human selection, structural scope pre-screening, independent validation, synthetic-only
+  regression requirements, and an external exact-SHA governance state model. Historical review
+  and approval assertions remain non-authoritative. The preferred path uses independent review;
+  when no eligible reviewer is reasonably available, the contract permits an explicitly disclosed
+  `owner_approved_with_exception` path bound to exact-subject-commit CI, complete tests, zero
+  unresolved blocking/high/medium findings, residual-risk acceptance, and two ordered immutable
+  owner attestations. The first attestation is immutable and verified; the new subject snapshot
+  still lacks exact-subject-commit CI and the second snapshot-closure attestation, so package
+  closure remains `NOT_CLOSED`.
+  Publication and runtime implementation remain subject to separate explicit authorization; live
+  access and real-company data remain unauthorized.
 
 FVI remains pre-v1.0 and is not investment advice. Interfaces and schemas may change before release.

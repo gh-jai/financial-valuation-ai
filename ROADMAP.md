@@ -53,9 +53,18 @@ default, and requires a separate live-readiness approval.
 Implementation status: The bounded M9-I1 offline foundation is merged through PR #20 as
 `7b2b2d2481a6a95e76156fedf39975381811fdea`. It adds safe errors, bounded redaction, canonical
 JSON/SHA-256, implementation-separated hash recomputation, and strict provider/license and concept
-registries without transport or provider payloads. M9-I2 through M9-I6 remain unauthorized, and
-live SEC or provider access remains unauthorized. The next possible checkpoint is separately
-authorized M9-I2 issuer resolution; it has not started.
+registries without transport or provider payloads. The first M9-I2 issuer-resolution contract SHA
+was recorded as reviewed and approved on 2026-08-09, then superseded for repository publication
+after documentation/governance findings. The revised contract now defines a narrow
+single-maintainer documentation-governance exception while preserving M1-M7 runtime separation and
+later qualified-review gates. The new exact SHA is recorded in the governance record. A verified
+immutable first-stage owner attestation and exact-subject-commit CI advance only the contract to
+`owner_approved_with_exception`. M9-I2 runtime and M9-I3
+through M9-I6 remain unauthorized, and live SEC or provider access remains unauthorized. M9-I2 implementation
+has not started and would require separate authorization after contract approval. Package closure
+is `NOT_CLOSED` in the recomputable manifest and evidence assessment in
+`docs/milestones/M9-I2-post-owner-approval-snapshot-closure.md`. Publication remains subject to
+separate explicit authorization.
 
 ## M10 Assumption, routing, and scenario engine
 
