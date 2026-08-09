@@ -1,0 +1,156 @@
+schema_version: 0.1.0
+canonicalization_version: fvi-canonical-json-v1
+catalog_id: m9-i2-synthetic-catalog
+catalog_version: 0.1.0
+status: approved
+effective_at: "2026-08-01T00:00:00Z"
+expires_at: "2030-01-01T00:00:00Z"
+reviewed_at: "2026-08-09T00:00:00Z"
+reviewed_by: synthetic-catalog-reviewer
+review_evidence:
+  - docs/milestones/M9-I2-post-owner-approval-snapshot-closure.md
+adapter_id: m9-i2-synthetic-adapter
+network_state: denied
+evidence_records:
+  - source_record_id: EVD-SYNTH-0001
+    source_kind: synthetic_identity
+    observed_at: "2026-08-01T00:00:00Z"
+    fact_as_of: "2026-08-01T00:00:00Z"
+    assertion_kind: active_as_of
+    cik: "9000000001"
+    legal_name: Northstar Synthetic Operating Company
+    ticker: ZXQA
+    exchange_code: XTEST
+    asserted_effective_from: "2020-01-01T00:00:00Z"
+    asserted_effective_to: null
+    evidence_record_hash: d5f1157a7f02495ae6c30b36ac7c38e92f49d8dfbd0268ae0c8b85b906650307
+  - source_record_id: EVD-SYNTH-0002
+    source_kind: synthetic_identity
+    observed_at: "2026-08-01T00:00:00Z"
+    fact_as_of: "2026-08-01T00:00:00Z"
+    assertion_kind: active_as_of
+    cik: "9000000002"
+    legal_name: Ambiguous Synthetic Industries
+    ticker: ZXQB
+    exchange_code: XTEST
+    asserted_effective_from: "2021-01-01T00:00:00Z"
+    asserted_effective_to: null
+    evidence_record_hash: f17f1be6bf01f3f680f3fd1ccb092a768b2470aa5dbb50140cf90da6259a936c
+  - source_record_id: EVD-SYNTH-0003
+    source_kind: synthetic_identity
+    observed_at: "2026-08-01T00:00:00Z"
+    fact_as_of: "2026-08-01T00:00:00Z"
+    assertion_kind: active_as_of
+    cik: "9000000003"
+    legal_name: Ambiguous Synthetic Industries
+    ticker: ZXQC
+    exchange_code: XTEST
+    asserted_effective_from: "2022-01-01T00:00:00Z"
+    asserted_effective_to: null
+    evidence_record_hash: d84e0d9fc8c83544f13204f709006cb9a6869c3e94163110c186a7c91d89dbe6
+  - source_record_id: EVD-SYNTH-0004
+    source_kind: synthetic_identity
+    observed_at: "2026-08-01T00:00:00Z"
+    fact_as_of: "2026-08-01T00:00:00Z"
+    assertion_kind: active_as_of
+    cik: "9000000004"
+    legal_name: Synthetic Regulated Bank Test Entity
+    ticker: ZXQD
+    exchange_code: XTEST
+    asserted_effective_from: "2023-01-01T00:00:00Z"
+    asserted_effective_to: null
+    evidence_record_hash: 89179e7de742a611d9fa92565fbb589a3f8b211f59cb8e8e7ef2defd48b38ad4
+records:
+  - record_id: RID-SYNTH-0001
+    cik: "9000000001"
+    legal_name: Northstar Synthetic Operating Company
+    aliases:
+      - Northstar Synthetic
+    listing_history:
+      - ticker: ZXQA
+        exchange_code: XTEST
+        effective_from: "2020-01-01T00:00:00Z"
+        effective_to: null
+        evidence_record_refs:
+          - EVD-SYNTH-0001
+        listing_entry_hash: 428c90bbd753882968a59b7e6573951c4ac2176b6f3ca26d5fe3f5f7dea80f9f
+    primary_listing_country: US
+    primary_reporting_currency: USD
+    issuer_class: operating_non_financial
+    regulated_capital_model_required: false
+    reserve_real_option_required: false
+    public_company_status: active
+    identity_observed_at: "2026-08-01T00:00:00Z"
+    source_record_refs:
+      - EVD-SYNTH-0001
+    catalog_record_hash: fe91771a64d01b545bbf3923c58f0d5b7860903ba9b6fbbd7f1ea9e9fef50162
+  - record_id: RID-SYNTH-0002
+    cik: "9000000002"
+    legal_name: Ambiguous Synthetic Industries
+    aliases:
+      - Ambiguous Synthetic Alpha
+    listing_history:
+      - ticker: ZXQB
+        exchange_code: XTEST
+        effective_from: "2021-01-01T00:00:00Z"
+        effective_to: null
+        evidence_record_refs:
+          - EVD-SYNTH-0002
+        listing_entry_hash: 8d99a259a85838db5f35aae030c5178f94b897f809f241ae396796c31fffccb5
+    primary_listing_country: US
+    primary_reporting_currency: USD
+    issuer_class: operating_non_financial
+    regulated_capital_model_required: false
+    reserve_real_option_required: false
+    public_company_status: active
+    identity_observed_at: "2026-08-01T00:00:00Z"
+    source_record_refs:
+      - EVD-SYNTH-0002
+    catalog_record_hash: 0956a137b8ee234568e141a3ccbae2f4b26aab74a74bb94ebe0503cb84f6d7a5
+  - record_id: RID-SYNTH-0003
+    cik: "9000000003"
+    legal_name: Ambiguous Synthetic Industries
+    aliases:
+      - Ambiguous Synthetic Beta
+    listing_history:
+      - ticker: ZXQC
+        exchange_code: XTEST
+        effective_from: "2022-01-01T00:00:00Z"
+        effective_to: null
+        evidence_record_refs:
+          - EVD-SYNTH-0003
+        listing_entry_hash: f823ba1cae638bb8c59d549d57e944821a833f9237f4d9ae65fbb77b8ef6965b
+    primary_listing_country: US
+    primary_reporting_currency: USD
+    issuer_class: operating_non_financial
+    regulated_capital_model_required: false
+    reserve_real_option_required: false
+    public_company_status: active
+    identity_observed_at: "2026-08-01T00:00:00Z"
+    source_record_refs:
+      - EVD-SYNTH-0003
+    catalog_record_hash: 3f7a4f31b5f40bc746ad61e09bd25d3d5c2e2b8b7eaa05491407c4e50995da55
+  - record_id: RID-SYNTH-0004
+    cik: "9000000004"
+    legal_name: Synthetic Regulated Bank Test Entity
+    aliases:
+      - Synthetic Test Bank
+    listing_history:
+      - ticker: ZXQD
+        exchange_code: XTEST
+        effective_from: "2023-01-01T00:00:00Z"
+        effective_to: null
+        evidence_record_refs:
+          - EVD-SYNTH-0004
+        listing_entry_hash: 9f6042f8f1fdcffe8426c3088b426d24ae4e5b42c28024d03a31c68d74ff19af
+    primary_listing_country: US
+    primary_reporting_currency: USD
+    issuer_class: bank
+    regulated_capital_model_required: true
+    reserve_real_option_required: false
+    public_company_status: active
+    identity_observed_at: "2026-08-01T00:00:00Z"
+    source_record_refs:
+      - EVD-SYNTH-0004
+    catalog_record_hash: 7a8af1d8521e5063654473a0428f9cfaf61a6555108b7c236c0c9c0d95c0e090
+catalog_hash: 2402b3bcb6d28bb8b68fb17d2486fbd68206bc7bf44f277311e7e55ba7916883

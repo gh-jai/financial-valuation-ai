@@ -1,0 +1,151 @@
+schema_version: 0.1.0
+canonicalization_version: fvi-canonical-json-v1
+scope_registry_id: m9-issuer-structural-scope
+scope_registry_version: 0.1.0
+status: approved
+effective_at: "2026-08-01T00:00:00Z"
+expires_at: "2030-01-01T00:00:00Z"
+reviewed_at: "2026-08-09T00:00:00Z"
+reviewed_by: synthetic-scope-reviewer
+review_evidence:
+  - docs/milestones/M9-I2-post-owner-approval-snapshot-closure.md
+m8_support_matrix_ref: docs/product/retail-v1-issuer-support-matrix.md
+m8_support_matrix_sha256: ba0d38f97e8c8ee24ee8cf9d34d3dc1600771c2b07f7e068ff36e946881e5414
+rules:
+  - rule_id: unsupported-financial
+    priority: 10
+    predicates:
+      - field: regulated_capital_model_required
+        operator: equals
+        value: true
+    outcome: unsupported
+    reason_code: SCOPE-UNSUPPORTED-FINANCIAL
+    evaluation_stage: m9-i2-structural
+  - rule_id: unsupported-reit
+    priority: 20
+    predicates:
+      - field: issuer_class
+        operator: equals
+        value: reit
+    outcome: unsupported
+    reason_code: SCOPE-UNSUPPORTED-REIT
+    evaluation_stage: m9-i2-structural
+  - rule_id: unsupported-fund
+    priority: 30
+    predicates:
+      - field: issuer_class
+        operator: equals
+        value: fund
+    outcome: unsupported
+    reason_code: SCOPE-UNSUPPORTED-FUND
+    evaluation_stage: m9-i2-structural
+  - rule_id: unsupported-etf
+    priority: 31
+    predicates:
+      - field: issuer_class
+        operator: equals
+        value: etf
+    outcome: unsupported
+    reason_code: SCOPE-UNSUPPORTED-FUND
+    evaluation_stage: m9-i2-structural
+  - rule_id: unsupported-investment-company
+    priority: 32
+    predicates:
+      - field: issuer_class
+        operator: equals
+        value: investment_company
+    outcome: unsupported
+    reason_code: SCOPE-UNSUPPORTED-FUND
+    evaluation_stage: m9-i2-structural
+  - rule_id: unsupported-non-operating-vehicle
+    priority: 33
+    predicates:
+      - field: issuer_class
+        operator: equals
+        value: non_operating_holding_vehicle
+    outcome: unsupported
+    reason_code: SCOPE-UNSUPPORTED-FUND
+    evaluation_stage: m9-i2-structural
+  - rule_id: unsupported-spac
+    priority: 40
+    predicates:
+      - field: issuer_class
+        operator: equals
+        value: spac_blank_check
+    outcome: unsupported
+    reason_code: SCOPE-UNSUPPORTED-SPAC
+    evaluation_stage: m9-i2-structural
+  - rule_id: unsupported-natural-resource
+    priority: 50
+    predicates:
+      - field: reserve_real_option_required
+        operator: equals
+        value: true
+    outcome: unsupported
+    reason_code: SCOPE-UNSUPPORTED-NATURAL-RESOURCE
+    evaluation_stage: m9-i2-structural
+  - rule_id: unsupported-non-us
+    priority: 60
+    predicates:
+      - field: primary_listing_country
+        operator: not_equals
+        value: US
+    outcome: unsupported
+    reason_code: SCOPE-UNSUPPORTED-NON-US
+    evaluation_stage: m9-i2-structural
+  - rule_id: unsupported-private
+    priority: 61
+    predicates:
+      - field: public_company_status
+        operator: equals
+        value: private
+    outcome: unsupported
+    reason_code: SCOPE-UNSUPPORTED-PRIVATE
+    evaluation_stage: m9-i2-structural
+  - rule_id: unsupported-non-usd
+    priority: 70
+    predicates:
+      - field: primary_reporting_currency
+        operator: not_equals
+        value: USD
+    outcome: unsupported
+    reason_code: SCOPE-UNSUPPORTED-NON-USD
+    evaluation_stage: m9-i2-structural
+  - rule_id: in-scope-pending-review
+    priority: 100
+    predicates:
+      - field: public_company_status
+        operator: equals
+        value: active
+      - field: primary_listing_country
+        operator: equals
+        value: US
+      - field: primary_reporting_currency
+        operator: equals
+        value: USD
+      - field: issuer_class
+        operator: equals
+        value: operating_non_financial
+      - field: regulated_capital_model_required
+        operator: equals
+        value: false
+      - field: reserve_real_option_required
+        operator: equals
+        value: false
+    outcome: eligible_for_data_review
+    reason_code: SCOPE-IN-SCOPE-PENDING-REVIEW
+    evaluation_stage: m9-i2-structural
+deferred_matrix_rows:
+  - row_id: M8-LIFECYCLE-CYCLICAL
+    status: deferred_to_m10
+  - row_id: M8-LIFECYCLE-DECLINING
+    status: deferred_to_m10
+  - row_id: M8-LIFECYCLE-DISTRESSED
+    status: deferred_to_m10
+  - row_id: M8-LIFECYCLE-GROWTH
+    status: deferred_to_m10
+  - row_id: M8-LIFECYCLE-MATURE
+    status: deferred_to_m10
+  - row_id: M8-LIFECYCLE-YOUNG
+    status: deferred_to_m10
+scope_registry_hash: d0181a0d5706398ed445ae00d17772a572e48ddd189670a3d3bffcb90e70ad20
