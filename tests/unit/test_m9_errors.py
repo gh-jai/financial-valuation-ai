@@ -44,6 +44,30 @@ def test_authorization_and_query_credentials_are_redacted() -> None:
     assert safe.count(REDACTED) == 3
 
 
+def test_cookie_session_and_named_credentials_are_redacted_end_to_end() -> None:
+    secrets = ("cookie-secret", "session-secret", "credential-secret", "passwd-secret")
+    message = (
+        "Cookie: sessionid=cookie-secret\n"
+        "session=session-secret credential=credential-secret passwd=passwd-secret"
+    )
+    error = RetailDataError(
+        "PROVIDER-ERROR",
+        message,
+        ErrorSeverity.REVIEW,
+        False,
+        next_action=NextAction.CONTACT_SUPPORT,
+    )
+    assert all(secret not in error.message for secret in secrets)
+    assert error.message.count(REDACTED) == 4
+
+
+def test_set_cookie_header_is_fully_redacted() -> None:
+    safe = redact_text("Set-Cookie: sessionid=secret; Path=/; HttpOnly\nrequest failed")
+    assert "secret" not in safe
+    assert "Path" not in safe
+    assert safe == "Set-Cookie: [REDACTED] request failed"
+
+
 def test_messages_are_flattened_and_bounded() -> None:
     safe = redact_text("first\r\nsecond " + "x" * 100, limit=24)
     assert "\n" not in safe and "\r" not in safe
@@ -64,6 +88,19 @@ def test_error_invariants_reject_unsafe_or_inconsistent_values() -> None:
         with pytest.raises((TypeError, ValueError)):
             RetailDataError(
                 code, "safe", ErrorSeverity.BLOCKING, retryable, refs, action
+            )
+
+
+def test_artifact_references_reject_strings_and_non_sequences() -> None:
+    for refs in ("ab", b"ab", {"artifact:a"}, iter(("artifact:a",))):
+        with pytest.raises(TypeError, match="non-string sequence"):
+            RetailDataError(
+                "DATA-BAD",
+                "safe",
+                ErrorSeverity.BLOCKING,
+                False,
+                refs,  # type: ignore[arg-type]
+                NextAction.STOP,
             )
 
 

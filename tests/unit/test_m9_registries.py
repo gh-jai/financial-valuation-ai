@@ -104,6 +104,29 @@ def test_unknown_fields_and_duplicate_identifiers_are_rejected(tmp_path: Path) -
         load_provider_registry(_write(tmp_path, duplicate, "duplicate.yaml"))
 
 
+def test_registry_identity_and_schema_versions_fail_closed(tmp_path: Path) -> None:
+    provider_mutations = (("registry_id", "other-registry"), ("schema_version", "999.0.0"))
+    for field, value in provider_mutations:
+        data = _provider_data()
+        data[field] = value
+        with pytest.raises(RegistryError, match="not supported"):
+            load_provider_registry(_write(tmp_path, data, f"provider-{field}.yaml"))
+
+    concept_mutations = (("registry_id", "other-registry"), ("schema_version", "999.0.0"))
+    for field, value in concept_mutations:
+        concept_data = yaml.safe_load(CONCEPTS.read_text(encoding="utf-8"))
+        concept_data[field] = value
+        with pytest.raises(RegistryError, match="not supported"):
+            load_concept_registry(_write(tmp_path, concept_data, f"concept-{field}.yaml"))
+
+
+def test_endpoint_hosts_must_be_explicitly_allowlisted(tmp_path: Path) -> None:
+    data = _provider_data()
+    data["providers"][0]["endpoint_templates"] = ["https://evil.example/data"]
+    with pytest.raises(RegistryError, match="not in host_allowlist"):
+        load_provider_registry(_write(tmp_path, data))
+
+
 def test_invalid_types_dates_urls_and_activation_are_rejected(tmp_path: Path) -> None:
     mutations = [
         ("rights", "storage", "yes"),

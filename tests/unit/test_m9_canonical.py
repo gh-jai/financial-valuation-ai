@@ -1,6 +1,7 @@
 import inspect
 import json
 import math
+from types import MappingProxyType
 
 import pytest
 
@@ -65,3 +66,11 @@ def test_independent_implementation_matches_vectors_without_production_import() 
         json.loads(independent_canonical_json(value))
     source = inspect.getsource(inspect.getmodule(independent_sha256))
     assert "retail_data.canonical" not in source
+
+
+def test_general_mappings_are_normalized_by_both_implementations() -> None:
+    value = MappingProxyType({"outer": MappingProxyType({"b": 2, "a": 1})})
+    expected = '{"outer":{"a":1,"b":2}}'
+    assert canonical_json(value) == expected
+    assert independent_canonical_json(value) == expected
+    assert canonical_sha256(value) == independent_sha256(value)

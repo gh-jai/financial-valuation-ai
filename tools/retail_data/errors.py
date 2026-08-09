@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import re
+from collections.abc import Sequence
 from dataclasses import dataclass
 from enum import Enum
 from typing import Any
@@ -54,6 +55,10 @@ class RetailDataError:
         if not safe_message:
             raise ValueError("message must not be empty")
         object.__setattr__(self, "message", safe_message)
+        if not isinstance(self.artifact_refs, Sequence) or isinstance(
+            self.artifact_refs, (str, bytes)
+        ):
+            raise TypeError("artifact_refs must be a non-string sequence")
         refs = tuple(self.artifact_refs)
         if len(set(refs)) != len(refs):
             raise ValueError("artifact references must be unique")

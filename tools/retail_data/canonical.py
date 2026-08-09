@@ -16,37 +16,37 @@ class CanonicalizationError(ValueError):
     """Raised when a value is not valid for the locked canonical representation."""
 
 
-def _validate(value: Any, active: set[int]) -> None:
+def _normalize(value: Any, active: set[int]) -> Any:
     if value is None or isinstance(value, (str, bool, int)):
-        return
+        return value
     if isinstance(value, float):
         if not math.isfinite(value):
             raise CanonicalizationError("canonical JSON rejects non-finite numbers")
-        return
+        return value
     if isinstance(value, Mapping):
         identity = id(value)
         if identity in active:
             raise CanonicalizationError("canonical JSON rejects cyclic values")
         active.add(identity)
         try:
+            normalized = {}
             for key, item in value.items():
                 if not isinstance(key, str):
                     raise CanonicalizationError("canonical JSON object keys must be strings")
-                _validate(item, active)
+                normalized[key] = _normalize(item, active)
         finally:
             active.remove(identity)
-        return
+        return normalized
     if isinstance(value, list):
         identity = id(value)
         if identity in active:
             raise CanonicalizationError("canonical JSON rejects cyclic values")
         active.add(identity)
         try:
-            for item in value:
-                _validate(item, active)
+            normalized_list = [_normalize(item, active) for item in value]
         finally:
             active.remove(identity)
-        return
+        return normalized_list
     raise CanonicalizationError(f"unsupported canonical JSON type: {type(value).__name__}")
 
 
@@ -59,9 +59,9 @@ def canonical_json(value: Any, version: str = CANONICALIZATION_VERSION) -> str:
     """Return the locked compact, Unicode-preserving canonical JSON representation."""
 
     _require_version(version)
-    _validate(value, set())
+    normalized = _normalize(value, set())
     return json.dumps(
-        value,
+        normalized,
         ensure_ascii=False,
         allow_nan=False,
         sort_keys=True,

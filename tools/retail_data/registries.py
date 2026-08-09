@@ -16,10 +16,17 @@ import yaml
 
 _IDENTIFIER = re.compile(r"^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$")
 _VERSION = re.compile(r"^\d+\.\d+\.\d+$")
+_HOSTNAME = re.compile(
+    r"^(?=.{1,253}$)(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+"
+    r"[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?$"
+)
 _RIGHTS = frozenset({"storage", "display", "export", "redistribution"})
 _PROVIDER_STATUS = frozenset({"pending", "approved", "rejected"})
 _AUTH_CLASSES = frozenset({"none", "api_key", "oauth2", "user_agent"})
 _CONCEPT_KINDS = frozenset({"monetary", "rate", "shares"})
+_PROVIDER_REGISTRY_ID = "m9-provider-license"
+_CONCEPT_REGISTRY_ID = "m9-concepts"
+_SUPPORTED_SCHEMA_VERSION = "0.1.0"
 
 
 class RegistryError(ValueError):
@@ -81,6 +88,26 @@ def _url_tuple(value: Any, label: str) -> tuple[str, ...]:
         if parsed.scheme != "https" or not parsed.hostname or parsed.username or parsed.password:
             raise RegistryError(f"{label} entries must be credential-free HTTPS URLs")
     return urls
+
+
+def _host_tuple(value: Any, label: str) -> tuple[str, ...]:
+    hosts = _string_tuple(value, label)
+    for host in hosts:
+        if not _HOSTNAME.fullmatch(host):
+            raise RegistryError(f"{label} entries must be canonical hostnames")
+    return hosts
+
+
+def _require_registry_identity(
+    root: Mapping[str, Any], *, registry_id: str, label: str
+) -> tuple[str, str]:
+    actual_id = _text(root["registry_id"], "registry_id", pattern=_IDENTIFIER)
+    if actual_id != registry_id:
+        raise RegistryError(f"{label} registry_id is not supported")
+    schema_version = _text(root["schema_version"], "schema_version", pattern=_VERSION)
+    if schema_version != _SUPPORTED_SCHEMA_VERSION:
+        raise RegistryError(f"{label} schema_version is not supported")
+    return actual_id, schema_version
 
 
 def _load(path: Path) -> Mapping[str, Any]:
@@ -231,17 +258,18 @@ def _provider_record(value: Any, index: int) -> ProviderPolicy:
     rate_values = (rate["window_seconds"], rate["max_requests"])
     if any(isinstance(item, bool) or not isinstance(item, int) or item < 1 for item in rate_values):
         raise RegistryError("rate_limit values must be positive integers")
-    hosts = _string_tuple(record["host_allowlist"], "host_allowlist")
-    redirects = _string_tuple(record["redirect_host_allowlist"], "redirect_host_allowlist")
-    if any("/" in host or ":" in host for host in (*hosts, *redirects)):
-        raise RegistryError("host allowlists contain hostnames only")
+    endpoints = _url_tuple(record["endpoint_templates"], "endpoint_templates")
+    hosts = _host_tuple(record["host_allowlist"], "host_allowlist")
+    redirects = _host_tuple(record["redirect_host_allowlist"], "redirect_host_allowlist")
+    if any(urlsplit(endpoint).hostname not in hosts for endpoint in endpoints):
+        raise RegistryError("endpoint_templates host is not in host_allowlist")
     return ProviderPolicy(
         provider_id=_text(record["provider_id"], "provider_id", pattern=_IDENTIFIER),
         provider_name=_text(record["provider_name"], "provider_name"),
         version=_text(record["version"], "version", pattern=_VERSION),
         status=status,
         live_activation="disabled",
-        endpoint_templates=_url_tuple(record["endpoint_templates"], "endpoint_templates"),
+        endpoint_templates=endpoints,
         host_allowlist=hosts,
         redirect_host_allowlist=redirects,
         data_categories=_string_tuple(
@@ -265,6 +293,9 @@ def load_provider_registry(path: Path) -> ProviderRegistry:
 
     root = _load(path)
     _exact_fields(root, _PROVIDER_ROOT_FIELDS, "provider registry")
+    registry_id, schema_version = _require_registry_identity(
+        root, registry_id=_PROVIDER_REGISTRY_ID, label="provider registry"
+    )
     values = root["providers"]
     if not isinstance(values, list) or not values:
         raise RegistryError("providers must be a non-empty array")
@@ -273,8 +304,8 @@ def load_provider_registry(path: Path) -> ProviderRegistry:
     if len(by_id) != len(records):
         raise RegistryError("provider_id values must be unique")
     return ProviderRegistry(
-        registry_id=_text(root["registry_id"], "registry_id", pattern=_IDENTIFIER),
-        schema_version=_text(root["schema_version"], "schema_version", pattern=_VERSION),
+        registry_id=registry_id,
+        schema_version=schema_version,
         records=records,
         by_id=MappingProxyType(by_id),
     )
@@ -306,6 +337,9 @@ def load_concept_registry(path: Path) -> ConceptRegistry:
 
     root = _load(path)
     _exact_fields(root, _CONCEPT_ROOT_FIELDS, "concept registry")
+    registry_id, schema_version = _require_registry_identity(
+        root, registry_id=_CONCEPT_REGISTRY_ID, label="concept registry"
+    )
     values = root["concepts"]
     if not isinstance(values, list) or not values:
         raise RegistryError("concepts must be a non-empty array")
@@ -314,8 +348,8 @@ def load_concept_registry(path: Path) -> ConceptRegistry:
     if len(by_id) != len(records):
         raise RegistryError("concept_id values must be unique")
     return ConceptRegistry(
-        registry_id=_text(root["registry_id"], "registry_id", pattern=_IDENTIFIER),
-        schema_version=_text(root["schema_version"], "schema_version", pattern=_VERSION),
+        registry_id=registry_id,
+        schema_version=schema_version,
         records=records,
         by_id=MappingProxyType(by_id),
     )
