@@ -37,6 +37,7 @@ Here, **Source** means the redistributable metadata record. A private local inpu
 | `agents/` | Governed agent role, authority, and handoff definitions |
 | `prompts/` | System, task, and evaluator prompts |
 | `agentization/` | Agent registry, tool allowlists, evaluator policy, and separation-of-duties controls |
+| `registries/` | Versioned, default-deny M9 provider/license and bounded concept metadata |
 | `templates/` | Authoring templates for consistent contributions |
 | `benchmarks/` | Synthetic fixtures, expected results, and scoring rules |
 | `tests/` | Schema, unit, integration, regression, and adversarial tests |
@@ -45,7 +46,14 @@ Here, **Source** means the redistributable metadata record. A private local inpu
 
 ## Milestone model
 
-M0 established repository governance and provenance. M1-M6 added bounded deterministic valuation and judgment vertical slices. M7 completes the governed `Workflow -> Agent -> Prompt -> Test` path without granting agents autonomous approval, private-source, network, shell, or trading authority. M8's cross-functional design review is complete, and the project owner has authorized M9 implementation planning with its seven recorded conditions. M9 implementation and every live-data capability remain separately gated. M9-M14 are the retail-product delivery path; no live issuer ingestion or user interface exists. See [ROADMAP.md](ROADMAP.md) and [PROJECT_STATUS.md](PROJECT_STATUS.md).
+M0 established repository governance and provenance. M1-M6 added bounded deterministic valuation
+and judgment vertical slices. M7 completes the governed `Workflow -> Agent -> Prompt -> Test` path
+without granting agents autonomous approval, private-source, network, shell, or trading authority.
+M8's cross-functional design review and the M9 planning baseline are merged. M9-I1 is an approved
+publication candidate containing offline errors, hashing, and default-deny registry primitives.
+M9-I2 through M9-I6 and every live-data capability remain separately gated. M9-M14 are the
+retail-product delivery path; no live issuer ingestion or user interface exists. See
+[ROADMAP.md](ROADMAP.md) and [PROJECT_STATUS.md](PROJECT_STATUS.md).
 
 ## Validate
 
@@ -78,6 +86,11 @@ Run `pre-commit install` once to enable local checks. See [CONTRIBUTING.md](CONT
 - M6: company-specific cycle routing, complete-input normalization or current-expectations scenarios, dated five-dimension evidence, immutable intrinsic-value references, and bounded non-numeric review posture composed with M1–M5.
 - M7: deny-by-default agent roles and prompts, exact-hash artifact handoffs, two human-only approval gates, executor-reviewer separation, offline allowlisted adapters, independent run validation, and three adversarial synthetic benchmarks composed with M1–M6.
 - M8 reviewed contract: retail product scope, five real-data interface contracts, safe-stop policy, threat model, pilot/holdout gates, and seven mandatory later-stage conditions.
-- M9 planning: reviewed and approved baseline for six separately approved public-data and normalization slices; implementation, live retrieval, provider activation, real-company fixtures, uploads, API, LLM, and UI remain unauthorized.
+- M9 planning: reviewed and merged baseline for six separately approved public-data and
+  normalization slices.
+- M9-I1 candidate: immutable safe errors, bounded secret redaction, versioned canonical JSON and
+  SHA-256, implementation-separated recomputation, strict provider/license policy, and a bounded
+  concept vocabulary. Network transport, issuer resolution, provider activation, real-company
+  fixtures, uploads, normalization, API, LLM, and UI remain absent or unauthorized.
 
 FVI remains pre-v1.0 and is not investment advice. Interfaces and schemas may change before release.

@@ -21,8 +21,8 @@ dev = [
   "pytest>=8.0,<9",
 ]
 
-[tool.setuptools]
-packages = ["tools"]
+[tool.setuptools.packages.find]
+include = ["tools*"]
 
 [tool.pytest.ini_options]
 addopts = "-ra"

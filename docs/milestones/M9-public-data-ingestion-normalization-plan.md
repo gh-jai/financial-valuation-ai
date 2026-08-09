@@ -1,6 +1,6 @@
 # M9 Public Data Ingestion and Accounting Normalization — Implementation Plan
 
-Status: Planning authorized; implementation not authorized
+Status: Planning merged; M9-I1 baseline approved for publication; M9-I2+ not authorized
 Plan version: 0.1.0
 Planning authorization: Project owner, 2026-08-08
 Planning baseline approval: Project owner, 2026-08-08
@@ -15,9 +15,11 @@ supported US-listed, USD-reporting non-financial operating companies. It will no
 valuation-case construction, assumptions, lifecycle routing, report rendering, a stable API, a
 CLI, a Web interface, model calls, user-file collection, external beta, or release.
 
-This document authorizes design and sequencing only. It does not authorize code implementation,
-live SEC retrieval, a market-data subscription or adapter, provider credentials, real-company
-fixtures, user uploads, staging, committing, pushing, or publication.
+The planning decision authorized design and sequencing only; it did not itself authorize code
+implementation, live SEC retrieval, a market-data subscription or adapter, provider credentials,
+real-company fixtures, user uploads, staging, committing, pushing, or publication. M9-I1 later
+received separate implementation, review, and publication authorizations. M9-I2 through M9-I6,
+live SEC or provider access, and every release action remain unauthorized.
 
 ## M9 outcome
 
@@ -234,4 +236,8 @@ Planning baseline decision:
 `[x] approve baseline  [ ] request changes  [ ] reject`
 
 Implementation decision:
-`[ ] authorize M9-I1 implementation  [ ] request plan changes`
+`[x] authorize M9-I1 implementation  [ ] request plan changes`
+
+Current implementation record: M9-I1 implementation baseline approved. M9-I2 through M9-I6
+remain unauthorized, and live SEC or provider access remains unauthorized. See
+`docs/milestones/M9-I1-implementation-review.md`.

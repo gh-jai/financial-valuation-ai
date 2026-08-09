@@ -1,0 +1,68 @@
+registry_id: m9-concepts
+schema_version: 0.1.0
+concepts:
+  - concept_id: revenue
+    label: Revenue
+    kind: monetary
+    allowed_units: [USD]
+    required_for: [fcff]
+  - concept_id: operating-income
+    label: Operating income
+    kind: monetary
+    allowed_units: [USD]
+    required_for: [fcff]
+  - concept_id: statutory-tax-rate
+    label: Statutory tax rate
+    kind: rate
+    allowed_units: [ratio]
+    required_for: [fcff]
+  - concept_id: cash-taxes
+    label: Cash taxes
+    kind: monetary
+    allowed_units: [USD]
+    required_for: [fcff]
+  - concept_id: depreciation-amortization
+    label: Depreciation and amortization
+    kind: monetary
+    allowed_units: [USD]
+    required_for: [fcff]
+  - concept_id: capital-expenditure
+    label: Capital expenditure
+    kind: monetary
+    allowed_units: [USD]
+    required_for: [fcff]
+  - concept_id: noncash-working-capital
+    label: Non-cash working capital
+    kind: monetary
+    allowed_units: [USD]
+    required_for: [fcff]
+  - concept_id: debt
+    label: Interest-bearing debt
+    kind: monetary
+    allowed_units: [USD]
+    required_for: [equity-bridge]
+  - concept_id: cash
+    label: Cash and cash equivalents
+    kind: monetary
+    allowed_units: [USD]
+    required_for: [equity-bridge]
+  - concept_id: nonoperating-assets
+    label: Non-operating assets
+    kind: monetary
+    allowed_units: [USD]
+    required_for: [equity-bridge]
+  - concept_id: minority-interest
+    label: Minority interest
+    kind: monetary
+    allowed_units: [USD]
+    required_for: [equity-bridge]
+  - concept_id: other-claims
+    label: Other non-equity claims
+    kind: monetary
+    allowed_units: [USD]
+    required_for: [equity-bridge]
+  - concept_id: diluted-shares
+    label: Diluted shares outstanding
+    kind: shares
+    allowed_units: [shares]
+    required_for: [per-share]

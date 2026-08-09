@@ -36,13 +36,22 @@ Define constrained agent roles, tool contracts, prompt suites, evaluator policie
 
 Define the supported retail user and issuer scope, five real-data interface schemas, safe-stop behavior, data and output policies, threat model, provider/legal/security review gates, and the pilot/holdout design. M8 is contract-only and does not add live data, LLM, API, CLI, or Web implementation.
 
-Status: Cross-functional design review complete. The project owner authorized M9 implementation planning with the seven recorded conditions on 2026-08-08; M9 implementation remains separately gated.
+Status: Cross-functional design review complete. The project owner authorized M9 implementation
+planning with the seven recorded conditions on 2026-08-08. The M9 planning baseline is merged;
+only the separately approved M9-I1 offline primitives are now a publication candidate.
 
 ## M9 Public data ingestion and accounting normalization
 
 Implement ticker/CIK resolution, SEC and licensed market-data adapters, immutable snapshots, manual import, US-GAAP normalization, reconciliation, data-quality findings, and offline provider fixtures.
 
-Planning status: Reviewed and approved. The planning baseline divides implementation into six separately approved offline-first slices, keeps every adapter disabled by default, and requires a separate live-readiness approval. No M9 implementation is authorized by the planning decision or baseline approval.
+Planning status: Reviewed, approved, and merged through PR #19. The planning baseline divides
+implementation into six separately approved offline-first slices, keeps every adapter disabled by
+default, and requires a separate live-readiness approval.
+
+Implementation status: M9-I1 implementation baseline approved for publication. It adds errors,
+redaction, canonical JSON/SHA-256, independent recomputation, and strict provider/license and
+concept registries without transport or provider payloads. M9-I2 through M9-I6 remain unauthorized,
+and live SEC or provider access remains unauthorized.
 
 ## M10 Assumption, routing, and scenario engine
 

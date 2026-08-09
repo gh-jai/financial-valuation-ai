@@ -1,6 +1,6 @@
 # Financial Valuation Intelligence — Project Status
 
-Last updated: 2026-08-08
+Last updated: 2026-08-09
 
 Repository: `gh-jai/financial-valuation-ai`
 
@@ -25,7 +25,21 @@ M6 contract-first planning, source-fidelity/financial review, repository-wide im
 
 M7 governed agentization is complete and merged through PR #16. It adds 20 reviewed claims, four Knowledge artifacts, five Skills, five agents, five prompts, `WFL-AGT-001`, five strict schemas, a deny-by-default registry, exact-hash handoffs, two human-only approvals, append-only events, executor/reviewer separation, offline adapters, independent validation, and three synthetic governance benchmarks. PR #16 Actions run #48 passed on Python 3.10 and 3.12 and merged as `75503192255053bffa42f2a2debe9a2668fe6f96`. The merged suite reports 275 passing tests.
 
-P0 publication-state synchronization and the M8 cross-functional design review are complete. The project owner authorized M9 implementation planning with the seven recorded conditions on 2026-08-08. The local planning baseline defines six separately approved, offline-first implementation slices; it does not authorize M9 implementation, live retrieval, provider activation, real-company fixtures, user uploads, API, LLM, or UI work. Qualified legal/compliance, provider-license, privacy, security, accessibility, and real-company evidence remain later blocking gates.
+P0 publication-state synchronization and the M8 cross-functional design review are complete. The
+M9 planning baseline was merged through PR #19 as `d129d3e`. The project owner separately
+authorized and approved the local M9-I1 implementation baseline, then authorized its publication
+steps. The resulting candidate contains only offline errors, hashing, and default-deny registry
+primitives. It does not authorize M9-I2 through M9-I6, live retrieval, provider activation,
+real-company fixtures, user uploads, API, LLM, or UI work. Qualified legal/compliance,
+provider-license, privacy, security, accessibility, and real-company evidence remain later gates.
+
+State terms used below are intentionally distinct:
+
+- **Merged:** M1-M8 and the M9 planning baseline are on `main`.
+- **Approved publication candidate:** M9-I1 is approved and reconstructed on its feature branch;
+  it is not part of `main` until a later merge decision.
+- **Unauthorized:** M9-I2 through M9-I6, issuer/data acquisition, live SEC/provider access, and
+  every later product or release capability.
 
 Current mainline architecture:
 
@@ -43,6 +57,15 @@ Evidence
 → Optional Dated Cycle Judgment Overlay
 → Feedback Revision
 → Exact-hash Human-Gated Agent Review and Memo
+```
+
+The M9-I1 candidate adds a separate offline foundation before any issuer workflow:
+
+```text
+Safe structured errors and bounded redaction
+→ Versioned canonical JSON/SHA-256
+↔ Implementation-separated canonical hash recomputation
+→ Immutable default-deny provider/license and concept registries
 ```
 
 The project remains pre-v1.0 and is not investment advice.
@@ -427,7 +450,7 @@ authorized that planning on 2026-08-08; the decision did not authorize implement
 
 ### M9 — Public data ingestion and accounting normalization
 
-Status: Implementation planning baseline approved; implementation not authorized
+Status: Planning baseline merged; M9-I1 implementation baseline approved for publication
 
 Planning artifact:
 
@@ -439,6 +462,13 @@ implementation into six separately approved slices covering primitives and regis
 resolution, immutable storage/manual import, disabled SEC adapters, US-GAAP normalization and
 reconciliation, and an offline end-to-end validator. All adapters remain disabled by default; live
 readiness and each implementation slice require separate authorization.
+
+M9-I1 delivers immutable safe errors, bounded redaction, canonical JSON/SHA-256,
+implementation-separated hash recomputation, a strict provider/license registry, and the bounded
+FCFF/equity-bridge concept vocabulary. SEC entries remain pending, all storage/display/export/
+redistribution rights are false, and `live_activation` is `disabled`. There is no transport,
+provider payload, credential, issuer resolver, storage, normalization, API, CLI, LLM, UI, or
+valuation behavior. M9-I2 through M9-I6 remain unauthorized.
 
 ## Current governed artifact graph
 
@@ -517,7 +547,14 @@ Validated controls include:
 - Repository copyright policy
 - Unit, integration, benchmark, and regression tests
 
-At M3 completion, the full suite reported 88 passing tests. M4 and its final review fixes brought the suite to 125. M5 brought the merged suite to 179 passing tests. M6 brought the merged suite to 242 passing tests, and M7 brought it to 275. The merged P0+M8 contract checkpoint added 10 contract tests for 285; the cross-functional review added two conditional-schema regressions for a merged total of 287. The local M9 planning baseline adds five planning-contract tests for 292 without changing valuation behavior.
+At M3 completion, the full suite reported 88 passing tests. M4 and its final review fixes brought
+the suite to 125. M5 brought the merged suite to 179 passing tests. M6 brought the merged suite to
+242 passing tests, and M7 brought it to 275. The merged P0+M8 contract checkpoint added 10 contract
+tests for 285; the cross-functional review added two conditional-schema regressions for 287. The
+merged M9 planning baseline adds five planning-contract tests for 292. The reconstructed M9-I1
+publication candidate adds 27 offline primitive and governance tests for a local total of 319,
+without changing M1-M8 valuation behavior. PR #19 planning CI passed before merge; I1 remote CI is
+not claimed until its Draft PR reports checks.
 
 ## Source and copyright policy
 
@@ -561,11 +598,18 @@ The repository does not yet provide:
 - Statistical failure-probability estimation
 - Automated extraction from private source PDFs
 
+It also does not yet provide M9-I2 issuer resolution, M9-I3 storage/manual import, M9-I4 disabled
+adapter implementations, M9-I5 normalization/reconciliation, or the M9-I6 end-to-end validator.
+
 M3 failure probabilities and recovery values are deterministic reviewed assumptions rather than statistical forecasts.
 
 ## Recommended next milestone
 
-M8's internal cross-functional contract review is complete, and the project owner authorized M9 implementation planning with conditions. The M9 planning baseline is reviewed and approved; the next checkpoint, after publishing this baseline, is a separate decision on `M9-I1` implementation. Baseline approval must not be confused with authority to implement, retrieve live data, enable a provider, or distribute a report.
+M8's internal review and the M9 planning merge are complete. M9-I1 implementation, baseline review,
+and publication authorization are complete. The next checkpoint after creating the Draft PR is its
+review; Mark Ready, approval, and merge each remain separate decisions. I1 approval must not be
+confused with authority to implement M9-I2+, retrieve live data, enable a provider, select an
+issuer, acquire pilot data, or distribute a retail report.
 
 Recommended sequencing:
 
@@ -576,7 +620,8 @@ M7: Merged implementation and remote Python 3.10/3.12 validation complete
 → Project-owner planning authorization complete
 → M9: Public-data ingestion and accounting-normalization planning baseline
 → Planning review and approval complete
-→ Separate approval for each implementation slice
+→ M9-I1 offline primitives approved for Draft PR publication
+→ Separate approval for each later implementation slice
 ```
 
 M8 has locked:
@@ -625,5 +670,6 @@ Do not commit private source material.
 Preserve composition with WFL-NAR-001, WFL-VAL-001, WFL-YNG-001,
 WFL-GRW-001, WFL-DST-001, WFL-CYC-001, and WFL-AGT-001.
 Do not treat draft M8 schemas as implemented ingestion or a retail-ready release.
-Do not treat M9 planning authorization as implementation or live-network authority.
+Treat only M9-I1 as an approved offline implementation candidate. Do not infer M9-I2+ or
+live-network authority from its approval.
 ```
