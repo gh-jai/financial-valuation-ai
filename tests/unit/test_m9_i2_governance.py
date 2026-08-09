@@ -11,12 +11,16 @@ CONTRACT = ROOT / "docs/milestones/M9-I2-issuer-resolution-contract-lock.md"
 APPROVAL = ROOT / "docs/milestones/M9-I2-contract-lock-review-approval-record.md"
 CLOSURE = ROOT / "docs/milestones/M9-I2-post-owner-approval-snapshot-closure.md"
 OWNER_ATTESTATION = ROOT / "docs/milestones/M9-I2-contract-owner-attestation.md"
+SNAPSHOT_ATTESTATION = ROOT / "docs/milestones/M9-I2-snapshot-closure-attestation.md"
 CONTRACT_SHA256 = "9326b6c76dcfe3061c5e356b5141d9f458d57694cb4e6b01b6470b0bf044d84e"
 SUBJECT_COMMIT_SHA = "743159d08ab05541a8d4fe25859bc9f9a49c5287"
 ATTESTATION_COMMIT_SHA = "a406b5fc5cfded19f116cc42309da13cea42c713"
 ATTESTATION_BLOB_SHA = "0011df140cfb44af244526b0feb3d71a8c40cdd6"
 ATTESTATION_SHA256 = "daba23aa09e9c6e3e13ed983518ecf44d4698160e38693c72357ed19b14f1a75"
 ATTESTATION_EVENT_HASH = "1c0a77e77fd3ecc755d86c0d0db3c229d5194be63eb87af5bd4984520506df83"
+SNAPSHOT_ID = "1c3754e724f98ff8324c567237070b68fe20514e678de3d1787e51d47f9da918"
+SNAPSHOT_COMMIT_SHA = "01b5d95bc990242321cfea3e6b7ddcde7b8a1f4f"
+SNAPSHOT_CARRIER_SHA256 = "335ff417785d6e97b23e395c2341910499d1661cc65c1a881219ef22576bc772"
 HASH_RE = re.compile(r"^[0-9a-f]{64}$")
 
 
@@ -47,6 +51,15 @@ def manifest_entries(text: str) -> list[tuple[str, str]]:
 
 def owner_attestation() -> dict[str, object]:
     text = OWNER_ATTESTATION.read_text(encoding="utf-8")
+    match = re.search(r"```yaml\n(.*?)\n```", text, re.DOTALL)
+    assert match
+    parsed = yaml.safe_load(match.group(1))
+    assert isinstance(parsed, dict)
+    return parsed
+
+
+def snapshot_attestation() -> dict[str, object]:
+    text = SNAPSHOT_ATTESTATION.read_text(encoding="utf-8")
     match = re.search(r"```yaml\n(.*?)\n```", text, re.DOTALL)
     assert match
     parsed = yaml.safe_load(match.group(1))
@@ -334,6 +347,47 @@ def test_second_stage_requirements_remain_fail_closed() -> None:
     assert "package closure remains `NOT_CLOSED`" in approval
     assert "has not yet been committed or received exact-subject-commit remote CI" in closure
     assert "The current package therefore remains `NOT_CLOSED`" in closure
+
+
+def test_snapshot_closure_attestation_binds_exact_subject_and_ci() -> None:
+    attestation = snapshot_attestation()
+    event = attestation["event"]
+    assert isinstance(event, dict)
+
+    assert event["decision_kind"] == "snapshot_closure_attestation"
+    assert event["decision"] == "CLOSED_WITH_SINGLE_MAINTAINER_EXCEPTION"
+    assert event["subject_kind"] == "exact_snapshot"
+    assert event["subject_id"] == SNAPSHOT_ID
+    assert event["snapshot_id"] == SNAPSHOT_ID
+    assert event["subject_commit_sha"] == SNAPSHOT_COMMIT_SHA
+    assert event["contract_sha256"] == CONTRACT_SHA256
+    assert event["evidence_sha256"] == SNAPSHOT_CARRIER_SHA256
+    assert event["previous_event_hash"] == ATTESTATION_EVENT_HASH
+    assert re.fullmatch(r"\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z", event["occurred_at"])
+
+    ci = event["ci_evidence"]
+    assert ci["workflow_run_id"] == 31315947577
+    assert ci["workflow_run_number"] == 68
+    assert ci["head_sha"] == SNAPSHOT_COMMIT_SHA
+    assert ci["status"] == "completed"
+    assert ci["conclusion"] == "success"
+    assert {job["python_version"] for job in ci["matrix_jobs"]} == {"3.10", "3.12"}
+    assert all(job["conclusion"] == "success" for job in ci["matrix_jobs"])
+    assert all(job["full_suite"] == "339 passed" for job in ci["matrix_jobs"])
+
+    text = SNAPSHOT_ATTESTATION.read_text(encoding="utf-8")
+    assert "Artifact state: `local_candidate_not_yet_immutable`" in text
+    assert "authoritative package state remains `NOT_CLOSED`" in text
+    assert "It does not authorize implementation" in " ".join(text.split())
+
+
+def test_snapshot_closure_attestation_event_hash_recomputes() -> None:
+    attestation = snapshot_attestation()
+    canonical = json.dumps(
+        attestation["event"], sort_keys=True, separators=(",", ":"), ensure_ascii=False
+    ).encode("utf-8")
+    assert HASH_RE.fullmatch(attestation["event_hash"])
+    assert hashlib.sha256(canonical).hexdigest() == attestation["event_hash"]
 
 
 def test_hook_count_includes_repository_policy_once() -> None:
