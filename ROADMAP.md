@@ -38,7 +38,9 @@ Define the supported retail user and issuer scope, five real-data interface sche
 
 Status: Cross-functional design review complete. The project owner authorized M9 implementation
 planning with the seven recorded conditions on 2026-08-08. The M9 planning baseline is merged;
-only the separately approved M9-I1 offline primitives are now a publication candidate.
+the separately approved M9-I1 offline foundation was subsequently reviewed, hardened, validated,
+and merged through PR #20. These post-M7 checkpoints do not advance the current operational
+implementation milestone beyond M7.
 
 ## M9 Public data ingestion and accounting normalization
 
@@ -48,10 +50,12 @@ Planning status: Reviewed, approved, and merged through PR #19. The planning bas
 implementation into six separately approved offline-first slices, keeps every adapter disabled by
 default, and requires a separate live-readiness approval.
 
-Implementation status: M9-I1 implementation baseline approved for publication. It adds errors,
-redaction, canonical JSON/SHA-256, independent recomputation, and strict provider/license and
-concept registries without transport or provider payloads. M9-I2 through M9-I6 remain unauthorized,
-and live SEC or provider access remains unauthorized.
+Implementation status: The bounded M9-I1 offline foundation is merged through PR #20 as
+`7b2b2d2481a6a95e76156fedf39975381811fdea`. It adds safe errors, bounded redaction, canonical
+JSON/SHA-256, implementation-separated hash recomputation, and strict provider/license and concept
+registries without transport or provider payloads. M9-I2 through M9-I6 remain unauthorized, and
+live SEC or provider access remains unauthorized. The next possible checkpoint is separately
+authorized M9-I2 issuer resolution; it has not started.
 
 ## M10 Assumption, routing, and scenario engine
 
