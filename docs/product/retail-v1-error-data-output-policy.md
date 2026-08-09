@@ -1,6 +1,6 @@
 # Retail v1 Error, Data, and Output Policy
 
-Status: M8 reviewed contract; M9 planning authorized; implementation not authorized
+Status: M8 reviewed contract; M9-I1 safe errors approved; data and output runtime unauthorized
 
 ## Error taxonomy
 

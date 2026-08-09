@@ -1,8 +1,13 @@
 # Retail v1 Pilot and Holdout Matrix
 
-Status: M8 reviewed design; M9 planning authorized; issuer selection and data acquisition are not authorized
+Status: M8 reviewed design; M9-I1 offline primitives approved; issuer selection and data
+acquisition are not authorized
 
 Issuer names are deliberately not selected in M8. Selection happens under M13 data-license and conflict-of-interest review, before viewing whether an issuer produces an attractive valuation.
+
+M9-I1 adds no issuer candidates, real-company fixtures, provider responses, or acquisition
+capability. Its provider registry remains pending and default deny. Pilot and holdout selection,
+data acquisition, and use of outcomes for mapping or tuning each require their later gates.
 
 ## Development pilots
 

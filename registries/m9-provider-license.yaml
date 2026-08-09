@@ -1,0 +1,119 @@
+registry_id: m9-provider-license
+schema_version: 0.1.0
+providers:
+  - provider_id: sec-identity
+    provider_name: SEC public issuer identity metadata
+    version: 0.1.0
+    status: pending
+    live_activation: disabled
+    endpoint_templates:
+      - https://www.sec.gov/files/company_tickers.json
+    host_allowlist:
+      - www.sec.gov
+    redirect_host_allowlist: []
+    data_categories:
+      - issuer-identity
+    authentication_class: user_agent
+    retention_days: 0
+    rights:
+      storage: false
+      display: false
+      export: false
+      redistribution: false
+    territories:
+      - US
+    attribution: SEC policy and rights review pending
+    review_date: "2026-08-08"
+    expires_on: "2026-09-07"
+    review_evidence:
+      - M8-C07 official-source recheck required before activation
+    rate_limit:
+      window_seconds: 1
+      max_requests: 1
+  - provider_id: sec-submissions
+    provider_name: SEC submissions metadata
+    version: 0.1.0
+    status: pending
+    live_activation: disabled
+    endpoint_templates:
+      - https://data.sec.gov/submissions/CIK{cik}.json
+    host_allowlist:
+      - data.sec.gov
+    redirect_host_allowlist: []
+    data_categories:
+      - issuer-submissions
+    authentication_class: user_agent
+    retention_days: 0
+    rights:
+      storage: false
+      display: false
+      export: false
+      redistribution: false
+    territories:
+      - US
+    attribution: SEC policy and rights review pending
+    review_date: "2026-08-08"
+    expires_on: "2026-09-07"
+    review_evidence:
+      - M8-C07 official-source recheck required before activation
+    rate_limit:
+      window_seconds: 1
+      max_requests: 1
+  - provider_id: sec-filings
+    provider_name: SEC filing documents
+    version: 0.1.0
+    status: pending
+    live_activation: disabled
+    endpoint_templates:
+      - https://www.sec.gov/Archives/edgar/data/{cik}/{accession}/{document}
+    host_allowlist:
+      - www.sec.gov
+    redirect_host_allowlist: []
+    data_categories:
+      - filing-document
+    authentication_class: user_agent
+    retention_days: 0
+    rights:
+      storage: false
+      display: false
+      export: false
+      redistribution: false
+    territories:
+      - US
+    attribution: SEC policy and rights review pending
+    review_date: "2026-08-08"
+    expires_on: "2026-09-07"
+    review_evidence:
+      - M8-C07 official-source recheck required before activation
+    rate_limit:
+      window_seconds: 1
+      max_requests: 1
+  - provider_id: sec-xbrl
+    provider_name: SEC company facts XBRL data
+    version: 0.1.0
+    status: pending
+    live_activation: disabled
+    endpoint_templates:
+      - https://data.sec.gov/api/xbrl/companyfacts/CIK{cik}.json
+    host_allowlist:
+      - data.sec.gov
+    redirect_host_allowlist: []
+    data_categories:
+      - xbrl-facts
+    authentication_class: user_agent
+    retention_days: 0
+    rights:
+      storage: false
+      display: false
+      export: false
+      redistribution: false
+    territories:
+      - US
+    attribution: SEC policy and rights review pending
+    review_date: "2026-08-08"
+    expires_on: "2026-09-07"
+    review_evidence:
+      - M8-C07 official-source recheck required before activation
+    rate_limit:
+      window_seconds: 1
+      max_requests: 1

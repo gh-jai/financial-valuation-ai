@@ -1,7 +1,7 @@
 # M9 Implementation Planning Review
 
 Plan: `docs/milestones/M9-public-data-ingestion-normalization-plan.md`
-Status: Planning baseline approved; implementation authorization pending
+Status: Planning baseline merged; M9-I1 separately authorized and approved
 Planning authorization: Project owner, 2026-08-08
 Planning baseline approval: Project owner, 2026-08-08
 Baseline: `e6a791a827a2a37457494ae0b184d3a37f3040a3`
@@ -48,8 +48,10 @@ Baseline: `e6a791a827a2a37457494ae0b184d3a37f3040a3`
 Planning recommendation:
 `[x] approve baseline  [ ] request changes  [ ] reject`
 
-Review conclusion: Approved on 2026-08-08. This approval accepts the planning baseline for
+Review conclusion: Approved on 2026-08-08. This planning approval accepts the planning baseline for
 publication; it does not authorize `M9-I1`, any later implementation slice, or live-network access.
+M9-I1 subsequently received separate implementation and publication decisions recorded in
+`docs/milestones/M9-I1-implementation-review.md`.
 
 Separate implementation decision:
-`[ ] authorize M9-I1 implementation  [ ] request further planning`
+`[x] authorize M9-I1 implementation  [ ] request further planning`

@@ -53,15 +53,32 @@ WFL-NAR-001
 
 Every artifact revision has a canonical SHA-256 hash. Handoffs and the two human gates bind that exact hash; any later mutation invalidates the approval and returns the run to the appropriate gate. State is independently derived from an append-only event chain. Agents have no approval, network, shell, arbitrary filesystem, private-source, secret, GitHub, brokerage, or trade authority.
 
-## Retail target boundary
+## Retail data boundary and target flow
 
-M8 defines, but does not implement, a future retail data path:
+M1-M8 and the M9 planning baseline are merged. The M9-I1 publication candidate implements only
+offline primitives at the start of the future retail data path:
 
 ```text
-Allowlisted data gateway
--> immutable public-data snapshot
--> deterministic accounting normalization
--> evidence-backed valuation case
+Structured safe errors + bounded redaction
+Versioned canonical JSON/hash <-> implementation-separated hash recomputation
+Default-deny provider/license registry + bounded concept vocabulary
+```
+
+The registries are immutable after loading. Unknown fields, types, providers, rights, territories,
+categories, dates, or concept kinds fail closed. SEC metadata remains `pending`, all four use
+rights are false, and `live_activation` is always `disabled`. No transport exists in I1.
+
+M9-I2 through M9-I6 target the rest of this data path but remain unauthorized:
+
+```text
+Explicit company request
+-> deterministic issuer candidates and verified identity (I2)
+-> provider/license policy decision
+-> immutable public-data snapshot or safe manual import (I3)
+-> disabled adapter and transport-policy implementation (I4)
+-> deterministic concept mapping, normalization, and reconciliation (I5)
+-> implementation-separated validation and M10 handoff candidate (I6)
+-> evidence-backed valuation case (M10)
 -> human case_lock
 -> network-denied M1-M6 runtime
 -> independent review
@@ -69,6 +86,12 @@ Allowlisted data gateway
 -> immutable retail report
 ```
 
-The gateway alone may fetch external data. Provider payloads, filings, uploads, and LLM text are untrusted data and cannot authorize actions. The valuation runtime remains offline and content-addressed. The report renderer may explain an approved range but cannot alter numbers or emit buy, sell, hold, sizing, timing, suitability, or execution instructions.
+The future gateway alone may fetch external data after a separate live-readiness approval. Provider
+payloads, filings, uploads, and LLM text are untrusted data and cannot authorize actions. The
+valuation runtime remains offline and content-addressed. The report renderer may explain an
+approved range but cannot alter numbers or emit buy, sell, hold, sizing, timing, suitability, or
+execution instructions.
 
-The five M8 schemas are unstable `0.1.0` interface contracts. Implementations begin in M9 and schema freeze is deferred until M14 after real-company pilots and holdouts.
+The five M8 schemas are unstable `0.1.0` interface contracts. I1 does not implement those schemas
+or ingest issuer data. Schema freeze remains deferred until M14 after real-company pilots and
+holdouts.
