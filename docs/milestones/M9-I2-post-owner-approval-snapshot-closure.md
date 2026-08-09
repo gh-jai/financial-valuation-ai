@@ -1,33 +1,35 @@
 # M9-I2 Post-Owner-Approval Exact-Snapshot Closure
 
-Status: `PASS`; exact post-owner-approval documentation snapshot closed
-Evidence date: 2026-08-09
+Status: `NOT_CLOSED`; durable review/approval provenance is incomplete
+Evidence assessment date: 2026-08-09
 Review baseline: `3945e90559ec2e10771489078c9e8f52036209b7`
 Current operational implementation milestone: M7
-Contract authority: `owner_approved`; contract boundary only
+Contract authority: `candidate`; frozen exact-SHA contract bytes only
 Publication authority: `DENIED`; separate explicit authorization required
 Runtime and data authority: `DENIED`; no M9-I2 implementation, live/provider access, real-company
 data, attachment use, or M9-I3 through M9-I6 authority
 
 ## Closure model
 
-This record closes only an exact post-owner-approval documentation snapshot. It does not alter the
-contract bytes or transfer contract approval to any other SHA-256. The subject snapshot consists
-of the five files in the ordered manifest below. This attestation carrier is deliberately outside
-the subject snapshot so that a reviewer can append a verdict without creating a self-referential
-file hash.
+This record assesses only an exact documentation snapshot. It does not alter the contract bytes or
+transfer a review or approval to another SHA-256. The subject snapshot consists of the five files
+in the ordered manifest below. This carrier is outside the subject snapshot so that evidence and a
+future verdict can be appended without creating a self-referential file hash.
 
 Closure is valid only when:
 
 - every subject-file SHA-256 matches;
 - the snapshot ID recomputes from the exact UTF-8 manifest block;
-- the independent-review attestation names that snapshot ID and returns `PASS`;
-- the attestation reports no blocking, high, or medium findings; and
-- the event order and authority boundaries below remain intact.
+- every relied-on governance event has an actor identifier, RFC 3339 UTC timestamp, exact subject,
+  immutable evidence reference and evidence hash, prior-event link, and recomputable event hash;
+- the event chain proves independent contract review before exact-SHA owner approval, followed by
+  remediation, validation, and independent exact-snapshot review;
+- reviewer/remediator identity separation is mechanically checkable; and
+- the exact-snapshot attestation returns `PASS` with no blocking, high, or medium findings.
 
-Any mismatch fails closed to `NOT_CLOSED`. The full-file SHA-256 of this carrier must also be
-reported with any handoff. Changing the carrier does not change the subject snapshot ID, but it
-invalidates the handoff until the new carrier hash and attestation are independently checked.
+Any mismatch or missing event evidence fails closed to `NOT_CLOSED`. The carrier SHA-256 must be
+reported with any handoff. Changing this carrier does not change the subject snapshot ID, but it
+invalidates a prior carrier handoff until the new bytes are independently checked.
 
 ## Ordered subject manifest
 
@@ -39,14 +41,14 @@ lowercase SHA-256 values by one ASCII space.
 ```text
 BEGIN SUBJECT MANIFEST
 4c596e806896a9693dd95766b7f5d3207c7f0969ee69e4aeeed05ab5e1e016ad docs/milestones/M9-I2-issuer-resolution-contract-lock.md
-67185fb9942783eb649a6834e0fadad0cdb1cf73537a1ac4ff6124b4f58de598 docs/milestones/M9-I2-contract-lock-review-approval-record.md
-27447057d275a7eb9396ffe7de84ae273a4b53621bb592fa51d6a7b1b511f96e PROJECT_STATUS.md
-2af3d60338e41a934ddde52cc0fa91ae6b2bca765a6c9984ddb1a3f2e2de6634 ROADMAP.md
-fd8ef8b12fba011dd92619bfe992ac4ca536bd3571389615fd3577027b4f70b5 README.md
+604b8535309e56bcd1115d465c48ac02d8de1f7e1a40662b838aec0c6b801d27 docs/milestones/M9-I2-contract-lock-review-approval-record.md
+5604b685e4dab6d94be1059f89061143d48b4878a1e82a38ae936553dc818941 PROJECT_STATUS.md
+9daeb38c2dff58af1681a3df8053ecf9239814d00cfd49d77417a60b46fdc931 ROADMAP.md
+d45d0195ce45a0d982e9a595a0e4747590e2fcbeddbbbb58d2a24bc440078715 README.md
 END SUBJECT MANIFEST
 ```
 
-Subject snapshot ID: `8558160280a48f2a43804361b61774aff911d41f5bd4a53999cf3452c128f9e6`
+Subject snapshot ID: `0dee9d0aa63672b29e95ad9d4d51add36484197fae8662f18dbe0735f939536c`
 
 Recompute from the repository root:
 
@@ -60,75 +62,99 @@ sed -n '/^BEGIN SUBJECT MANIFEST$/,/^END SUBJECT MANIFEST$/p' \
   | sed '1d;$d' | sha256sum
 ```
 
-## Governance event sequence
+## Required durable event record
 
-| Order | Date | Actor boundary | Event | Exact subject |
-|---|---|---|---|---|
-| 1 | 2026-08-09 | Independent documentation/governance reviewer, separate from authoring | Contract review `PASS` | Contract SHA-256 `4c596e806896a9693dd95766b7f5d3207c7f0969ee69e4aeeed05ab5e1e016ad` |
-| 2 | 2026-08-09 | Project owner | Explicit `APPROVED`; contract boundary only | Same exact contract SHA-256 |
-| 3 | 2026-08-09 | Independent documentation/governance reviewer, separate from authoring | Final package review returned `PASS WITH REQUIRED CHANGES`; contract approval remained valid | Post-owner-approval five-file worktree package |
-| 4 | 2026-08-09 | Documentation remediation pass | Publication ambiguity removed; exact-snapshot and durable evidence model added; status summaries made non-authoritative for closure | Contract bytes unchanged; subject snapshot to be fixed above |
-| 5 | 2026-08-09 | Local validation pass | All-candidate pre-commit and full suite | Commands and results below |
-| 6 | 2026-08-09 | Independent exact-snapshot reviewer, separate from remediation | `PASS`; no blocking, high, medium, or low findings | Subject snapshot ID `8558160280a48f2a43804361b61774aff911d41f5bd4a53999cf3452c128f9e6` |
+Every event relied on for closure must be preserved in an append-only artifact with these fields:
 
-The project-owner approval in event 2 is the only approval event. Event 6 may close the
-documentation snapshot but cannot approve publication, implementation, network/provider use,
-real-company data, attachments, or a later milestone.
+| Field | Requirement |
+|---|---|
+| `event_id` | Unique bounded identifier. |
+| `occurred_at` | RFC 3339 UTC timestamp ending in `Z`; strict ordering uses the instant, not a date label. |
+| `actor_id` | Stable bounded actor identifier; role-only labels are insufficient. |
+| `actor_role` | One of contract author, independent reviewer, project owner, remediator, validator, or exact-snapshot reviewer. |
+| `actor_type` | Human or agent, without implying authority from the type alone. |
+| `repository` | Exact canonical repository. |
+| `baseline_sha` | Exact review baseline commit. |
+| `subject_kind` | Contract, owner decision, remediation snapshot, validation result, or exact snapshot. |
+| `subject_id` | Exact contract SHA-256, snapshot ID, or decision/event ID as applicable. |
+| `decision` | Bounded verdict/decision plus its authority boundary. |
+| `evidence_ref` | Independently retrievable immutable artifact reference, not prose in this carrier. |
+| `evidence_sha256` | SHA-256 of the referenced evidence bytes. |
+| `previous_event_hash` | Prior event hash or an explicit genesis marker. |
+| `event_hash` | SHA-256 over every event field except `event_hash`. |
 
-## Reproducible validation evidence
+An owner-approval event must name the exact earlier independent-review `event_id` and event hash.
+An exact-snapshot review must name the remediation and validation events and use an `actor_id`
+different from every actor that changed the reviewed subject bytes. A single commit containing the
+claims and their supposed proof does not independently establish occurrence, separation, or order.
 
-Environment:
+## Current evidence assessment
 
-- OS/runtime context: Linux workspace; repository detached at baseline
-  `3945e90559ec2e10771489078c9e8f52036209b7`
-- Python: `3.12.13`
-- pre-commit: `4.6.1`
-- pytest: `8.4.2`
-- test environment: `/workspace/scratch/08c7bea11713/test-env` outside the repository
+The prior carrier asserted six events using only one date and role labels. It did not preserve the
+minimum durable fields:
 
-Commands, run from the repository root:
+| Claimed event | Actor ID | UTC timestamp | Immutable evidence ref/hash | Event-chain link | Result |
+|---|---|---|---|---|---|
+| Contract review `PASS` | Missing | Missing | Missing | Missing | Not auditable |
+| Exact-SHA project-owner approval | Missing | Missing | Missing | Missing | Not auditable |
+| Package review with required changes | Missing | Missing | Missing | Missing | Not auditable |
+| Documentation remediation | Missing | Missing | Missing | Missing | Not auditable |
+| Local validation | Missing | Missing | Missing | Missing | Not auditable |
+| Exact-snapshot review `PASS` | Missing | Missing | Missing | Missing | Not auditable |
 
-```bash
-git diff --cached --quiet
-git ls-files -z --cached --others --exclude-standard \
-  | xargs -0 /workspace/scratch/08c7bea11713/test-env/bin/pre-commit run --files
-FVI_M9I2_TEST_TMP="$(mktemp -d \
-  /workspace/scratch/08c7bea11713/m9i2-closure.XXXXXX)"
-/workspace/scratch/08c7bea11713/test-env/bin/pytest \
-  --basetemp="${FVI_M9I2_TEST_TMP}/pytest"
-```
+The branch commit `5a7e5cb2a09806b6545e9837078ed60374c5187b` is immutable evidence of the
+published documentation bytes and Git identity only. Because all six files were introduced in that
+single commit, it does not prove that the claimed review preceded approval, that reviewers were
+separate from authors/remediators, or that a pre-attestation carrier existed.
 
-Recorded results for the subject snapshot:
+The earlier pre-attestation SHA-256
+`770929fe7a7b2bfcfa7710fa38bd60733f62e5ff553c9abbf7cf8e929bff12ee` is retained as a historical
+assertion. No independently retrievable artifact containing those exact bytes was preserved, so
+the value cannot serve as closure evidence.
 
-- Git index: empty; `git diff --cached --quiet` exited `0`
-- all-candidate pre-commit: `PASS`; all 16 configured hooks passed without rewriting files
-- full pytest suite: `PASS`; 325 tests passed on Python 3.12.13 with pytest 8.4.2
-- contract SHA-256 unchanged:
-  `4c596e806896a9693dd95766b7f5d3207c7f0969ee69e4aeeed05ab5e1e016ad`
-- prohibited source or attachment use: none; no file under `project_sources/` was read or used
+## Historical validation and attestation assertions
 
-## Independent exact-snapshot attestation
+The prior carrier recorded 325 passing tests and all 16 configured pre-commit hooks for the earlier
+snapshot. The configuration consists of six upstream hooks plus all 10 local hooks, including
+repository policy. That wording replaces the earlier imprecise statement that counted repository
+policy separately from the 10 local hooks.
 
-- Reviewer boundary: independent documentation/governance reviewer, separate from the remediation
-  pass
-- Reviewed subject snapshot ID:
-  `8558160280a48f2a43804361b61774aff911d41f5bd4a53999cf3452c128f9e6`
-- Review date: 2026-08-09
-- Verdict: `PASS`
-- Blocking findings: none
-- High findings: none
-- Medium findings: none
-- Low observations: none
-- Independent reproduction: 325 tests passed; all 10 local validation hooks and repository policy
-  passed; the configured 16-hook set, commands, versions, and recorded results were verified as
-  adequate and reproducible for the exact snapshot
-- Carrier integrity check: pre-attestation carrier SHA-256
-  `770929fe7a7b2bfcfa7710fa38bd60733f62e5ff553c9abbf7cf8e929bff12ee` matched the reviewed
-  candidate. The full attested-carrier SHA-256 is intentionally external to this non-self-referential
-  record and must be recomputed and reported with the handoff.
+Those test results are useful historical execution evidence but cannot repair missing review or
+approval provenance. Changes made during remediation also require fresh validation against the new
+subject snapshot.
 
-The exact subject snapshot is `CLOSED`. This closure does not authorize publication,
-implementation, network/provider use, real-company data, attachments, or a later milestone.
+Fresh remediation validation for subject snapshot
+`0dee9d0aa63672b29e95ad9d4d51add36484197fae8662f18dbe0735f939536c` completed in the local
+workspace on Python 3.12.13 with pytest 8.4.2:
+
+- all-candidate pre-commit: `PASS`; all 16 configured hooks passed without rewriting files;
+- hook composition: six upstream hooks and 10 local hooks, including repository policy;
+- full pytest suite: `PASS`; 331 tests passed;
+- focused governance regressions: `PASS`; six tests passed; and
+- `git diff --check`: `PASS`.
+
+These results demonstrate reproducibility of the remediated bytes. They are not a substitute for a
+durable validation event or for the missing independent review and project-owner approval events,
+so the closure state remains `NOT_CLOSED`.
+
+The prior exact-snapshot `PASS` is retained only as a historical assertion. It has no actor ID, UTC
+timestamp, immutable evidence reference, or event-chain link and therefore grants no closure state.
+It must not be silently upgraded by adding invented metadata after the fact.
+
+## Required path to closure
+
+1. Record a fresh independent contract review for the unchanged contract SHA-256 with durable event
+   evidence and an identified reviewer separate from contract authoring/remediation.
+2. After that `PASS`, record a fresh project-owner decision that names the review event and exact
+   contract SHA-256.
+3. Recompute the post-approval subject manifest and record remediation/validation events with exact
+   hashes and immutable references.
+4. Obtain a separate exact-snapshot review, durably record its verdict, and verify the full event
+   hash chain.
+
+Until every step is satisfied, the exact subject snapshot is `NOT_CLOSED`. This state does not
+authorize publication, implementation, network/provider use, real-company data, attachments, or a
+later milestone.
 
 ## Source boundary
 

@@ -1,7 +1,7 @@
 # M9-I2 Contract Lock — Review and Approval Record
 
-Status: Project-owner approved; contract boundary only
-Post-owner-approval package closure: Controlled by the exact-snapshot closure evidence record
+Status: `candidate`; historical review/approval assertions are not independently auditable
+Post-owner-approval package closure: `NOT_CLOSED`
 Contract path: `docs/milestones/M9-I2-issuer-resolution-contract-lock.md`
 Contract SHA-256: `4c596e806896a9693dd95766b7f5d3207c7f0969ee69e4aeeed05ab5e1e016ad`
 Review baseline: `3945e90559ec2e10771489078c9e8f52036209b7`
@@ -12,91 +12,99 @@ Network and data state: Denied; synthetic offline design only
 ## Purpose and authority
 
 This record carries the mutable governance state for the frozen M9-I2 contract payload. A review or
-approval applies only when the contract path and recomputed SHA-256 exactly match the values above.
-This record does not authorize M9-I2 runtime implementation, staging, committing, pushing, creating
-or changing a pull request, live SEC/provider access, provider activation, real-company data,
-attachments, or M9-I3 through M9-I6.
+approval applies only when the contract path and recomputed SHA-256 exactly match the values above
+and the event evidence satisfies the durable-evidence requirements below. This record does not
+authorize M9-I2 runtime implementation, staging, committing, pushing, creating or changing a pull
+request, live SEC/provider access, provider activation, real-company data, attachments, or M9-I3
+through M9-I6.
 
-Repository status summaries are informational. If they conflict with this record, or if the
-contract hash does not match, the contract fails closed to `candidate`. Contract approval and
-post-owner-approval package closure are separate decisions. The latter is authoritative only in
+Repository status summaries are informational. If they conflict with this record, if the contract
+hash does not match, or if required event evidence is absent, the contract fails closed to
+`candidate`. Contract approval and post-owner-approval package closure are separate decisions. The
+latter is authoritative only in
 `docs/milestones/M9-I2-post-owner-approval-snapshot-closure.md`.
 
 ## Exact-SHA lineage
 
-| Contract SHA-256 | Independent review | Project-owner decision | Repository-use state |
+| Contract SHA-256 | Historical assertion | Auditable governance state | Repository-use state |
 |---|---|---|---|
-| `4bb47ef11c645f8f38f1112c433d63e8670ae5fe48a7896bb325d86d122f7d7b` | `PASS`; five rounds; 16 cumulative findings resolved | Approved 2026-08-09 | Superseded for repository publication after documentation/governance review found six trailing-whitespace violations and no explicit external-state record. The semantic review and approval remain historical evidence but do not transfer to changed bytes. |
-| `4c596e806896a9693dd95766b7f5d3207c7f0969ee69e4aeeed05ab5e1e016ad` | `PASS`; contract review completed 2026-08-09 | Approved 2026-08-09 | Owner-approved contract boundary. Package closure is controlled separately by the exact-snapshot closure evidence record. Publication and implementation remain subject to separate explicit authorization; live or real-data use remains unauthorized. |
+| `4bb47ef11c645f8f38f1112c433d63e8670ae5fe48a7896bb325d86d122f7d7b` | Five review rounds, 16 findings resolved, and owner approval were recorded on 2026-08-09. | Historical only; superseded bytes and no durable event references. | Superseded for repository publication after documentation/governance findings. |
+| `4c596e806896a9693dd95766b7f5d3207c7f0969ee69e4aeeed05ab5e1e016ad` | A contract review `PASS` and exact-SHA owner approval were recorded on 2026-08-09. | `candidate`; actor identifiers, UTC event timestamps, immutable evidence references, and a verifiable event chain were not preserved. | Frozen contract candidate only. Publication and implementation remain separately unauthorized. |
 
-## Pre-owner-approval independent-review record
+The historical assertions explain the document's provenance but grant no current authority. They
+must not be promoted to `independently_reviewed` or `owner_approved` without fresh durable evidence.
 
-- Reviewed contract SHA-256: `4c596e806896a9693dd95766b7f5d3207c7f0969ee69e4aeeed05ab5e1e016ad`
-- Reviewer separation: satisfied by an independent documentation/governance reviewer, separate
-  from the authoring pass.
-- Review scope at the time of review: contract bytes and the then-current governance record,
-  `PROJECT_STATUS.md`, `ROADMAP.md`, and `README.md`, all against baseline
-  `3945e90559ec2e10771489078c9e8f52036209b7`.
-- Required checks: exact-hash recomputation, external-state consistency, pre-commit, full test
-  suite, M1-M7 governance preservation, M9-I2 runtime exclusion, and live/private-data exclusion.
-- Verdict: `PASS`
-- Review date: 2026-08-09
-- Blocking, high, or medium findings: none
-- Non-blocking observation: test-run scratch output existed outside the repository and outside the
-  frozen review scope; it is not eligible for staging or publication.
+## Durable event evidence requirements
 
-This verdict establishes the prerequisite contract review for owner approval. It does not claim
-that the mutable record or status-summary bytes written after owner approval have completed final
-package closure.
+Every review or approval event used by the external state machine must preserve all of the
+following in an append-only, independently retrievable artifact:
 
-Before an independent `PASS`, the state remains `candidate`. `PASS WITH REQUIRED CHANGES` or `FAIL`
-does not advance the state. Any change to the contract bytes requires a new SHA-256 and a new
-review entry.
+- a unique `event_id` and the prior event's hash or an explicit genesis marker;
+- an RFC 3339 UTC `occurred_at` timestamp with a terminal `Z`;
+- a bounded `actor_id`, `actor_role`, and human/agent boundary;
+- the exact repository, baseline, subject path, and subject SHA-256;
+- the verdict or decision and its authority boundary;
+- an immutable artifact reference plus the SHA-256 of the referenced evidence bytes; and
+- an event hash computed over all event fields other than the event hash itself.
 
-## Current project-owner approval record
+For an independent review, the reviewer `actor_id` must differ from every authoring or remediation
+actor for the reviewed bytes. Owner approval must reference a qualifying earlier independent
+`PASS` event for the same exact contract SHA-256. Dates without times, role labels without actor
+identifiers, and prose in the same commit as the claimed decision are not sufficient evidence.
 
-- Approval subject: contract SHA-256
+## Historical pre-owner-review assertion
+
+- Asserted reviewed contract SHA-256:
   `4c596e806896a9693dd95766b7f5d3207c7f0969ee69e4aeeed05ab5e1e016ad`
-- Prerequisite: independent `PASS` for the same SHA-256
-- Decision: `APPROVED`
-- Decision date: 2026-08-09
-- Approval boundary: the frozen M9-I2 issuer-resolution contract boundary only; no implementation,
-  staging, committing, pushing, pull-request, live SEC/provider, real-company-data, attachment, or
-  M9-I3 through M9-I6 authority is granted.
+- Asserted verdict/date: `PASS`, 2026-08-09
+- Asserted reviewer boundary: independent documentation/governance reviewer
+- Preserved actor identifier: **missing**
+- Preserved UTC event timestamp: **missing**
+- Immutable review artifact reference and evidence hash: **missing**
+- Verifiable event ID/hash-chain link: **missing**
+- Governance result: does not advance the exact SHA beyond `candidate`
 
-The state is `owner_approved` because the project owner explicitly approved this exact SHA-256 after
-the independent `PASS`. Approval of an earlier SHA-256, approval of a diff description, or approval
-of this record without naming the contract SHA-256 does not transfer. Contract approval does not
+Any future independent review must be a new event. It must not backfill an invented identity,
+timestamp, or evidence reference for the historical assertion.
+
+## Historical project-owner approval assertion
+
+- Asserted approval subject:
+  `4c596e806896a9693dd95766b7f5d3207c7f0969ee69e4aeeed05ab5e1e016ad`
+- Asserted decision/date: `APPROVED`, 2026-08-09
+- Preserved owner actor identifier: **missing**
+- Preserved UTC event timestamp: **missing**
+- Immutable approval artifact reference and evidence hash: **missing**
+- Verifiable reference to a qualifying earlier review event: **missing**
+- Governance result: does not advance the exact SHA to `owner_approved`
+
+A fresh project-owner decision may occur only after a fresh, durably evidenced independent `PASS`
+for the same exact SHA. Such approval would cover the frozen contract boundary only and would not
 authorize publication or implementation.
 
 ## Post-owner-approval exact-snapshot closure
 
-The authoritative closure evidence is
-`docs/milestones/M9-I2-post-owner-approval-snapshot-closure.md`. Package closure fails closed unless
-all of the following are true:
+The authoritative closure assessment is
+`docs/milestones/M9-I2-post-owner-approval-snapshot-closure.md`. Package closure remains
+`NOT_CLOSED` unless all subject hashes and the snapshot ID recompute and the durable event chain
+proves, in order:
 
-1. every subject path and SHA-256 in its ordered manifest matches the repository bytes;
-2. its snapshot ID recomputes from that exact manifest;
-3. the contract SHA-256 remains
-   `4c596e806896a9693dd95766b7f5d3207c7f0969ee69e4aeeed05ab5e1e016ad`;
-4. the event sequence records contract review before exact-SHA owner approval, followed by
-   post-approval remediation, validation, and an independent exact-snapshot review; and
-5. the independent reviewer attests `PASS` for that snapshot ID with no blocking, high, or medium
-   findings.
+1. independent contract review;
+2. exact-SHA project-owner approval referencing that review;
+3. post-approval remediation and validation; and
+4. an independent exact-snapshot `PASS` by an actor separate from remediation.
 
-Any change to a subject file invalidates that closure without changing or revoking the separate
-exact-SHA contract approval. Neither closure nor contract approval authorizes publication or
-implementation.
+Any change to a subject file invalidates an earlier snapshot closure. Neither a closed snapshot nor
+contract approval would authorize publication or implementation.
 
-## Verification evidence supporting owner approval
+## Current verification state
 
-- [x] Contract SHA-256 recomputed and equal to the reviewed contract value.
-- [x] All-candidate pre-commit checks pass without rewriting files: 16 hooks passed.
-- [x] Full repository test suite passes: 325 tests passed.
-- [x] Independent review returns `PASS` for the exact contract SHA-256 and frozen review scope.
+- [x] Contract SHA-256 recomputes to the frozen candidate value.
 - [x] No M9-I2 runtime, live provider access, real-company material, or attachment content is added.
-- [x] Git index remains empty; publication actions remain subject to separate explicit
-  authorization.
+- [ ] A durable independent-review event exists for the exact contract SHA-256.
+- [ ] A later durable project-owner approval event references that exact review event.
+- [ ] The post-owner-approval package has a complete, independently verifiable event chain.
+- [ ] Package closure is established.
 
 ## Source boundary
 

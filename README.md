@@ -51,10 +51,11 @@ and judgment vertical slices. M7 completes the governed `Workflow -> Agent -> Pr
 without granting agents autonomous approval, private-source, network, shell, or trading authority.
 M8's cross-functional design review and the M9 planning baseline are merged. M9-I1 is a merged
 offline foundation containing errors, hashing, and default-deny registry primitives. The revised
-M9-I2 issuer-resolution contract lock has an independent `PASS` and exact-SHA project-owner
-approval for the contract boundary only; publication, runtime, M9-I3 through M9-I6, and every
-live-data capability remain separately gated. Package-final closure is controlled by the
-recomputable manifest and reviewer attestation in
+M9-I2 issuer-resolution contract bytes are frozen at an exact SHA, but the historical review and
+owner-approval assertions lack durable actor, UTC timestamp, immutable-reference, and event-chain
+evidence. Governance therefore fails closed to `candidate`; publication, runtime, M9-I3 through
+M9-I6, and every live-data capability remain separately gated. Package closure is `NOT_CLOSED` as
+recorded by the recomputable manifest and evidence assessment in
 `docs/milestones/M9-I2-post-owner-approval-snapshot-closure.md`, not by this summary. M9-M14 are the
 retail-product delivery path; no live issuer ingestion or user interface exists. See
 [ROADMAP.md](ROADMAP.md) and [PROJECT_STATUS.md](PROJECT_STATUS.md).
@@ -96,11 +97,12 @@ Run `pre-commit install` once to enable local checks. See [CONTRIBUTING.md](CONT
   SHA-256, implementation-separated recomputation, strict provider/license policy, and a bounded
   concept vocabulary. Network transport, issuer resolution, provider activation, real-company
   fixtures, uploads, normalization, API, LLM, and UI remain absent or unauthorized.
-- M9-I2 owner-approved contract lock: deterministic offline issuer-resolution boundaries, exact-hash
+- M9-I2 frozen contract candidate: deterministic offline issuer-resolution boundaries, exact-hash
   human selection, structural scope pre-screening, independent validation, synthetic-only
-  regression requirements, and an external exact-SHA review/approval state model. The revised
-  contract has passed independent review and received contract-boundary project-owner approval.
-  Package-final closure must be verified from the separate exact-snapshot evidence record.
+  regression requirements, and an external exact-SHA review/approval state model. Historical
+  review and approval assertions are retained as provenance but do not satisfy that state model;
+  fresh durably evidenced review and owner approval are required. Package closure is
+  `NOT_CLOSED` in the separate exact-snapshot evidence record.
   Publication and runtime implementation remain subject to separate explicit authorization; live
   access and real-company data remain unauthorized.
 
