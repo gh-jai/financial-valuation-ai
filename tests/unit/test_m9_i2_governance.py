@@ -21,6 +21,12 @@ ATTESTATION_EVENT_HASH = "1c0a77e77fd3ecc755d86c0d0db3c229d5194be63eb87af5bd4984
 SNAPSHOT_ID = "1c3754e724f98ff8324c567237070b68fe20514e678de3d1787e51d47f9da918"
 SNAPSHOT_COMMIT_SHA = "01b5d95bc990242321cfea3e6b7ddcde7b8a1f4f"
 SNAPSHOT_CARRIER_SHA256 = "335ff417785d6e97b23e395c2341910499d1661cc65c1a881219ef22576bc772"
+SNAPSHOT_ATTESTATION_COMMIT_SHA = "1f1f0fd65e067015a17b016536f04ca9435493c3"
+SNAPSHOT_ATTESTATION_BLOB_SHA = "955fae32f148385b4eb09f72d3775d8898fbf8ef"
+SNAPSHOT_ATTESTATION_SHA256 = "16984ab5492114d111b1ba2c9c56e6a1c433a7fc6db3ace79d6dc2344bf7c12c"
+SNAPSHOT_ATTESTATION_EVENT_HASH = (
+    "288270085de0794ed954ef10ab41746a85fe357e6c02d5ff1a43adb949aabcea"
+)
 HASH_RE = re.compile(r"^[0-9a-f]{64}$")
 
 
@@ -92,15 +98,16 @@ def test_subject_manifest_and_snapshot_id_recompute() -> None:
     assert match.group(1) == expected_snapshot
 
 
-def test_missing_snapshot_closure_event_fails_closed() -> None:
+def test_completed_snapshot_closure_preserves_fail_closed_schema() -> None:
     approval = APPROVAL.read_text(encoding="utf-8")
     closure = closure_text()
 
     assert "Status: `owner_approved_with_exception`" in approval
     assert "Post-owner-approval package closure: `NOT_CLOSED`" in approval
-    assert "Status: `NOT_CLOSED`" in closure
-    assert "the exact subject snapshot is `NOT_CLOSED`" in closure
-    assert "The exact subject snapshot is `CLOSED`" not in closure
+    assert "Status: `CLOSED_WITH_SINGLE_MAINTAINER_EXCEPTION`" in closure
+    assert "both ordered immutable exception events verified" in closure
+    assert "Any hash, event-chain, immutable-object" in closure
+    assert "mismatch fails closed to `NOT_CLOSED`" in closure
 
     for required_field in (
         "`event_id`",
@@ -146,7 +153,7 @@ def test_historical_assertions_cannot_satisfy_actor_separation_or_ordering() -> 
     assert "does not prove that the claimed review preceded approval" in closure
 
 
-def test_status_summaries_preserve_approved_with_exception_and_not_closed_state() -> None:
+def test_frozen_subject_summaries_preserve_attested_preclosure_bytes() -> None:
     summaries = {
         path: (ROOT / path).read_text(encoding="utf-8")
         for path in ("PROJECT_STATUS.md", "ROADMAP.md", "README.md")
@@ -155,6 +162,11 @@ def test_status_summaries_preserve_approved_with_exception_and_not_closed_state(
         assert "`owner_approved_with_exception`" in text
         assert "`NOT_CLOSED`" in text
         assert "single-maintainer" in text
+
+    closure = closure_text()
+    assert "historical snapshot bytes, not a competing current\nverdict" in closure
+    assert "Altering them would invalidate the attestation" in closure
+    assert "carrier is the authoritative current\nclosure assessment" in closure
 
     combined = "\n".join(summaries.values())
     for stale_claim in (
@@ -217,10 +229,10 @@ def test_exception_evidence_schema_is_complete_and_first_stage_is_immutable() ->
     assert "The contract state is therefore\n`owner_approved_with_exception`" in approval
     assert "focused M9-I2 governance regressions: `PASS`; nine tests passed" in closure
     assert "full pytest suite: `PASS`; 334 tests passed" in closure
-    assert "The ordered `snapshot_closure_attestation` is necessarily absent" in closure
+    assert "The ordered second-stage `snapshot_closure_attestation` is now immutable" in closure
     assert "focused M9-I2 governance regressions: `PASS`; 14 tests passed" in closure
     assert "full pytest suite: `PASS`; 339 tests passed" in closure
-    assert "It is not exact-subject-commit remote\nCI" in closure
+    assert "Exact-subject-commit remote\nCI and the immutable `snapshot_closure_attestation`" in closure
 
 
 def test_exception_states_are_distinct_and_fail_closed_on_change() -> None:
@@ -318,8 +330,8 @@ def test_published_attestation_advances_only_contract_state() -> None:
     assert "Status: `owner_approved_with_exception`" in approval
     assert ATTESTATION_COMMIT_SHA in approval
     assert sha256(OWNER_ATTESTATION) == ATTESTATION_SHA256
-    assert "Status: `NOT_CLOSED`" in closure
-    assert "`snapshot_closure_attestation` is necessarily absent" in closure
+    assert "Status: `CLOSED_WITH_SINGLE_MAINTAINER_EXCEPTION`" in closure
+    assert SNAPSHOT_ATTESTATION_COMMIT_SHA in closure
     assert "CLOSED_WITH_SINGLE_MAINTAINER_EXCEPTION` claim" in attestation_text
 
 
@@ -338,15 +350,20 @@ def test_approval_record_references_exact_immutable_attestation_objects() -> Non
     assert "never `independently_reviewed` or unqualified `owner_approved`" in normalized
 
 
-def test_second_stage_requirements_remain_fail_closed() -> None:
+def test_second_stage_immutable_objects_close_only_exact_snapshot() -> None:
     approval = " ".join(APPROVAL.read_text(encoding="utf-8").split())
     closure = " ".join(closure_text().split())
 
     assert "This record update creates a new subject snapshot" in approval
     assert "snapshot_closure_attestation" in approval
     assert "package closure remains `NOT_CLOSED`" in approval
-    assert "has not yet been committed or received exact-subject-commit remote CI" in closure
-    assert "The current package therefore remains `NOT_CLOSED`" in closure
+    assert SNAPSHOT_ATTESTATION_COMMIT_SHA in closure
+    assert SNAPSHOT_ATTESTATION_BLOB_SHA in closure
+    assert SNAPSHOT_ATTESTATION_SHA256 in closure
+    assert SNAPSHOT_ATTESTATION_EVENT_HASH in closure
+    assert f"blob/{SNAPSHOT_ATTESTATION_COMMIT_SHA}/docs/milestones/M9-I2-snapshot-closure-attestation.md" in closure
+    assert "package state is `CLOSED_WITH_SINGLE_MAINTAINER_EXCEPTION`" in closure
+    assert "does not authorize publication, implementation" in closure
 
 
 def test_snapshot_closure_attestation_binds_exact_subject_and_ci() -> None:
@@ -388,6 +405,30 @@ def test_snapshot_closure_attestation_event_hash_recomputes() -> None:
     ).encode("utf-8")
     assert HASH_RE.fullmatch(attestation["event_hash"])
     assert hashlib.sha256(canonical).hexdigest() == attestation["event_hash"]
+
+
+def test_snapshot_attestation_immutable_bytes_and_validation_run_are_bound() -> None:
+    closure = " ".join(closure_text().split())
+
+    assert sha256(SNAPSHOT_ATTESTATION) == SNAPSHOT_ATTESTATION_SHA256
+    assert snapshot_attestation()["event_hash"] == SNAPSHOT_ATTESTATION_EVENT_HASH
+    assert "Validate` run #69" in closure
+    assert "31316921540" in closure
+    assert "93253567690" in closure
+    assert "93253567722" in closure
+    assert "each passed all validation and repository-policy steps and 341 tests" in closure
+
+
+def test_carrier_only_transition_leaves_subject_manifest_unchanged() -> None:
+    closure = closure_text()
+
+    assert "Carrier update state: `local_candidate_not_yet_immutable`" in closure
+    for expected_digest, relative_path in manifest_entries(closure):
+        assert sha256(ROOT / relative_path) == expected_digest
+    assert snapshot_attestation()["event"]["subject_commit_sha"] == SNAPSHOT_COMMIT_SHA
+    assert "[complete in this local candidate] update only this out-of-manifest carrier" in closure
+    assert "without altering a subject file" in closure
+    assert "published authoritative repository state only after separately authorized" in closure
 
 
 def test_hook_count_includes_repository_policy_once() -> None:

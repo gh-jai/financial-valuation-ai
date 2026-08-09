@@ -1,6 +1,7 @@
 # M9-I2 Post-Owner-Approval Exact-Snapshot Closure
 
-Status: `NOT_CLOSED`; first exception event verified, snapshot-closure event still absent
+Status: `CLOSED_WITH_SINGLE_MAINTAINER_EXCEPTION`; both ordered immutable exception events verified
+Carrier update state: `local_candidate_not_yet_immutable`
 Evidence assessment date: 2026-08-09
 Review baseline: `3945e90559ec2e10771489078c9e8f52036209b7`
 Current operational implementation milestone: M7
@@ -161,10 +162,41 @@ waiver, and residual-risk acceptance. `Validate` run
 [#67](https://github.com/gh-jai/financial-valuation-ai/actions/runs/31314762621) also verified the
 immutable attestation commit on Python 3.10 and 3.12 with 337 tests per job.
 
-That event advances only the contract to `owner_approved_with_exception`. This approval-record and
-status-summary update creates a new subject snapshot that has not yet been committed or received
-exact-subject-commit remote CI. The ordered `snapshot_closure_attestation` is necessarily absent.
-The current package therefore remains `NOT_CLOSED`.
+That event advances only the contract to `owner_approved_with_exception`. The subsequent
+approval-record and status-summary update created exact subject snapshot
+`1c3754e724f98ff8324c567237070b68fe20514e678de3d1787e51d47f9da918`, preserved in subject commit
+`01b5d95bc990242321cfea3e6b7ddcde7b8a1f4f`. `Validate` run
+[#68](https://github.com/gh-jai/financial-valuation-ai/actions/runs/31315947577) completed
+successfully for that exact head, with Python 3.10 and 3.12 each passing 339 tests.
+
+The ordered second-stage `snapshot_closure_attestation` is now immutable in commit
+`1f1f0fd65e067015a17b016536f04ca9435493c3`. Its fixed blob is
+`955fae32f148385b4eb09f72d3775d8898fbf8ef`, its file SHA-256 is
+`16984ab5492114d111b1ba2c9c56e6a1c433a7fc6db3ace79d6dc2344bf7c12c`, and canonical event hash
+`288270085de0794ed954ef10ab41746a85fe357e6c02d5ff1a43adb949aabcea` recomputes. The immutable
+reference is
+`https://github.com/gh-jai/financial-valuation-ai/blob/1f1f0fd65e067015a17b016536f04ca9435493c3/docs/milestones/M9-I2-snapshot-closure-attestation.md`.
+Its event links to first-stage event hash
+`1c0a77e77fd3ecc755d86c0d0db3c229d5194be63eb87af5bd4984520506df83`, binds the unchanged subject
+snapshot and commit, records the successful exact-subject `Validate` run #68, discloses the shared
+owner/author/remediator identity, accepts the bounded residual risk, and reports no unresolved
+blocking, high, or medium finding.
+
+`Validate` run [#69](https://github.com/gh-jai/financial-valuation-ai/actions/runs/31316921540)
+independently verified the immutable attestation commit. Job
+[`93253567690`](https://github.com/gh-jai/financial-valuation-ai/actions/runs/31316921540/job/93253567690)
+on Python 3.12 and job
+[`93253567722`](https://github.com/gh-jai/financial-valuation-ai/actions/runs/31316921540/job/93253567722)
+on Python 3.10 completed successfully; each passed all validation and repository-policy steps and
+341 tests. The complete ordered exception path is therefore mechanically verifiable, and this
+out-of-manifest carrier records the exact subject snapshot as
+`CLOSED_WITH_SINGLE_MAINTAINER_EXCEPTION`.
+
+The five subject files intentionally retain the pre-closure `NOT_CLOSED` statements that were
+hashed into the attested snapshot. They are historical snapshot bytes, not a competing current
+verdict. Altering them would invalidate the attestation. This carrier is the authoritative current
+closure assessment because the contract explicitly places it outside the subject manifest for the
+final carrier-only transition.
 
 ## Historical validation and attestation assertions
 
@@ -216,8 +248,31 @@ workspace on Python 3.12.13 with pytest 8.4.2 and jsonschema 4.26.0:
 - full pytest suite: `PASS`; 339 tests passed; and
 - `git diff --check`: `PASS`.
 
-This validates the recomputable local candidate bytes only. It is not exact-subject-commit remote
-CI and is not an immutable `snapshot_closure_attestation`; package closure remains `NOT_CLOSED`.
+This was local validation of the recomputable subject candidate bytes. Exact-subject-commit remote
+CI and the immutable `snapshot_closure_attestation` were subsequently published and verified as
+recorded in the current evidence assessment above.
+
+Immutable second-stage publication verification for attestation commit
+`1f1f0fd65e067015a17b016536f04ca9435493c3` completed in `Validate` run #69:
+
+- Python 3.10.20: `PASS`; 341 tests passed;
+- Python 3.12.13: `PASS`; 341 tests passed;
+- pytest 8.4.2 and jsonschema 4.26.0;
+- all validation and repository-policy steps: `PASS`; and
+- the workflow's pull-request head is the exact attestation commit.
+
+Current local validation for this carrier-only transition completed in the local workspace on
+Python 3.12.13 with pytest 8.4.2 and jsonschema 4.26.0:
+
+- focused M9-I2 governance regressions: `PASS`; 18 tests passed;
+- all-candidate pre-commit: `PASS`; all 16 configured hooks passed without rewriting files;
+- hook composition: six upstream hooks and 10 local hooks, including repository policy;
+- full pytest suite: `PASS`; 343 tests passed; and
+- `git diff --check`: `PASS`.
+
+These results validate the final local candidate bytes. The carrier transition becomes the
+published authoritative repository state only after separately authorized staging, commit, push,
+and exact-head remote verification.
 
 The prior exact-snapshot `PASS` is retained only as a historical assertion. It has no actor ID, UTC
 timestamp, immutable evidence reference, or event-chain link and therefore grants no closure state.
@@ -239,16 +294,18 @@ When no eligible independent reviewer is reasonably available, the alternative p
 2. [complete] obtain successful remote CI and complete validation for that immutable subject
    commit, then publish an immutable `contract_owner_attestation` satisfying every exception field
    and advance only the contract state to `owner_approved_with_exception` in the approval record;
-3. [current] publish that approval-record update, recompute the subject manifest, obtain successful
+3. [complete] publish that approval-record update, recompute the subject manifest, obtain successful
    remote CI for the new immutable subject commit, and confirm no unresolved
    blocking/high/medium finding;
-4. publish a separate immutable `snapshot_closure_attestation` bound to that exact subject commit
+4. [complete] publish a separate immutable `snapshot_closure_attestation` bound to that exact subject commit
    and snapshot ID; and
-5. update only this out-of-manifest carrier to reference the second event and record
+5. [complete in this local candidate] update only this out-of-manifest carrier to reference the second event and record
    `CLOSED_WITH_SINGLE_MAINTAINER_EXCEPTION`, without altering a subject file.
 
-Until every selected-path step is satisfied, the exact subject snapshot is `NOT_CLOSED`. No closure
-state authorizes publication, implementation, network/provider use, real-company data,
+Every selected-path evidence step is satisfied for the unchanged exact subject snapshot, so its
+package state is `CLOSED_WITH_SINGLE_MAINTAINER_EXCEPTION`. Any hash, event-chain, immutable-object,
+CI, finding-disposition, or authority-boundary mismatch fails closed to `NOT_CLOSED`. This closure
+state does not authorize publication, implementation, network/provider use, real-company data,
 attachments, or a later milestone.
 
 ## Source boundary
