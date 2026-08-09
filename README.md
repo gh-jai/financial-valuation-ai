@@ -53,8 +53,8 @@ M8's cross-functional design review and the M9 planning baseline are merged. M9-
 offline foundation containing errors, hashing, and default-deny registry primitives. The revised
 M9-I2 issuer-resolution contract bytes now define a narrow single-maintainer
 documentation-governance exception without weakening runtime separation or later qualified-review
-gates. No immutable subject commit, exact-subject-commit remote CI evidence, or first-stage owner
-attestation exists yet, so governance still fails closed to `candidate`; publication, runtime,
+gates. A verified immutable first-stage owner attestation and exact-subject-commit CI advance only
+the contract to `owner_approved_with_exception`; publication, runtime,
 M9-I3 through M9-I6, and every live-data
 capability remain separately gated. Package closure is `NOT_CLOSED` as recorded by the recomputable
 manifest and evidence assessment in
@@ -99,15 +99,16 @@ Run `pre-commit install` once to enable local checks. See [CONTRIBUTING.md](CONT
   SHA-256, implementation-separated recomputation, strict provider/license policy, and a bounded
   concept vocabulary. Network transport, issuer resolution, provider activation, real-company
   fixtures, uploads, normalization, API, LLM, and UI remain absent or unauthorized.
-- M9-I2 frozen contract candidate: deterministic offline issuer-resolution boundaries, exact-hash
+- M9-I2 frozen contract: deterministic offline issuer-resolution boundaries, exact-hash
   human selection, structural scope pre-screening, independent validation, synthetic-only
   regression requirements, and an external exact-SHA governance state model. Historical review
   and approval assertions remain non-authoritative. The preferred path uses independent review;
   when no eligible reviewer is reasonably available, the contract permits an explicitly disclosed
   `owner_approved_with_exception` path bound to exact-subject-commit CI, complete tests, zero
   unresolved blocking/high/medium findings, residual-risk acceptance, and two ordered immutable
-  owner attestations. None of that evidence exists for the new bytes yet, so package closure
-  remains `NOT_CLOSED`.
+  owner attestations. The first attestation is immutable and verified; the new subject snapshot
+  still lacks exact-subject-commit CI and the second snapshot-closure attestation, so package
+  closure remains `NOT_CLOSED`.
   Publication and runtime implementation remain subject to separate explicit authorization; live
   access and real-company data remain unauthorized.
 

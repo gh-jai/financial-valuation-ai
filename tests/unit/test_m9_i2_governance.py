@@ -13,6 +13,10 @@ CLOSURE = ROOT / "docs/milestones/M9-I2-post-owner-approval-snapshot-closure.md"
 OWNER_ATTESTATION = ROOT / "docs/milestones/M9-I2-contract-owner-attestation.md"
 CONTRACT_SHA256 = "9326b6c76dcfe3061c5e356b5141d9f458d57694cb4e6b01b6470b0bf044d84e"
 SUBJECT_COMMIT_SHA = "743159d08ab05541a8d4fe25859bc9f9a49c5287"
+ATTESTATION_COMMIT_SHA = "a406b5fc5cfded19f116cc42309da13cea42c713"
+ATTESTATION_BLOB_SHA = "0011df140cfb44af244526b0feb3d71a8c40cdd6"
+ATTESTATION_SHA256 = "daba23aa09e9c6e3e13ed983518ecf44d4698160e38693c72357ed19b14f1a75"
+ATTESTATION_EVENT_HASH = "1c0a77e77fd3ecc755d86c0d0db3c229d5194be63eb87af5bd4984520506df83"
 HASH_RE = re.compile(r"^[0-9a-f]{64}$")
 
 
@@ -75,11 +79,11 @@ def test_subject_manifest_and_snapshot_id_recompute() -> None:
     assert match.group(1) == expected_snapshot
 
 
-def test_missing_durable_events_fail_closed() -> None:
+def test_missing_snapshot_closure_event_fails_closed() -> None:
     approval = APPROVAL.read_text(encoding="utf-8")
     closure = closure_text()
 
-    assert "Status: `candidate`" in approval
+    assert "Status: `owner_approved_with_exception`" in approval
     assert "Post-owner-approval package closure: `NOT_CLOSED`" in approval
     assert "Status: `NOT_CLOSED`" in closure
     assert "the exact subject snapshot is `NOT_CLOSED`" in closure
@@ -129,13 +133,13 @@ def test_historical_assertions_cannot_satisfy_actor_separation_or_ordering() -> 
     assert "does not prove that the claimed review preceded approval" in closure
 
 
-def test_status_summaries_preserve_candidate_and_not_closed_state() -> None:
+def test_status_summaries_preserve_approved_with_exception_and_not_closed_state() -> None:
     summaries = {
         path: (ROOT / path).read_text(encoding="utf-8")
         for path in ("PROJECT_STATUS.md", "ROADMAP.md", "README.md")
     }
     for text in summaries.values():
-        assert "`candidate`" in text
+        assert "`owner_approved_with_exception`" in text
         assert "`NOT_CLOSED`" in text
         assert "single-maintainer" in text
 
@@ -172,7 +176,7 @@ def test_single_maintainer_exception_is_explicit_and_narrow() -> None:
         assert protected_gate in normalized
 
 
-def test_exception_evidence_schema_is_complete_and_currently_pending() -> None:
+def test_exception_evidence_schema_is_complete_and_first_stage_is_immutable() -> None:
     approval = APPROVAL.read_text(encoding="utf-8")
     closure = closure_text()
 
@@ -193,19 +197,17 @@ def test_exception_evidence_schema_is_complete_and_currently_pending() -> None:
         "`previous_event_hash` and `event_hash`",
     )
     assert all(field in closure for field in required_exception_fields)
-    assert "immutable subject commit containing these bytes: pending" in approval
-    assert (
-        "successful exact-subject-commit remote CI run identifiers and URLs: pending" in approval
-    )
-    assert "immutable `contract_owner_attestation`" in approval
-    assert "Consequently the current state remains `candidate`" in approval
-    assert (
-        "Eligibility to use the exception is not evidence that the exception was exercised"
-        in " ".join(closure.split())
-    )
+    assert f"immutable attestation commit: `{ATTESTATION_COMMIT_SHA}`" in approval
+    assert f"attestation Git blob: `{ATTESTATION_BLOB_SHA}`" in approval
+    assert f"attestation SHA-256: `{ATTESTATION_SHA256}`" in approval
+    assert f"event hash: `{ATTESTATION_EVENT_HASH}`" in approval
+    assert "The contract state is therefore\n`owner_approved_with_exception`" in approval
     assert "focused M9-I2 governance regressions: `PASS`; nine tests passed" in closure
     assert "full pytest suite: `PASS`; 334 tests passed" in closure
-    assert "not exact-subject-commit remote\nCI or either immutable owner attestation" in closure
+    assert "The ordered `snapshot_closure_attestation` is necessarily absent" in closure
+    assert "focused M9-I2 governance regressions: `PASS`; 14 tests passed" in closure
+    assert "full pytest suite: `PASS`; 339 tests passed" in closure
+    assert "It is not exact-subject-commit remote\nCI" in closure
 
 
 def test_exception_states_are_distinct_and_fail_closed_on_change() -> None:
@@ -293,18 +295,45 @@ def test_contract_owner_attestation_event_hash_recomputes() -> None:
     assert hashlib.sha256(canonical).hexdigest() == attestation["event_hash"]
 
 
-def test_local_attestation_candidate_does_not_advance_governance_state() -> None:
+def test_published_attestation_advances_only_contract_state() -> None:
     attestation_text = OWNER_ATTESTATION.read_text(encoding="utf-8")
     approval = APPROVAL.read_text(encoding="utf-8")
     closure = closure_text()
 
     assert "Artifact state: `local_candidate_not_yet_immutable`" in attestation_text
     assert "This local file is not yet an immutable public attestation" in attestation_text
-    assert "Status: `candidate`" in approval
-    assert "immutable `contract_owner_attestation`" in approval
+    assert "Status: `owner_approved_with_exception`" in approval
+    assert ATTESTATION_COMMIT_SHA in approval
+    assert sha256(OWNER_ATTESTATION) == ATTESTATION_SHA256
     assert "Status: `NOT_CLOSED`" in closure
     assert "`snapshot_closure_attestation` is necessarily absent" in closure
     assert "CLOSED_WITH_SINGLE_MAINTAINER_EXCEPTION` claim" in attestation_text
+
+
+def test_approval_record_references_exact_immutable_attestation_objects() -> None:
+    approval = APPROVAL.read_text(encoding="utf-8")
+    normalized = " ".join(approval.split())
+
+    assert ATTESTATION_COMMIT_SHA in approval
+    assert ATTESTATION_BLOB_SHA in approval
+    assert ATTESTATION_SHA256 in approval
+    assert ATTESTATION_EVENT_HASH in approval
+    assert (
+        f"blob/{ATTESTATION_COMMIT_SHA}/docs/milestones/M9-I2-contract-owner-attestation.md"
+        in normalized
+    )
+    assert "never `independently_reviewed` or unqualified `owner_approved`" in normalized
+
+
+def test_second_stage_requirements_remain_fail_closed() -> None:
+    approval = " ".join(APPROVAL.read_text(encoding="utf-8").split())
+    closure = " ".join(closure_text().split())
+
+    assert "This record update creates a new subject snapshot" in approval
+    assert "snapshot_closure_attestation" in approval
+    assert "package closure remains `NOT_CLOSED`" in approval
+    assert "has not yet been committed or received exact-subject-commit remote CI" in closure
+    assert "The current package therefore remains `NOT_CLOSED`" in closure
 
 
 def test_hook_count_includes_repository_policy_once() -> None:

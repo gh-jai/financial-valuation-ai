@@ -57,9 +57,9 @@ registries without transport or provider payloads. The first M9-I2 issuer-resolu
 was recorded as reviewed and approved on 2026-08-09, then superseded for repository publication
 after documentation/governance findings. The revised contract now defines a narrow
 single-maintainer documentation-governance exception while preserving M1-M7 runtime separation and
-later qualified-review gates. The new exact SHA is recorded in the governance record. No immutable
-subject commit, successful exact-subject-commit remote CI evidence, or first-stage immutable owner
-attestation exists for these bytes yet, so it fails closed to `candidate`. M9-I2 runtime and M9-I3
+later qualified-review gates. The new exact SHA is recorded in the governance record. A verified
+immutable first-stage owner attestation and exact-subject-commit CI advance only the contract to
+`owner_approved_with_exception`. M9-I2 runtime and M9-I3
 through M9-I6 remain unauthorized, and live SEC or provider access remains unauthorized. M9-I2 implementation
 has not started and would require separate authorization after contract approval. Package closure
 is `NOT_CLOSED` in the recomputable manifest and evidence assessment in

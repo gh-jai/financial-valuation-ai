@@ -1,10 +1,10 @@
 # M9-I2 Post-Owner-Approval Exact-Snapshot Closure
 
-Status: `NOT_CLOSED`; neither the default nor single-maintainer evidence path is complete
+Status: `NOT_CLOSED`; first exception event verified, snapshot-closure event still absent
 Evidence assessment date: 2026-08-09
 Review baseline: `3945e90559ec2e10771489078c9e8f52036209b7`
 Current operational implementation milestone: M7
-Contract authority: `candidate`; single-maintainer exception policy defined, attestation pending
+Contract authority: `owner_approved_with_exception`; first-stage immutable attestation verified
 Publication authority: `DENIED`; separate explicit authorization required
 Runtime and data authority: `DENIED`; no M9-I2 implementation, live/provider access, real-company
 data, attachment use, or M9-I3 through M9-I6 authority
@@ -44,14 +44,14 @@ lowercase SHA-256 values by one ASCII space.
 ```text
 BEGIN SUBJECT MANIFEST
 9326b6c76dcfe3061c5e356b5141d9f458d57694cb4e6b01b6470b0bf044d84e docs/milestones/M9-I2-issuer-resolution-contract-lock.md
-47141591752ac078c9aafea377f4e04c99baa4b0c7786faa80e5706127bc4448 docs/milestones/M9-I2-contract-lock-review-approval-record.md
-093c12abd3b65f895c27e32faabbb584ca0214a695a438e514351431a1686200 PROJECT_STATUS.md
-13ab4e5a354932ba771857a33a381eeb64d1b4c44180cb8f1c03c25684833e67 ROADMAP.md
-544b88549d29e6712d683df5d225ba213766eb8247be335e27bdfe387056f2ec README.md
+4734260f5946f57d08bb502919091025c49c7368d683d4334997e132d48ce969 docs/milestones/M9-I2-contract-lock-review-approval-record.md
+c181c387c98bc77fbb6d9c7ff4face0c6bd7edb41e4c71d3c505f064e6030c45 PROJECT_STATUS.md
+d1cc6d6f3a63fef58b50ef3b83131f36de56fa6af1b01023936b4200cb8538ab ROADMAP.md
+6057359a14a20a8945a471d6fe527e7baab4481ee765d7d45bdae6b013c74f6d README.md
 END SUBJECT MANIFEST
 ```
 
-Subject snapshot ID: `c2f3abc9ee6e1ce08938467c654ae65b86bfdf143ade244b7bb4688c077377d6`
+Subject snapshot ID: `1c3754e724f98ff8324c567237070b68fe20514e678de3d1787e51d47f9da918`
 
 Recompute from the repository root:
 
@@ -149,11 +149,22 @@ The earlier pre-attestation SHA-256
 assertion. No independently retrievable artifact containing those exact bytes was preserved, so
 the value cannot serve as closure evidence.
 
-The current single-maintainer policy change has not yet been committed, pushed, validated by
-exact-subject-commit remote CI, or covered by an immutable `contract_owner_attestation`.
-Eligibility to use the exception is not evidence that the exception was exercised. The later
-`snapshot_closure_attestation` is necessarily absent as well. The current package therefore
-remains `NOT_CLOSED`.
+The first-stage single-maintainer exception is now exercised by immutable
+`contract_owner_attestation` commit `a406b5fc5cfded19f116cc42309da13cea42c713`. Its fixed blob is
+`0011df140cfb44af244526b0feb3d71a8c40cdd6`, its file SHA-256 is
+`daba23aa09e9c6e3e13ed983518ecf44d4698160e38693c72357ed19b14f1a75`, and canonical event hash
+`1c0a77e77fd3ecc755d86c0d0db3c229d5194be63eb87af5bd4984520506df83` recomputes. The event binds
+contract subject commit `743159d08ab05541a8d4fe25859bc9f9a49c5287`, successful `Validate` run
+[#66](https://github.com/gh-jai/financial-valuation-ai/actions/runs/31313816548), complete validation,
+zero unresolved blocking/high/medium findings, explicit shared-actor disclosure, a narrow separation
+waiver, and residual-risk acceptance. `Validate` run
+[#67](https://github.com/gh-jai/financial-valuation-ai/actions/runs/31314762621) also verified the
+immutable attestation commit on Python 3.10 and 3.12 with 337 tests per job.
+
+That event advances only the contract to `owner_approved_with_exception`. This approval-record and
+status-summary update creates a new subject snapshot that has not yet been committed or received
+exact-subject-commit remote CI. The ordered `snapshot_closure_attestation` is necessarily absent.
+The current package therefore remains `NOT_CLOSED`.
 
 ## Historical validation and attestation assertions
 
@@ -191,9 +202,22 @@ workspace on Python 3.12.13 with pytest 8.4.2:
 - full pytest suite: `PASS`; 334 tests passed; and
 - `git diff --check`: `PASS`.
 
-This is reproducibility evidence for the current uncommitted bytes, not exact-subject-commit remote
-CI or either immutable owner attestation. It does not advance the contract beyond `candidate` or
-the package beyond `NOT_CLOSED`.
+This is historical reproducibility evidence for the pre-approval snapshot. Exact-subject-commit
+remote CI and the first immutable owner attestation later advanced only the contract to
+`owner_approved_with_exception`; they did not close the package.
+
+Current local validation for the post-owner-approval subject snapshot
+`1c3754e724f98ff8324c567237070b68fe20514e678de3d1787e51d47f9da918` completed in the local
+workspace on Python 3.12.13 with pytest 8.4.2 and jsonschema 4.26.0:
+
+- focused M9-I2 governance regressions: `PASS`; 14 tests passed;
+- all-candidate pre-commit: `PASS`; all 16 configured hooks passed without rewriting files;
+- hook composition: six upstream hooks and 10 local hooks, including repository policy;
+- full pytest suite: `PASS`; 339 tests passed; and
+- `git diff --check`: `PASS`.
+
+This validates the recomputable local candidate bytes only. It is not exact-subject-commit remote
+CI and is not an immutable `snapshot_closure_attestation`; package closure remains `NOT_CLOSED`.
 
 The prior exact-snapshot `PASS` is retained only as a historical assertion. It has no actor ID, UTC
 timestamp, immutable evidence reference, or event-chain link and therefore grants no closure state.
@@ -210,12 +234,14 @@ The preferred default path remains:
 
 When no eligible independent reviewer is reasonably available, the alternative path is:
 
-1. commit and publish the exact contract/documentation candidate without declaring it approved;
-2. obtain successful remote CI and complete validation for that immutable subject commit, then
-   publish an immutable `contract_owner_attestation` satisfying every exception field and advance
-   only the contract state to `owner_approved_with_exception` in the approval record;
-3. publish that approval-record update, recompute the subject manifest, obtain successful remote CI
-   for the new immutable subject commit, and confirm no unresolved blocking/high/medium finding;
+1. [complete] commit and publish the exact contract/documentation candidate without declaring it
+   approved;
+2. [complete] obtain successful remote CI and complete validation for that immutable subject
+   commit, then publish an immutable `contract_owner_attestation` satisfying every exception field
+   and advance only the contract state to `owner_approved_with_exception` in the approval record;
+3. [current] publish that approval-record update, recompute the subject manifest, obtain successful
+   remote CI for the new immutable subject commit, and confirm no unresolved
+   blocking/high/medium finding;
 4. publish a separate immutable `snapshot_closure_attestation` bound to that exact subject commit
    and snapshot ID; and
 5. update only this out-of-manifest carrier to reference the second event and record

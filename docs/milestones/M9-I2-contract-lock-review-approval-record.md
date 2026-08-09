@@ -1,6 +1,6 @@
 # M9-I2 Contract Lock — Review and Approval Record
 
-Status: `candidate`; single-maintainer exception policy defined but no exact-SHA attestation exists
+Status: `owner_approved_with_exception`; first-stage immutable owner attestation verified
 Post-owner-approval package closure: `NOT_CLOSED`
 Contract path: `docs/milestones/M9-I2-issuer-resolution-contract-lock.md`
 Contract SHA-256: `9326b6c76dcfe3061c5e356b5141d9f458d57694cb4e6b01b6470b0bf044d84e`
@@ -30,7 +30,7 @@ latter is authoritative only in
 |---|---|---|---|
 | `4bb47ef11c645f8f38f1112c433d63e8670ae5fe48a7896bb325d86d122f7d7b` | Five review rounds, 16 findings resolved, and owner approval were recorded on 2026-08-09. | Historical only; superseded bytes and no durable event references. | Superseded for repository publication after documentation/governance findings. |
 | `4c596e806896a9693dd95766b7f5d3207c7f0969ee69e4aeeed05ab5e1e016ad` | A contract review `PASS` and exact-SHA owner approval were recorded on 2026-08-09. | Historical only; actor identifiers, UTC event timestamps, immutable evidence references, and a verifiable event chain were not preserved. | Superseded by the contract that defines the single-maintainer exception. |
-| `9326b6c76dcfe3061c5e356b5141d9f458d57694cb4e6b01b6470b0bf044d84e` | A narrow two-stage single-maintainer documentation-governance exception is defined. | `candidate`; no immutable subject commit, exact-subject-commit CI reference, or exception attestation exists yet. | Frozen contract candidate only. Publication and implementation remain separately unauthorized. |
+| `9326b6c76dcfe3061c5e356b5141d9f458d57694cb4e6b01b6470b0bf044d84e` | A narrow two-stage single-maintainer documentation-governance exception is defined. | `owner_approved_with_exception`; the first-stage immutable attestation and its exact-subject-commit CI evidence are verified below. | Frozen contract approved only under the disclosed exception. Publication, implementation, and package closure remain separately unauthorized. |
 
 The historical assertions explain the document's provenance but grant no current authority. They
 must not be promoted to `independently_reviewed` or `owner_approved` without fresh durable evidence.
@@ -93,28 +93,44 @@ or the explicit single-maintainer path. The latter must be recorded as
 Either decision would cover only the frozen contract boundary and would not authorize publication
 or implementation.
 
-## Current single-maintainer exception assessment
+## Current single-maintainer exception decision
 
-The canonical repository and PR are currently operated through the project-owner identity
-`gh-jai`, which is also the author/remediator identity for this candidate. The lack of a second
-eligible reviewer makes the contract eligible to seek, but does not automatically grant, the
-single-maintainer exception.
+The canonical repository and PR are operated through project-owner identity `github:gh-jai`, which
+is also the author/remediator identity for the frozen contract bytes. No eligible independent
+reviewer was reasonably available. The owner therefore exercised the narrow exception without
+claiming reviewer/author separation or independent review.
 
-Current first-stage evidence is incomplete:
+The qualifying first-stage evidence is:
 
-- exact contract SHA-256 and exception policy: present;
-- immutable subject commit containing these bytes: pending;
-- successful exact-subject-commit remote CI run identifiers and URLs: pending;
-- immutable `contract_owner_attestation` with actor, UTC timestamp, explicit self-review disclosure, waiver,
-  residual-risk acceptance, authority boundary, evidence hash, and event hash: pending; and
-- confirmation against that exact subject commit that no unresolved blocking, high, or medium finding
-  remains: pending.
+- immutable subject commit: `743159d08ab05541a8d4fe25859bc9f9a49c5287`;
+- successful exact-subject-commit CI: `Validate` run
+  [#66](https://github.com/gh-jai/financial-valuation-ai/actions/runs/31313816548), with Python 3.10
+  and 3.12 each passing 334 tests and all nine focused M9-I2 governance regressions;
+- immutable attestation commit: `a406b5fc5cfded19f116cc42309da13cea42c713`;
+- immutable attestation reference:
+  `https://github.com/gh-jai/financial-valuation-ai/blob/a406b5fc5cfded19f116cc42309da13cea42c713/docs/milestones/M9-I2-contract-owner-attestation.md`;
+- attestation Git blob: `0011df140cfb44af244526b0feb3d71a8c40cdd6`;
+- attestation SHA-256: `daba23aa09e9c6e3e13ed983518ecf44d4698160e38693c72357ed19b14f1a75`;
+- event ID: `m9-i2-contract-owner-attestation-20260809T124450Z`;
+- event hash: `1c0a77e77fd3ecc755d86c0d0db3c229d5194be63eb87af5bd4984520506df83`;
+- immutable-attestation validation: `Validate` run
+  [#67](https://github.com/gh-jai/financial-valuation-ai/actions/runs/31314762621), with Python 3.10
+  and 3.12 each passing 337 tests, all 12 focused M9-I2 governance regressions, and repository
+  policy over 343 candidate files; and
+- finding disposition: no unresolved blocking, high, or medium finding remained against the exact
+  contract subject commit.
 
-Consequently the current state remains `candidate`. A future attestation must report the facts at
-its own decision time and must not reuse the historical review/approval assertions as proof.
-Only after that event may this record be updated to `owner_approved_with_exception`. The resulting
-new subject snapshot then requires its own exact-subject-commit CI and immutable
-`snapshot_closure_attestation`; the first event cannot close the later snapshot.
+The attestation's canonical event discloses the shared owner/author/remediator identity, explicitly
+waives separation only for M9-I2 contract/documentation governance, accepts the residual risk from
+loss of independent challenge, and denies implementation, publication, data, release, and later
+qualified-review authority. Its event hash, evidence hash, contract SHA-256, and immutable Git
+objects were independently recomputed after publication. The contract state is therefore
+`owner_approved_with_exception`, never `independently_reviewed` or unqualified `owner_approved`.
+
+This record update creates a new subject snapshot. That snapshot still requires its own immutable
+subject commit, successful exact-subject-commit CI, complete validation, zero unresolved
+blocking/high/medium findings, and a later immutable `snapshot_closure_attestation`. The first-stage
+event cannot close the later snapshot, so package closure remains `NOT_CLOSED`.
 
 ## Post-owner-approval exact-snapshot closure
 
@@ -133,14 +149,16 @@ contract approval would authorize publication or implementation.
 
 ## Current verification state
 
-- [x] Contract SHA-256 recomputes to the frozen candidate value.
+- [x] Contract SHA-256 recomputes to the frozen approved-with-exception value.
 - [x] No M9-I2 runtime, live provider access, real-company material, or attachment content is added.
 - [x] A bounded single-maintainer documentation-governance exception is defined without weakening
       M1-M7 runtime separation or later qualified-review gates.
-- [ ] A complete default-path event chain or qualifying `contract_owner_attestation` exists for
+- [x] A qualifying immutable `contract_owner_attestation` exists for
       the exact contract SHA-256 and immutable subject commit.
-- [ ] Exact-subject-commit remote CI and complete validation evidence are durably referenced.
-- [ ] No unresolved blocking, high, or medium finding remains against that subject commit.
+- [x] First-stage exact-subject-commit remote CI and complete validation evidence are durably
+      referenced.
+- [x] No unresolved blocking, high, or medium finding remains against the first-stage subject
+      commit.
 - [ ] A later `snapshot_closure_attestation` binds the final subject snapshot.
 - [ ] Package closure is established.
 
