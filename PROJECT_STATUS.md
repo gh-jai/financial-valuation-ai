@@ -510,9 +510,13 @@ Approved M1-M6 route → WFL-AGT-001 exact-hash orchestration → independent re
 
 Latest merged change CI:
 
-- GitHub Actions Validate run #58
+- GitHub Actions Validate run #60 for the PR #21 status-document synchronization
 - Python 3.10: Passed
 - Python 3.12: Passed
+
+PR #21 merged the M7/M9-I1 status clarification as
+`e805b54dabef039cb1acfd9e72a40768ea9e74eb`. It changed only `PROJECT_STATUS.md` and did not alter
+the operational implementation, authorize M9-I2+, or add live-data capability.
 
 M9-I1 passed local validation, independent code/governance review, and PR #20 remote matrix
 validation on Python 3.10 and Python 3.12 before merge commit `7b2b2d2`. This bounded offline
