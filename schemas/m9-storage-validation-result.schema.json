@@ -1,0 +1,71 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://fvi.example/schemas/m9-storage-validation-result.schema.json",
+  "title": "FVI M9-I3 Storage Validation Result",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "canonicalization_version",
+    "validation_result_id",
+    "created_at",
+    "implementation_separation",
+    "subjects",
+    "status",
+    "findings",
+    "validation_result_hash"
+  ],
+  "properties": {
+    "schema_version": {"const": "0.1.0"},
+    "canonicalization_version": {"const": "fvi-canonical-json-v1"},
+    "validation_result_id": {"type": "string", "pattern": "^SVR-[A-Z0-9-]+$"},
+    "created_at": {"type": "string", "format": "date-time"},
+    "implementation_separation": {"const": "independent"},
+    "subjects": {
+      "type": "array",
+      "minItems": 5,
+      "uniqueItems": true,
+      "items": {"$ref": "#/$defs/subject"}
+    },
+    "status": {"enum": ["passed", "failed"]},
+    "findings": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {"$ref": "#/$defs/finding"}
+    },
+    "validation_result_hash": {"$ref": "#/$defs/hash"}
+  },
+  "allOf": [
+    {
+      "if": {"properties": {"status": {"const": "passed"}}, "required": ["status"]},
+      "then": {"properties": {"findings": {"maxItems": 0}}}
+    },
+    {
+      "if": {"properties": {"status": {"const": "failed"}}, "required": ["status"]},
+      "then": {"properties": {"findings": {"minItems": 1}}}
+    }
+  ],
+  "$defs": {
+    "hash": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+    "subject": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "identifier", "hash"],
+      "properties": {
+        "kind": {"enum": ["verified_identity", "scope_decision", "manual_import", "raw_record", "source_snapshot", "snapshot_manifest"]},
+        "identifier": {"type": "string", "minLength": 1, "maxLength": 128},
+        "hash": {"$ref": "#/$defs/hash"}
+      }
+    },
+    "finding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["code", "message", "subject"],
+      "properties": {
+        "code": {"type": "string", "pattern": "^M9I3-[A-Z0-9-]+$"},
+        "message": {"type": "string", "minLength": 1, "maxLength": 240},
+        "subject": {"type": "string", "minLength": 1, "maxLength": 128}
+      }
+    }
+  }
+}
