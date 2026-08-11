@@ -12,6 +12,9 @@ APPROVAL = ROOT / "docs/milestones/M9-I2-contract-lock-review-approval-record.md
 CLOSURE = ROOT / "docs/milestones/M9-I2-post-owner-approval-snapshot-closure.md"
 OWNER_ATTESTATION = ROOT / "docs/milestones/M9-I2-contract-owner-attestation.md"
 SNAPSHOT_ATTESTATION = ROOT / "docs/milestones/M9-I2-snapshot-closure-attestation.md"
+CURRENT_SNAPSHOT_ATTESTATION = (
+    ROOT / "docs/milestones/M9-I2-current-snapshot-closure-attestation.md"
+)
 CONTRACT_SHA256 = "9326b6c76dcfe3061c5e356b5141d9f458d57694cb4e6b01b6470b0bf044d84e"
 SUBJECT_COMMIT_SHA = "743159d08ab05541a8d4fe25859bc9f9a49c5287"
 ATTESTATION_COMMIT_SHA = "a406b5fc5cfded19f116cc42309da13cea42c713"
@@ -28,6 +31,9 @@ SNAPSHOT_ATTESTATION_SHA256 = "16984ab5492114d111b1ba2c9c56e6a1c433a7fc6db3ace79
 SNAPSHOT_ATTESTATION_EVENT_HASH = (
     "288270085de0794ed954ef10ab41746a85fe357e6c02d5ff1a43adb949aabcea"
 )
+CURRENT_MAIN_SUBJECT_COMMIT_SHA = "3b2a7adec3fb2c9c8d4d9ce2eb9aa61e75f5379c"
+CURRENT_MAIN_SUBJECT_TREE_SHA = "444938a913197824d2556193a4b3b1c812694210"
+CURRENT_CARRIER_SHA256 = "d7cd3e309505a0bd2168b22f2689a508847bbe354a26d526ab326c92f1d4cb73"
 HASH_RE = re.compile(r"^[0-9a-f]{64}$")
 
 
@@ -88,6 +94,15 @@ def owner_attestation() -> dict[str, object]:
 
 def snapshot_attestation() -> dict[str, object]:
     text = SNAPSHOT_ATTESTATION.read_text(encoding="utf-8")
+    match = re.search(r"```yaml\n(.*?)\n```", text, re.DOTALL)
+    assert match
+    parsed = yaml.safe_load(match.group(1))
+    assert isinstance(parsed, dict)
+    return parsed
+
+
+def current_snapshot_attestation() -> dict[str, object]:
+    text = CURRENT_SNAPSHOT_ATTESTATION.read_text(encoding="utf-8")
     match = re.search(r"```yaml\n(.*?)\n```", text, re.DOTALL)
     assert match
     parsed = yaml.safe_load(match.group(1))
@@ -466,6 +481,116 @@ def test_snapshot_attestation_immutable_bytes_and_validation_run_are_bound() -> 
     assert "93253567690" in closure
     assert "93253567722" in closure
     assert "each passed all validation and repository-policy steps and 341 tests" in closure
+
+
+def test_current_snapshot_attestation_binds_main_ci_review_and_resolved_finding() -> None:
+    attestation = current_snapshot_attestation()
+    event = attestation["event"]
+    assert isinstance(event, dict)
+
+    required_fields = {
+        "schema_version",
+        "event_id",
+        "exception_id",
+        "decision_kind",
+        "occurred_at",
+        "actor_id",
+        "actor_role",
+        "actor_type",
+        "repository",
+        "baseline_sha",
+        "subject_kind",
+        "subject_id",
+        "subject_commit_sha",
+        "contract_path",
+        "contract_sha256",
+        "snapshot_id",
+        "decision",
+        "eligibility_reason",
+        "shared_actor_disclosure",
+        "separation_waiver_scope",
+        "ci_evidence",
+        "local_validation_evidence",
+        "review_evidence",
+        "finding_disposition",
+        "residual_risk_acceptance",
+        "authority_boundary",
+        "evidence_ref",
+        "evidence_sha256",
+        "previous_event_hash",
+    }
+    assert set(event) == required_fields
+    assert all(value not in (None, "", "pending", "PENDING") for value in event.values())
+    assert re.fullmatch(r"\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z", event["occurred_at"])
+
+    assert event["decision_kind"] == "snapshot_closure_attestation"
+    assert event["decision"] == "CLOSED_WITH_SINGLE_MAINTAINER_EXCEPTION"
+    assert event["subject_kind"] == "exact_snapshot"
+    assert event["subject_id"] == CURRENT_SNAPSHOT_ID
+    assert event["snapshot_id"] == CURRENT_SNAPSHOT_ID
+    assert event["subject_commit_sha"] == CURRENT_MAIN_SUBJECT_COMMIT_SHA
+    assert event["contract_sha256"] == CONTRACT_SHA256
+    assert event["evidence_sha256"] == CURRENT_CARRIER_SHA256
+    assert sha256(CLOSURE) == CURRENT_CARRIER_SHA256
+    assert event["previous_event_hash"] == SNAPSHOT_ATTESTATION_EVENT_HASH
+
+    ci = event["ci_evidence"]
+    assert ci["workflow_run_id"] == 31519855793
+    assert ci["workflow_run_number"] == 85
+    assert ci["trigger"] == "push"
+    assert ci["head_sha"] == CURRENT_MAIN_SUBJECT_COMMIT_SHA
+    assert ci["status"] == "completed"
+    assert ci["conclusion"] == "success"
+    assert {job["python_version"] for job in ci["matrix_jobs"]} == {"3.10", "3.12"}
+    assert all(job["conclusion"] == "success" for job in ci["matrix_jobs"])
+    assert all(job["full_suite"] == "426 passed" for job in ci["matrix_jobs"])
+
+    review = event["review_evidence"]
+    assert review["pull_request_number"] == 27
+    assert review["reviewed_head_sha"] == "ff0767f145867f08a4386d1d8e5d7342663fed7c"
+    assert review["reviewed_tree_sha"] == CURRENT_MAIN_SUBJECT_TREE_SHA
+    assert review["main_subject_tree_sha"] == CURRENT_MAIN_SUBJECT_TREE_SHA
+    assert review["review_id"] == 4909174183
+    assert review["review_node_id"] == "PRR_kwDOTqKoFc8AAAABJJwNpw"
+    assert review["disposition"] == "COMMENTED_PASS"
+    assert review["finding_thread_id"] == "PRRT_kwDOTqKoFc6YUcz-"
+    assert review["finding_comment_id"] == "PRRC_kwDOTqKoFc7gIYkI"
+    assert review["finding_resolution"] == "resolved"
+
+
+def test_current_snapshot_attestation_event_hash_recomputes_and_chains() -> None:
+    attestation = current_snapshot_attestation()
+    canonical = json.dumps(
+        attestation["event"], sort_keys=True, separators=(",", ":"), ensure_ascii=False
+    ).encode("utf-8")
+    assert HASH_RE.fullmatch(attestation["event_hash"])
+    assert hashlib.sha256(canonical).hexdigest() == attestation["event_hash"]
+    assert (
+        attestation["event"]["previous_event_hash"]
+        == snapshot_attestation()["event_hash"]
+    )
+
+
+def test_current_snapshot_attestation_candidate_does_not_close_or_expand_authority() -> None:
+    text = CURRENT_SNAPSHOT_ATTESTATION.read_text(encoding="utf-8")
+    normalized = " ".join(text.split())
+
+    assert "Artifact state: `local_candidate_not_yet_immutable`" in text
+    assert "Current snapshot state before immutable publication: `NOT_CLOSED`" in text
+    assert "This local file is not yet an immutable public attestation" in text
+    assert "Its existence does not close the current snapshot" in normalized
+    assert "later carrier-only transition requires separate authorization" in normalized
+    assert "shared_actor_disclosure" in text
+    assert "residual_risk_acceptance" in text
+    assert "authority_boundary" in text
+    assert "this event is not independent review" in normalized
+    assert "does not authorize staging, committing, pushing, PR creation or state changes" in normalized
+    assert "live or provider access" in normalized
+    assert "real-company data" in normalized
+    assert "attachment use" in normalized
+    assert closure_text().startswith(
+        "# M9-I2 Post-Owner-Approval Exact-Snapshot Closure\n\nStatus: `NOT_CLOSED`"
+    )
 
 
 def test_current_reclosure_is_hash_bound_and_fails_closed_pending_new_evidence() -> None:
