@@ -1,0 +1,7 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema", "$id": "https://fvi.example/schemas/issuer-selection.schema.json", "title": "FVI M9-I2 Human Issuer Selection",
+  "type": "object", "additionalProperties": false,
+  "required": ["schema_version", "canonicalization_version", "selection_id", "created_at", "selected_at", "candidate_set_id", "candidate_set_hash", "selected_candidate_id", "selected_candidate_hash", "actor_type", "actor_id", "selection_reason", "selection_hash"],
+  "properties": {"schema_version": {"const": "0.1.0"}, "canonicalization_version": {"const": "fvi-canonical-json-v1"}, "selection_id": {"type": "string", "pattern": "^ISL-[A-Z0-9-]+$"}, "created_at": {"$ref": "#/$defs/time"}, "selected_at": {"$ref": "#/$defs/time"}, "candidate_set_id": {"type": "string", "pattern": "^ICS-[A-Z0-9-]+$"}, "candidate_set_hash": {"$ref": "#/$defs/hash"}, "selected_candidate_id": {"type": "string", "pattern": "^ICD-[A-F0-9]{64}$"}, "selected_candidate_hash": {"$ref": "#/$defs/hash"}, "actor_type": {"const": "human"}, "actor_id": {"type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,79}$"}, "selection_reason": {"enum": ["confirmed_unique", "resolved_ambiguity"]}, "selection_hash": {"$ref": "#/$defs/hash"}},
+  "$defs": {"hash": {"type": "string", "pattern": "^[a-f0-9]{64}$"}, "time": {"type": "string", "format": "date-time", "pattern": "Z$"}}
+}

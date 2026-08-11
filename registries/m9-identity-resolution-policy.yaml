@@ -1,0 +1,86 @@
+schema_version: 0.1.0
+canonicalization_version: fvi-canonical-json-v1
+identity_policy_id: m9-identity-resolution-policy
+identity_policy_version: 0.1.0
+status: approved
+effective_at: "2026-08-01T00:00:00Z"
+expires_at: "2030-01-01T00:00:00Z"
+reviewed_at: "2026-08-09T00:00:00Z"
+reviewed_by: synthetic-policy-reviewer
+review_evidence:
+  - docs/milestones/M9-I2-post-owner-approval-snapshot-closure.md
+normalization_version: m9-i2-name-nfkc-casefold-v1
+allowed_query_kinds:
+  - cik
+  - company_name
+  - ticker
+allowed_match_kinds:
+  - cik_exact
+  - declared_alias_exact
+  - legal_name_exact
+  - ticker_current_exact
+  - ticker_historical_exact
+match_ranks:
+  - match_kind: cik_exact
+    rank: 0
+    precedence: 0
+  - match_kind: ticker_current_exact
+    rank: 0
+    precedence: 1
+  - match_kind: legal_name_exact
+    rank: 0
+    precedence: 2
+  - match_kind: ticker_historical_exact
+    rank: 10
+    precedence: 3
+  - match_kind: declared_alias_exact
+    rank: 10
+    precedence: 4
+max_identity_age_seconds: 31536000
+timestamp_rule: injected-rfc3339-utc
+interval_rule: half-open
+issuer_classes:
+  - bank
+  - broker_dealer
+  - deposit_taking
+  - etf
+  - fund
+  - insurer
+  - investment_company
+  - non_operating_holding_vehicle
+  - operating_non_financial
+  - other_regulated_capital_financial
+  - private_company
+  - reit
+  - spac_blank_check
+  - unknown
+required_classification_fields:
+  - issuer_class
+  - primary_listing_country
+  - primary_reporting_currency
+  - public_company_status
+  - regulated_capital_model_required
+  - reserve_real_option_required
+evidence_assertion_kinds:
+  - active_as_of
+  - closed_interval
+derived_temporal_classifications:
+  - current
+  - future
+  - historical
+public_company_statuses:
+  - active
+  - delisted
+  - inactive
+  - private
+  - suspended
+synthetic_adapter_ids:
+  - m9-i2-synthetic-adapter
+network_state: denied
+supported_primary_listing_countries:
+  - US
+supported_reporting_currencies:
+  - USD
+synthetic_exchange_codes:
+  - XTEST
+identity_policy_hash: 2b4560c54aa7e23b78acaa0698ba6b5218d4b20e9b7a60c2a73f62a3848bab87
