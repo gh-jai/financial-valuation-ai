@@ -82,6 +82,11 @@ def build_manual_snapshot(
     _self_hash(identity, "verified_identity_hash")
     _self_hash(decision, "scope_decision_hash")
     _self_hash(imported, "import_hash")
+    if created_at != imported["created_at"]:
+        raise SnapshotError(
+            "SNAPSHOT-TIME-MISMATCH",
+            "snapshot creation time must match the manual import time",
+        )
     expected_source_kind = {
         "application/json": "manual-json",
         "text/csv": "manual-csv",

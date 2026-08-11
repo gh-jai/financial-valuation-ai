@@ -4,6 +4,8 @@ import inspect
 from datetime import datetime, timezone
 from pathlib import Path
 
+import pytest
+
 from tools.retail_data.canonical import canonical_sha256
 from tools.retail_data.identity_contracts import strict_load
 from tools.retail_data.manual_import import import_manual_bytes
@@ -13,7 +15,7 @@ from tools.retail_data.resolution import (
     resolve_issuer,
     verify_selected_identity,
 )
-from tools.retail_data.snapshots import build_manual_snapshot
+from tools.retail_data.snapshots import SnapshotError, build_manual_snapshot
 from tools.retail_data.storage import ContentAddressedStore
 from tools.retail_data.structural_scope import evaluate_structural_scope
 from tools.validate_m9_i3_storage import validate_m9_i3_storage
@@ -77,7 +79,7 @@ def _identity_and_scope() -> tuple[dict, dict]:
     return identity, decision
 
 
-def _graph(tmp_path: Path) -> tuple:
+def _graph(tmp_path: Path, *, snapshot_created_at: str = AT) -> tuple:
     store_root = tmp_path / "store"
     store_root.mkdir()
     store = ContentAddressedStore(store_root)
@@ -95,7 +97,7 @@ def _graph(tmp_path: Path) -> tuple:
         verified_identity=identity,
         scope_decision=decision,
         import_result=imported,
-        created_at=AT,
+        created_at=snapshot_created_at,
         record_metadata={
             "as_of": AT,
             "period_start": "2025-01-01",
@@ -152,6 +154,12 @@ def test_i3_graph_closes_six_subjects_and_is_deterministic(tmp_path: Path) -> No
     assert len(result["subjects"]) == 6
     assert result["implementation_separation"] == "independent"
     assert _validate(graph) == result
+
+
+def test_builder_rejects_import_snapshot_time_mismatch(tmp_path: Path) -> None:
+    with pytest.raises(SnapshotError) as error:
+        _graph(tmp_path, snapshot_created_at="2026-08-11T00:00:01Z")
+    assert error.value.code == "SNAPSHOT-TIME-MISMATCH"
 
 
 def test_validator_kills_coordinated_rehash_of_snapshot_identity_copy(tmp_path: Path) -> None:
