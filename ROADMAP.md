@@ -37,10 +37,9 @@ Define constrained agent roles, tool contracts, prompt suites, evaluator policie
 Define the supported retail user and issuer scope, five real-data interface schemas, safe-stop behavior, data and output policies, threat model, provider/legal/security review gates, and the pilot/holdout design. M8 is contract-only and does not add live data, LLM, API, CLI, or Web implementation.
 
 Status: Cross-functional design review complete. The project owner authorized M9 implementation
-planning with the seven recorded conditions on 2026-08-08. The M9 planning baseline is merged;
-the separately approved M9-I1 offline foundation was subsequently reviewed, hardened, validated,
-and merged through PR #20. These post-M7 checkpoints do not advance the current operational
-implementation milestone beyond M7.
+planning with the seven recorded conditions on 2026-08-08. The M9 planning baseline, bounded M9-I1
+offline foundation, and bounded offline M9-I2 issuer-resolution slice are now merged. These post-M7
+checkpoints do not advance the complete end-to-end operational implementation milestone beyond M7.
 
 ## M9 Public data ingestion and accounting normalization
 
@@ -50,21 +49,25 @@ Planning status: Reviewed, approved, and merged through PR #19. The planning bas
 implementation into six separately approved offline-first slices, keeps every adapter disabled by
 default, and requires a separate live-readiness approval.
 
-Implementation status: The bounded M9-I1 offline foundation is merged through PR #20 as
-`7b2b2d2481a6a95e76156fedf39975381811fdea`. It adds safe errors, bounded redaction, canonical
-JSON/SHA-256, implementation-separated hash recomputation, and strict provider/license and concept
-registries without transport or provider payloads. The first M9-I2 issuer-resolution contract SHA
-was recorded as reviewed and approved on 2026-08-09, then superseded for repository publication
-after documentation/governance findings. The revised contract now defines a narrow
-single-maintainer documentation-governance exception while preserving M1-M7 runtime separation and
-later qualified-review gates. The new exact SHA is recorded in the governance record. A verified
-immutable first-stage owner attestation and exact-subject-commit CI advance only the contract to
-`owner_approved_with_exception`. M9-I2 runtime and M9-I3
-through M9-I6 remain unauthorized, and live SEC or provider access remains unauthorized. M9-I2 implementation
-has not started and would require separate authorization after contract approval. Package closure
-is `NOT_CLOSED` in the recomputable manifest and evidence assessment in
-`docs/milestones/M9-I2-post-owner-approval-snapshot-closure.md`. Publication remains subject to
-separate explicit authorization.
+Implementation status: In progress.
+
+- M9-I1 bounded offline primitives merged through PR #20 as
+  `7b2b2d2481a6a95e76156fedf39975381811fdea`.
+- The M9-I2 contract package closed through PR #23 as
+  `CLOSED_WITH_SINGLE_MAINTAINER_EXCEPTION`.
+- The bounded offline M9-I2 issuer-resolution implementation merged through PR #24 from exact head
+  `ee03a4bcab00bcc63ae4a4ffd980b3c345743dca` as merge commit
+  `3ea93c8751bfaa558d3597a91b978f986dac6412`.
+- Validate run #74 passed on Python 3.10 and 3.12 with 39/39 focused tests, 382/382 full-suite
+  tests, 363 repository-policy files, and a 19/19 review carrier. All six authoritative review
+  threads were answered and resolved.
+- The merge used a disclosed single-maintainer exception. It does not claim independent-human
+  review or GitHub platform approval.
+
+M9-I2 completes only the synthetic offline issuer-resolution slice. M9-I3 through M9-I6, live SEC
+or provider access, real-company data, immutable storage/manual import, normalization, API, LLM,
+UI, pilots, and release remain separately unauthorized. The next gated slice is M9-I3. The current
+complete end-to-end operational implementation milestone remains M7.
 
 ## M10 Assumption, routing, and scenario engine
 
