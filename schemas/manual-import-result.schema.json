@@ -1,0 +1,55 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://fvi.example/schemas/manual-import-result.schema.json",
+  "title": "FVI M9-I3 Manual Import Result",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "canonicalization_version",
+    "import_id",
+    "created_at",
+    "source_kind",
+    "media_type",
+    "source_label",
+    "record_id",
+    "record_hash",
+    "byte_length",
+    "record_count",
+    "columns",
+    "import_hash"
+  ],
+  "properties": {
+    "schema_version": {"const": "0.1.0"},
+    "canonicalization_version": {"const": "fvi-canonical-json-v1"},
+    "import_id": {"type": "string", "pattern": "^IMP-[A-F0-9]{24}$"},
+    "created_at": {"type": "string", "format": "date-time"},
+    "source_kind": {"enum": ["manual-json", "manual-csv"]},
+    "media_type": {"enum": ["application/json", "text/csv"]},
+    "source_label": {"type": "string", "minLength": 1, "maxLength": 128},
+    "record_id": {"type": "string", "pattern": "^REC-[A-F0-9]{24}$"},
+    "record_hash": {"$ref": "#/$defs/hash"},
+    "byte_length": {"type": "integer", "minimum": 1, "maximum": 1048576},
+    "record_count": {"type": "integer", "minimum": 1, "maximum": 2000},
+    "columns": {
+      "type": "array",
+      "maxItems": 128,
+      "uniqueItems": true,
+      "items": {"type": "string", "minLength": 1, "maxLength": 16384}
+    },
+    "import_hash": {"$ref": "#/$defs/hash"}
+  },
+  "allOf": [
+    {
+      "if": {"properties": {"source_kind": {"const": "manual-csv"}}, "required": ["source_kind"]},
+      "then": {"properties": {"columns": {"minItems": 1}}}
+    },
+    {
+      "if": {"properties": {"source_kind": {"const": "manual-json"}}, "required": ["source_kind"]},
+      "then": {"properties": {"columns": {"maxItems": 0}}}
+    }
+  ],
+  "$defs": {
+    "hash": {"type": "string", "pattern": "^[a-f0-9]{64}$"}
+  }
+}

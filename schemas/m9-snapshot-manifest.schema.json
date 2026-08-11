@@ -1,0 +1,53 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://fvi.example/schemas/m9-snapshot-manifest.schema.json",
+  "title": "FVI M9-I3 Snapshot Manifest",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "canonicalization_version",
+    "manifest_id",
+    "created_at",
+    "request_id",
+    "verified_identity_id",
+    "verified_identity_hash",
+    "scope_decision_id",
+    "scope_decision_hash",
+    "import_id",
+    "import_hash",
+    "snapshot_id",
+    "snapshot_hash",
+    "record_hashes",
+    "store_layout",
+    "network_state",
+    "manifest_hash"
+  ],
+  "properties": {
+    "schema_version": {"const": "0.1.0"},
+    "canonicalization_version": {"const": "fvi-canonical-json-v1"},
+    "manifest_id": {"type": "string", "pattern": "^MNF-[A-F0-9]{24}$"},
+    "created_at": {"type": "string", "format": "date-time"},
+    "request_id": {"type": "string", "pattern": "^REQ-[A-Z0-9-]+$"},
+    "verified_identity_id": {"type": "string", "pattern": "^VID-[A-Z0-9-]+$"},
+    "verified_identity_hash": {"$ref": "#/$defs/hash"},
+    "scope_decision_id": {"type": "string", "pattern": "^ISD-[A-Z0-9-]+$"},
+    "scope_decision_hash": {"$ref": "#/$defs/hash"},
+    "import_id": {"type": "string", "pattern": "^IMP-[A-F0-9]{24}$"},
+    "import_hash": {"$ref": "#/$defs/hash"},
+    "snapshot_id": {"type": "string", "pattern": "^SNP-[A-F0-9]{24}$"},
+    "snapshot_hash": {"$ref": "#/$defs/hash"},
+    "record_hashes": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {"$ref": "#/$defs/hash"}
+    },
+    "store_layout": {"const": "sha256-sharded-v1"},
+    "network_state": {"const": "denied"},
+    "manifest_hash": {"$ref": "#/$defs/hash"}
+  },
+  "$defs": {
+    "hash": {"type": "string", "pattern": "^[a-f0-9]{64}$"}
+  }
+}
