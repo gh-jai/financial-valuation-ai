@@ -210,8 +210,12 @@ def test_status_summaries_advance_without_transferring_historical_closure() -> N
     closure = closure_text()
     normalized = " ".join(closure.split())
     assert "preserves the old immutable evidence without transferring its verdict" in normalized
-    assert "current manifest is a local candidate only" in normalized
-    assert "No local hash match, prior attestation, merged implementation, or status prose" in normalized
+    assert "current manifest is preserved in immutable subject commit" in normalized
+    assert "authoritative current-snapshot state remains `NOT_CLOSED`" in normalized
+    assert (
+        "No hash match, prior attestation, merged implementation, review remediation, or status prose"
+        in normalized
+    )
 
     combined = "\n".join(summaries.values())
     assert "M9-I2 runtime and M9-I3 through M9-I6 remain unauthorized" not in combined
@@ -468,16 +472,23 @@ def test_current_reclosure_is_hash_bound_and_fails_closed_pending_new_evidence()
     closure = closure_text()
     normalized = " ".join(closure.split())
 
-    assert "Carrier update state: `local_reclosure_candidate_not_yet_immutable`" in closure
+    assert (
+        "Carrier update state: `published_subject_pending_finding_disposition_and_attestation`"
+        in closure
+    )
     for expected_digest, relative_path in manifest_entries(closure):
         assert sha256(ROOT / relative_path) == expected_digest
     assert snapshot_attestation()["event"]["subject_commit_sha"] == SNAPSHOT_COMMIT_SHA
     assert snapshot_attestation()["event"]["snapshot_id"] == HISTORICAL_SNAPSHOT_ID
     assert CURRENT_SNAPSHOT_ID != HISTORICAL_SNAPSHOT_ID
-    assert "The current manifest is a local candidate only" in closure
+    assert "f571c1426181107d50f84e59fed051fb11c9c94e" in closure
+    assert "Validate run\n[#83]" in closure
+    assert "31518237790" in closure
+    assert "Formal exact-head review recorded `COMMENTED_BLOCKING`" in closure
+    assert "The authoritative current-snapshot state remains `NOT_CLOSED`" in closure
     assert "new immutable `snapshot_closure_attestation`" in closure
     assert "transition the current snapshot to `CLOSED_WITH_SINGLE_MAINTAINER_EXCEPTION`" in normalized
-    assert "Until all five steps are complete" in closure
+    assert "Until all six steps are complete" in closure
 
 
 def test_hook_count_includes_repository_policy_once() -> None:

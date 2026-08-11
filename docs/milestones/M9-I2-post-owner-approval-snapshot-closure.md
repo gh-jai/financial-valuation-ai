@@ -3,7 +3,7 @@
 Status: `NOT_CLOSED`; post-merge status-snapshot reclosure candidate
 Historical snapshot status: `CLOSED_WITH_SINGLE_MAINTAINER_EXCEPTION`; both ordered immutable
 exception events remain verified for snapshot `1c3754e7…a918`
-Carrier update state: `local_reclosure_candidate_not_yet_immutable`
+Carrier update state: `published_subject_pending_finding_disposition_and_attestation`
 Evidence assessment date: 2026-08-12
 Review baseline: `3945e90559ec2e10771489078c9e8f52036209b7`
 Status synchronization baseline: `c4dcf9ef4780249f7a9a3a12a515cf4e07ce64b3`
@@ -24,9 +24,10 @@ contract and review/approval bytes are unchanged; only `PROJECT_STATUS.md`, `ROA
 No review, approval, event, or closure transfers between snapshot IDs. The historical attestation
 continues to close only historical snapshot
 `1c3754e724f98ff8324c567237070b68fe20514e678de3d1787e51d47f9da918`. The current snapshot fails
-closed to `NOT_CLOSED` until a separately authorized immutable subject commit, exact-head remote
-CI, findings disposition, and a new immutable `snapshot_closure_attestation` are published and
-independently verified in a later carrier-only transition.
+closed to `NOT_CLOSED`. Its immutable subject commit and exact-subject remote CI now exist, but the
+formal review disposition remains `COMMENTED_BLOCKING`. Closure still requires a no-unresolved-
+blocking/high/medium finding disposition, a separately authorized immutable
+`snapshot_closure_attestation`, and independent verification in a later carrier-only transition.
 
 Closure is valid only when:
 
@@ -246,10 +247,18 @@ Those facts require `README.md`, `ROADMAP.md`, and `PROJECT_STATUS.md` to move b
 contract and approval-record hashes remain unchanged, and the historical attestation files and
 events are not modified.
 
-The current manifest is a local candidate only. It has no immutable subject commit, remote CI,
-current-snapshot findings disposition, or new immutable closure attestation. Its authoritative
-state is therefore `NOT_CLOSED`. No local hash match, prior attestation, merged implementation, or
-status prose may advance it to a closed state.
+The current manifest is preserved in immutable subject commit
+`f571c1426181107d50f84e59fed051fb11c9c94e`. Validate run
+[#83](https://github.com/gh-jai/financial-valuation-ai/actions/runs/31518237790) succeeded for that
+exact head on Python 3.10 and 3.12; each job passed all 10 workflow validators/repository-policy
+steps and 426 tests. Formal exact-head review recorded `COMMENTED_BLOCKING` against that commit and
+identified one current-evidence inconsistency in this out-of-manifest carrier. This carrier-only
+follow-up corrects the inconsistency without changing any subject byte or the current snapshot ID.
+
+The authoritative current-snapshot state remains `NOT_CLOSED`. Successful subject publication and
+CI do not supply a no-unresolved-blocking/high/medium finding disposition, and no new immutable
+closure attestation exists. No hash match, prior attestation, merged implementation, review
+remediation, or status prose may advance the current snapshot to a closed state.
 
 ## Historical validation and attestation assertions
 
@@ -342,9 +351,12 @@ on Python 3.12.13 with pytest 8.4.2, jsonschema 4.26.0, and PyYAML 6.0.3:
 - `git diff --check`: `PASS`; and
 - staged index: empty; no commit, push, PR, attestation publication, or closure transition claimed.
 
-These results validate only the unstaged local candidate. They identify the new snapshot bytes but
-do not satisfy the pending immutable-subject, remote-CI, findings, attestation, or carrier-verification
-steps required for current-snapshot closure.
+These results first validated the unstaged local candidate. Commit
+`f571c1426181107d50f84e59fed051fb11c9c94e` subsequently published the exact current subject bytes,
+and exact-head Validate run #83 (`31518237790`) supplied successful remote CI. Formal review of that
+head returned `COMMENTED_BLOCKING`; therefore the required no-unresolved-blocking/high/medium
+finding disposition, immutable attestation, and later carrier-verification steps remain
+unsatisfied.
 
 The prior exact-snapshot `PASS` is retained only as a historical assertion. It has no actor ID, UTC
 timestamp, immutable evidence reference, or event-chain link and therefore grants no closure state.
@@ -381,20 +393,23 @@ data, attachments, or a later milestone.
 
 ## Required path for current reclosure
 
-1. [complete in this local candidate] synchronize only the three high-level status subjects,
+1. [complete] synchronize only the three high-level status subjects,
    preserve both contract-governance subjects, record the new manifest/snapshot ID, and add
    recomputation and history-preservation regressions;
-2. [pending separate authorization] review the complete unstaged candidate and confirm no blocking,
-   high, or medium documentation/governance finding;
-3. [pending separate authorization] stage and commit the exact subject and carrier bytes, then push
-   and obtain successful exact-head Python 3.10/3.12 CI;
-4. [pending separate authorization] publish a new immutable `snapshot_closure_attestation` bound to
+2. [complete] publish exact subject commit `f571c1426181107d50f84e59fed051fb11c9c94e` and retain the
+   current manifest and snapshot ID without declaring closure;
+3. [complete] obtain successful exact-subject Python 3.10/3.12 CI in Validate run #83
+   (`31518237790`);
+4. [in progress; blocking disposition recorded] correct the carrier-only current-evidence finding,
+   obtain successful exact-head CI for the correction, and complete formal re-review with no
+   unresolved blocking, high, or medium finding;
+5. [pending separate authorization] publish a new immutable `snapshot_closure_attestation` bound to
    the current snapshot ID, subject commit, CI, validation, finding disposition, shared-actor
    disclosure, residual-risk acceptance, prior event chain, and authority boundary; and
-5. [pending separate authorization] update only this out-of-manifest carrier to verify the new Git
+6. [pending separate authorization] update only this out-of-manifest carrier to verify the new Git
    object and transition the current snapshot to `CLOSED_WITH_SINGLE_MAINTAINER_EXCEPTION`.
 
-Until all five steps are complete, any missing hash, event-chain, immutable-object, CI,
+Until all six steps are complete, any missing hash, event-chain, immutable-object, CI,
 finding-disposition, or authority-boundary evidence fails closed to `NOT_CLOSED`.
 
 ## Source boundary
