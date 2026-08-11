@@ -134,6 +134,27 @@ def test_resolver_rejects_catalog_adapter_outside_policy_allowlist(artifacts) ->
         )
     assert stopped.value.error.code == "IDENTITY-POLICY-DENIED"
     assert stopped.value.error.artifact_refs == ("adapter:unapproved-synthetic-adapter",)
+
+    policy = copy.deepcopy(artifacts[1])
+    policy["synthetic_adapter_ids"] = ["coordinated-synthetic-adapter"]
+    policy = attach_hash(
+        {key: value for key, value in policy.items() if key != "identity_policy_hash"},
+        "identity_policy_hash",
+    )
+    catalog = copy.deepcopy(artifacts[0])
+    catalog["adapter_id"] = "coordinated-synthetic-adapter"
+    catalog = rehash_catalog(catalog)
+    with pytest.raises(ResolutionStop) as stopped:
+        resolve_issuer(
+            request({"kind": "ticker", "ticker": "ZXQA"}, "AUTHORITY"),
+            catalog,
+            policy,
+            resolution_at=AT,
+            candidate_set_id="ICS-SYNTH-AUTHORITY",
+        )
+    assert stopped.value.error.code == "IDENTITY-POLICY-DENIED"
+    assert stopped.value.error.artifact_refs == ("policy:denied",)
+
     no_match = resolve_issuer(request({"kind": "company_name", "company_name": "Northstar"}), artifacts[0], artifacts[1], resolution_at=AT, candidate_set_id="ICS-SYNTH-2")
     assert no_match["status"] == "not_found" and not no_match["candidates"]
 

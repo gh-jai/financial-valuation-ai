@@ -1,9 +1,10 @@
 # M9-I2 Bounded Offline Implementation Review
 
-Status: `LOCAL_REVIEW_PASS_NOT_PUBLISHED`
-Review date: 2026-08-09
+Status: `LOCAL_REMEDIATION_VALIDATED_REVIEW_PENDING`
+Review date: 2026-08-11
 Canonical repository: `gh-jai/financial-valuation-ai`
 Exact implementation base: `8dc7e45a623571e856ccdc4e10ddc62db1c3cdef`
+Remediation parent: `126b7baa8f6a2fcb1d31e88e546402445cc0ea07`
 Local branch: `feat/m9-i2-issuer-resolution-offline`
 Contract snapshot: `1c3754e724f98ff8324c567237070b68fe20514e678de3d1787e51d47f9da918`
 Contract package state: `CLOSED_WITH_SINGLE_MAINTAINER_EXCEPTION`
@@ -12,8 +13,8 @@ Data boundary: synthetic offline identity fixtures only
 
 ## Review conclusion
 
-The bounded local implementation passes code, contract, artifact-graph, authority-boundary, and
-regression review with no unresolved blocking, high, medium, or low finding. It implements only:
+The bounded local remediation candidate passes focused and complete repository tests for code,
+contract, artifact-graph, authority-boundary, and regression behavior. It implements only:
 
 ```text
 strict company-request
@@ -27,6 +28,9 @@ strict company-request
 The independent validator does not import the production resolver, normalization, candidate
 ordering, selection, identity construction, or structural-scope evaluator. AST/import tests also
 deny transport, socket, HTTP client, provider SDK, subprocess, shell, and dynamic-execution paths.
+
+This carrier binds the current unstaged local remediation bytes. The six GitHub review threads
+remain unresolved, and a second-round PASS, platform approval, Mark Ready, or merge is not claimed.
 
 This review was performed as a role-separated local review in the same Codex execution context
 that authored and remediated the candidate. It is not an external-human or GitHub platform
@@ -66,7 +70,21 @@ or external reviewer remains unsatisfied until separately evidenced.
    governed timestamp, or M8 matrix byte hash. These are now independently recomputed and covered
    by mutation-kill regressions.
 
-No finding remains open.
+## GitHub review findings remediated locally
+
+1. Verified-identity upstream references and evaluation-time structural-scope semantics are now
+   independently recomputed, including freshness, exact rules, reason/error pairs, and deferred
+   M8 rows.
+2. Identity rank/precedence and structural-scope rule/deferred-row semantics are contract-locked,
+   and the resolver rejects a catalog adapter outside the policy allowlist.
+3. Every policy list is now independently pinned to its exact contract tuple. A coordinated,
+   schema-valid policy/catalog adapter substitution that rehashes the complete downstream graph is
+   rejected by both the production loader and the implementation-separated validator.
+4. This out-of-manifest carrier now binds all 19 current implementation subjects and the current
+   39-test focused / 382-test complete-suite evidence.
+
+No reviewed blocking vector remains locally reproducible. The six GitHub threads remain open until
+a separately authorized re-review and thread-resolution action.
 
 ## Validation evidence
 
@@ -76,18 +94,15 @@ Environment:
 - pytest 8.4.2;
 - jsonschema 4.26.0;
 - PyYAML 6.0.3; and
-- dependency installation and network access disabled during validation.
+- package-index access disabled during test execution with `PIP_NO_INDEX=1`.
 
 Results:
 
-- focused M9-I2 suite: `PASS`; 29 tests;
-- complete repository suite: `PASS`; 372 tests;
-- schema/document validation: `PASS`; 29 schemas and 121 governed documents;
-- repository content policy: `PASS`; 498 candidate files, no prohibited source;
-- all-file pre-commit: `PASS`; all 16 configured hooks;
-- explicit new-file pre-commit: `PASS`; all 16 configured hooks;
+- focused M9-I2 suite: `PASS`; 39 tests;
+- complete repository suite: `PASS`; 382 tests;
 - `git diff --check`: `PASS`;
-- staged index: empty; and
+- staged index: empty;
+- local remediation state: unstaged and uncommitted; and
 - five attested subject hashes and snapshot ID: unchanged and exactly recomputable.
 
 ## Reviewed local file manifest
@@ -107,14 +122,14 @@ f4116f97086d532d701c6e9ebf1c5776b6bba986e4c9ed1a538347d592a44549 schemas/issuer-
 6d2b6e0e7efdd8bf6dd2b64679dcb917e2a770277e5406f42b13af3afb0dbab9 schemas/issuer-structural-scope-decision.schema.json
 df3c7a22f75c91048e1ca4afeb7d7d6e72d250fa03921841e30e6601de49e67d schemas/issuer-structural-scope-registry.schema.json
 2d6c78769b21b2cf1c59600e5cea1dd5339a277d7fb5f12d5e61e5c0698eff2f schemas/verified-issuer-identity.schema.json
-bd09cac8470ee89fd1f4262c8442f03f85ee1d7751b391bd6b8ea7498898c676 tests/integration/test_m9_i2_artifact_graph.py
-f92c63c3ee51b6dc7d1c5cb217a4a73d318b77880a17f580cd8cfb3f74ed2df2 tests/unit/test_m9_i2_identity_contracts.py
-7087b34faa9861f3e16ba3f89ee0b508797470ff3bc4434df66ae369ba1dccc0 tests/unit/test_m9_i2_resolution.py
+8d9f7c1cc712b36292c64065f453acf5fd9a7382e53c7dbea526c54d46f7f190 tests/integration/test_m9_i2_artifact_graph.py
+cf3b74e4ea26409f9490cac7cdea65564095284bf9441dbe13f5229cb2786546 tests/unit/test_m9_i2_identity_contracts.py
+f3692edb84d0e4c9b554cc4cdc97e2707a973997fe2f4eed3520f5a6857b3ba6 tests/unit/test_m9_i2_resolution.py
 f6008e473696e31ee2cba39c4884399b91818477d42883f220db2b16bc6ce819 tools/retail_data/__init__.py
-03f4f2ba7810c25c8ea803343f2f058789ac0860351245398041d3e89d46e351 tools/retail_data/identity_contracts.py
-ebdbe458216395af00ccc2766fed65f53230fd6b42cc32639cac2a0094f4b61e tools/retail_data/resolution.py
+0ec4bc40492f86986640be5ae0bfddd6d87d69370cb3847fadbb7cb02e3fe935 tools/retail_data/identity_contracts.py
+c80e0d3c6ea0fa695f2217137948aaa0c0c1f16e362d4aa01ef4f5a071f3cc2b tools/retail_data/resolution.py
 97a5399e297f91c5a35c06d8e05e86d7da8f978a26fc026beedd8ad075f75c27 tools/retail_data/structural_scope.py
-a5774d922ba27a7156077d966f1a5f30b6fba28813b1f5fab94d55b2d0119bcc tools/validate_issuer_resolution.py
+60aff9e4eb7b85537ec42d1a77daab5c5003835acfe9b332290d1d153875d7a9 tools/validate_issuer_resolution.py
 ```
 
 ## Authority boundary

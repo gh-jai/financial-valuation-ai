@@ -74,7 +74,7 @@ def test_fixture_adapter_rejects_paths_unknown_ids_and_environment_shape() -> No
         assert stopped.value.error.code == "IDENTITY-CATALOG-DENIED"
 
 
-def test_policy_rejects_schema_valid_rehashed_rank_semantic_drift() -> None:
+def test_policy_rejects_schema_valid_rehashed_contract_semantic_drift() -> None:
     policy = strict_load(POLICY)
     policy["match_ranks"][1]["precedence"] = 2
     policy["match_ranks"][2]["precedence"] = 1
@@ -87,6 +87,22 @@ def test_policy_rejects_schema_valid_rehashed_rank_semantic_drift() -> None:
     )
     with pytest.raises(IdentityContractError, match="rank and precedence table"):
         validate_identity_policy(mutated, AT)
+
+    substitutions = {
+        "synthetic_adapter_ids": ["unapproved-synthetic-adapter"],
+        "supported_primary_listing_countries": ["JP"],
+        "supported_reporting_currencies": ["JPY"],
+        "synthetic_exchange_codes": ["XOTHER"],
+    }
+    for field, replacement in substitutions.items():
+        policy = strict_load(POLICY)
+        policy[field] = replacement
+        mutated = attach_hash(
+            {key: value for key, value in policy.items() if key != "identity_policy_hash"},
+            "identity_policy_hash",
+        )
+        with pytest.raises(IdentityContractError, match=f"{field} allowlist"):
+            validate_identity_policy(mutated, AT)
 
 
 def test_scope_registry_rejects_rehashed_contradictory_rule_semantics() -> None:

@@ -39,6 +39,60 @@ _LOCKED_MATCH_RANKS = (
     ("declared_alias_exact", 10, 4),
 )
 
+_LOCKED_POLICY_LISTS = (
+    ("allowed_query_kinds", ("cik", "company_name", "ticker")),
+    (
+        "allowed_match_kinds",
+        (
+            "cik_exact",
+            "declared_alias_exact",
+            "legal_name_exact",
+            "ticker_current_exact",
+            "ticker_historical_exact",
+        ),
+    ),
+    (
+        "issuer_classes",
+        (
+            "bank",
+            "broker_dealer",
+            "deposit_taking",
+            "etf",
+            "fund",
+            "insurer",
+            "investment_company",
+            "non_operating_holding_vehicle",
+            "operating_non_financial",
+            "other_regulated_capital_financial",
+            "private_company",
+            "reit",
+            "spac_blank_check",
+            "unknown",
+        ),
+    ),
+    (
+        "required_classification_fields",
+        (
+            "issuer_class",
+            "primary_listing_country",
+            "primary_reporting_currency",
+            "public_company_status",
+            "regulated_capital_model_required",
+            "reserve_real_option_required",
+        ),
+    ),
+    ("evidence_assertion_kinds", ("active_as_of", "closed_interval")),
+    ("derived_temporal_classifications", ("current", "future", "historical")),
+    (
+        "public_company_statuses",
+        ("active", "delisted", "inactive", "private", "suspended"),
+    ),
+    ("synthetic_adapter_ids", ("m9-i2-synthetic-adapter",)),
+    ("supported_primary_listing_countries", ("US",)),
+    ("supported_reporting_currencies", ("USD",)),
+    ("synthetic_exchange_codes", ("XTEST",)),
+)
+
 _LOCKED_SCOPE_RULES = (
     ("unsupported-financial", 10, (("regulated_capital_model_required", "equals", True),), "unsupported", "SCOPE-UNSUPPORTED-FINANCIAL"),
     ("unsupported-reit", 20, (("issuer_class", "equals", "reit"),), "unsupported", "SCOPE-UNSUPPORTED-REIT"),
@@ -451,6 +505,13 @@ def validate_issuer_resolution(
         )
         if actual_ranks != _LOCKED_MATCH_RANKS:
             findings.append(_finding("identity-policy rank semantics are not contract-locked", "identity_policy"))
+        if any(tuple(policy[field]) != expected for field, expected in _LOCKED_POLICY_LISTS):
+            findings.append(
+                _finding(
+                    "identity-policy allowlist semantics are not contract-locked",
+                    "identity_policy",
+                )
+            )
         if catalog.get("adapter_id") not in policy.get("synthetic_adapter_ids", []):
             findings.append(_finding("catalog adapter is not authorized by identity policy", "identity_catalog"))
         expected = _independent_matches(catalog, policy, request, at)

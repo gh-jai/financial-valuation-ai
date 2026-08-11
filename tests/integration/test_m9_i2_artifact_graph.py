@@ -98,6 +98,26 @@ def _validate_graph(graph: tuple, suffix: str) -> dict:
     )
 
 
+def _rebind_authority(graph: tuple, adapter_id: str) -> tuple:
+    graph = list(copy.deepcopy(graph))
+    graph[2]["synthetic_adapter_ids"] = [adapter_id]
+    graph[2] = _rehash(graph[2], "identity_policy_hash")
+    graph[1]["adapter_id"] = adapter_id
+    graph[1] = _rehash(graph[1], "catalog_hash")
+    graph[4]["catalog_hash"] = graph[1]["catalog_hash"]
+    graph[4]["identity_policy_hash"] = graph[2]["identity_policy_hash"]
+    graph[4] = _rehash(graph[4], "candidate_set_hash")
+    graph[5]["candidate_set_hash"] = graph[4]["candidate_set_hash"]
+    graph[5] = _rehash(graph[5], "selection_hash")
+    graph[6]["selection_hash"] = graph[5]["selection_hash"]
+    graph[6]["candidate_set_hash"] = graph[4]["candidate_set_hash"]
+    graph[6]["freshness_policy_ref"] = graph[2]["identity_policy_hash"]
+    graph[6] = _rehash(graph[6], "verified_identity_hash")
+    graph[7]["verified_identity_hash"] = graph[6]["verified_identity_hash"]
+    graph[7] = _rehash(graph[7], "scope_decision_hash")
+    return tuple(graph)
+
+
 def test_independent_validator_closes_all_eight_subjects() -> None:
     request, catalog, policy, registry, candidates, selection, identity, decision = _graph()
     result = validate_issuer_resolution(company_request=request, identity_catalog=catalog, identity_policy=policy, candidate_set=candidates, selection=selection, verified_identity=identity, scope_registry=registry, scope_decision=decision, validation_result_id="IVR-SYNTH-GRAPH", created_at=AT)
@@ -106,13 +126,23 @@ def test_independent_validator_closes_all_eight_subjects() -> None:
     assert result["implementation_separation"] == "independent"
 
 
-def test_independent_validator_kills_nested_production_mutation() -> None:
+def test_independent_validator_kills_nested_and_coordinated_authority_mutations() -> None:
     request, catalog, policy, registry, candidates, selection, identity, decision = _graph()
     mutated = copy.deepcopy(identity)
     mutated["ticker"] = "ZXQZ"
     result = validate_issuer_resolution(company_request=request, identity_catalog=catalog, identity_policy=policy, candidate_set=candidates, selection=selection, verified_identity=mutated, scope_registry=registry, scope_decision=decision, validation_result_id="IVR-SYNTH-MUTATION", created_at=AT)
     assert result["status"] == "failed"
     assert any("mutates selected candidate" in item["message"] for item in result["findings"])
+
+    coordinated = _rebind_authority(
+        _graph(), "coordinated-synthetic-adapter"
+    )
+    result = _validate_graph(coordinated, "COORDINATED-AUTHORITY")
+    assert result["status"] == "failed"
+    assert any(
+        "allowlist semantics are not contract-locked" in item["message"]
+        for item in result["findings"]
+    )
 
 
 @pytest.mark.parametrize("field", ["selection_hash", "freshness_policy_ref"])
