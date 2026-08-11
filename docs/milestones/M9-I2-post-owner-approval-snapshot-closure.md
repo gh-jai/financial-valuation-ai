@@ -1,21 +1,32 @@
 # M9-I2 Post-Owner-Approval Exact-Snapshot Closure
 
-Status: `CLOSED_WITH_SINGLE_MAINTAINER_EXCEPTION`; both ordered immutable exception events verified
-Carrier update state: `local_candidate_not_yet_immutable`
-Evidence assessment date: 2026-08-09
+Status: `NOT_CLOSED`; post-merge status-snapshot reclosure candidate
+Historical snapshot status: `CLOSED_WITH_SINGLE_MAINTAINER_EXCEPTION`; both ordered immutable
+exception events remain verified for snapshot `1c3754e7…a918`
+Carrier update state: `local_reclosure_candidate_not_yet_immutable`
+Evidence assessment date: 2026-08-12
 Review baseline: `3945e90559ec2e10771489078c9e8f52036209b7`
+Status synchronization baseline: `c4dcf9ef4780249f7a9a3a12a515cf4e07ce64b3`
 Current operational implementation milestone: M7
 Contract authority: `owner_approved_with_exception`; first-stage immutable attestation verified
 Publication authority: `DENIED`; separate explicit authorization required
-Runtime and data authority: `DENIED`; no M9-I2 implementation, live/provider access, real-company
-data, attachment use, or M9-I3 through M9-I6 authority
+Runtime and data authority: bounded synthetic offline M9-I2/M9-I3 only; live/provider access,
+real-company data, attachment use, M9-I4 through M9-I6, and release authority remain `DENIED`
 
 ## Closure model
 
-This record assesses only an exact documentation snapshot. It does not alter the contract bytes or
-transfer a review or approval to another SHA-256. The subject snapshot consists of the five files
-in the ordered manifest below. This carrier is outside the subject snapshot so that evidence and a
-future verdict can be appended without creating a self-referential file hash.
+This record preserves two distinct exact documentation snapshots. The historical manifest records
+the five immutable subject hashes closed by the published 2026-08-09 attestation. The current
+manifest records the same five paths after the 2026-08-12 post-merge status synchronization. The
+contract and review/approval bytes are unchanged; only `PROJECT_STATUS.md`, `ROADMAP.md`, and
+`README.md` change. This carrier remains outside both manifests to avoid a self-referential hash.
+
+No review, approval, event, or closure transfers between snapshot IDs. The historical attestation
+continues to close only historical snapshot
+`1c3754e724f98ff8324c567237070b68fe20514e678de3d1787e51d47f9da918`. The current snapshot fails
+closed to `NOT_CLOSED` until a separately authorized immutable subject commit, exact-head remote
+CI, findings disposition, and a new immutable `snapshot_closure_attestation` are published and
+independently verified in a later carrier-only transition.
 
 Closure is valid only when:
 
@@ -35,7 +46,25 @@ Any mismatch or missing event evidence fails closed to `NOT_CLOSED`. The carrier
 reported with any handoff. Changing this carrier does not change the subject snapshot ID, but it
 invalidates a prior carrier handoff until the new bytes are independently checked.
 
-## Ordered subject manifest
+## Historical closed subject manifest
+
+The following block is historical evidence and must remain byte-for-byte stable. Its snapshot ID
+is SHA-256 over the block bytes using the same newline rules as the current manifest.
+
+```text
+BEGIN HISTORICAL SUBJECT MANIFEST
+9326b6c76dcfe3061c5e356b5141d9f458d57694cb4e6b01b6470b0bf044d84e docs/milestones/M9-I2-issuer-resolution-contract-lock.md
+4734260f5946f57d08bb502919091025c49c7368d683d4334997e132d48ce969 docs/milestones/M9-I2-contract-lock-review-approval-record.md
+c181c387c98bc77fbb6d9c7ff4face0c6bd7edb41e4c71d3c505f064e6030c45 PROJECT_STATUS.md
+d1cc6d6f3a63fef58b50ef3b83131f36de56fa6af1b01023936b4200cb8538ab ROADMAP.md
+6057359a14a20a8945a471d6fe527e7baab4481ee765d7d45bdae6b013c74f6d README.md
+END HISTORICAL SUBJECT MANIFEST
+```
+
+Historical subject snapshot ID:
+`1c3754e724f98ff8324c567237070b68fe20514e678de3d1787e51d47f9da918`
+
+## Current reclosure subject manifest
 
 The snapshot ID is SHA-256 over the bytes between `BEGIN SUBJECT MANIFEST` and
 `END SUBJECT MANIFEST`, excluding both delimiter lines and including the final newline after the
@@ -46,13 +75,13 @@ lowercase SHA-256 values by one ASCII space.
 BEGIN SUBJECT MANIFEST
 9326b6c76dcfe3061c5e356b5141d9f458d57694cb4e6b01b6470b0bf044d84e docs/milestones/M9-I2-issuer-resolution-contract-lock.md
 4734260f5946f57d08bb502919091025c49c7368d683d4334997e132d48ce969 docs/milestones/M9-I2-contract-lock-review-approval-record.md
-c181c387c98bc77fbb6d9c7ff4face0c6bd7edb41e4c71d3c505f064e6030c45 PROJECT_STATUS.md
-d1cc6d6f3a63fef58b50ef3b83131f36de56fa6af1b01023936b4200cb8538ab ROADMAP.md
-6057359a14a20a8945a471d6fe527e7baab4481ee765d7d45bdae6b013c74f6d README.md
+ef05898cb6a8bdda0d52eeb7ac53e95862ca6065aa1253b28b3ed6ff2969c2db PROJECT_STATUS.md
+c657a35c37b1b9e6424e39cf56d6b595c1e2c70bad2e3f37a79ce9d8cab3d2d8 ROADMAP.md
+e5cc613c4a593c5cb99b61d168602f72179e61465ef9a348c1ab60eabdff2c13 README.md
 END SUBJECT MANIFEST
 ```
 
-Subject snapshot ID: `1c3754e724f98ff8324c567237070b68fe20514e678de3d1787e51d47f9da918`
+Current subject snapshot ID: `eb726009ac6afeebd5b15618ff03796c73790175f6360a3823f7c411dafde705`
 
 Recompute from the repository root:
 
@@ -65,6 +94,11 @@ sed -n '/^BEGIN SUBJECT MANIFEST$/,/^END SUBJECT MANIFEST$/p' \
   docs/milestones/M9-I2-post-owner-approval-snapshot-closure.md \
   | sed '1d;$d' | sha256sum
 ```
+
+The two contract-governance subjects intentionally retain their historical hashes. The three
+status subjects must match the current repository bytes. A mismatch in either current hashes or
+the current snapshot ID fails closed to `NOT_CLOSED`; matching hashes establish only the candidate
+identity, not closure.
 
 ## Required durable event record
 
@@ -122,11 +156,13 @@ Only the first event may advance the contract to `owner_approved_with_exception`
 approval record is updated and the subject manifest is recomputed, only the second event may
 advance that exact snapshot to `CLOSED_WITH_SINGLE_MAINTAINER_EXCEPTION`. The unqualified states
 `independently_reviewed`, `owner_approved`, and `CLOSED` are forbidden on this path. Any subject-file
-change invalidates the snapshot attestation and returns the changed package to `NOT_CLOSED`. A
-later carrier-only update may reference the second immutable event because the carrier is outside
-the subject manifest; it must not alter any subject file.
+change invalidates that attestation for the changed bytes and returns the new package to
+`NOT_CLOSED`. A later carrier-only update may reference the second immutable event because the
+carrier is outside the subject manifest; it must not alter a subject file within the same
+snapshot. An intentionally changed subject set starts a new snapshot lineage and must preserve the
+prior manifest and attestation as historical evidence.
 
-## Current evidence assessment
+## Historical closure evidence assessment
 
 The prior carrier asserted six events using only one date and role labels. It did not preserve the
 minimum durable fields:
@@ -192,11 +228,28 @@ on Python 3.10 completed successfully; each passed all validation and repository
 out-of-manifest carrier records the exact subject snapshot as
 `CLOSED_WITH_SINGLE_MAINTAINER_EXCEPTION`.
 
-The five subject files intentionally retain the pre-closure `NOT_CLOSED` statements that were
-hashed into the attested snapshot. They are historical snapshot bytes, not a competing current
-verdict. Altering them would invalidate the attestation. This carrier is the authoritative current
-closure assessment because the contract explicitly places it outside the subject manifest for the
-final carrier-only transition.
+The historical manifest above preserves those five exact subject hashes and the attested snapshot
+ID. The current repository no longer pretends that its three high-level status files still have
+those bytes. This explicit separation preserves the old immutable evidence without transferring
+its verdict to the new snapshot.
+
+## Current reclosure evidence assessment
+
+PR #24 merged the bounded synthetic offline M9-I2 issuer-resolution implementation as
+`3ea93c8751bfaa558d3597a91b978f986dac6412`. PR #25 merged its out-of-manifest completion carrier as
+`58a6031427ace8ce61b48884753ca732943ea2ca`. PR #26 merged the bounded offline M9-I3 immutable store
+and safe manual-import implementation as `c4dcf9ef4780249f7a9a3a12a515cf4e07ce64b3`; exact-head
+Validate run #81 succeeded on Python 3.10 and 3.12 with 425 tests per job.
+
+Those facts require `README.md`, `ROADMAP.md`, and `PROJECT_STATUS.md` to move beyond their attested
+2026-08-09 status. Their changed bytes produce the current manifest and snapshot ID above. The
+contract and approval-record hashes remain unchanged, and the historical attestation files and
+events are not modified.
+
+The current manifest is a local candidate only. It has no immutable subject commit, remote CI,
+current-snapshot findings disposition, or new immutable closure attestation. Its authoritative
+state is therefore `NOT_CLOSED`. No local hash match, prior attestation, merged implementation, or
+status prose may advance it to a closed state.
 
 ## Historical validation and attestation assertions
 
@@ -261,7 +314,7 @@ Immutable second-stage publication verification for attestation commit
 - all validation and repository-policy steps: `PASS`; and
 - the workflow's pull-request head is the exact attestation commit.
 
-Current local validation for this carrier-only transition completed in the local workspace on
+Historical local validation for the final 2026-08-09 carrier-only transition completed in the local workspace on
 Python 3.12.13 with pytest 8.4.2 and jsonschema 4.26.0:
 
 - focused M9-I2 governance regressions: `PASS`; 18 tests passed;
@@ -274,11 +327,30 @@ These results validate the final local candidate bytes. The carrier transition b
 published authoritative repository state only after separately authorized staging, commit, push,
 and exact-head remote verification.
 
+Current local validation for the 2026-08-12 post-merge status-snapshot reclosure candidate completed
+on Python 3.12.13 with pytest 8.4.2, jsonschema 4.26.0, and PyYAML 6.0.3:
+
+- focused M9-I2 governance regressions: `PASS`; 19 tests passed;
+- current subject manifest: `PASS`; all five current repository hashes and the current snapshot ID
+  recomputed exactly;
+- historical subject manifest: `PASS`; all five recorded hashes and historical snapshot ID
+  remained byte-for-byte stable;
+- complete repository suite: `PASS`; 426 tests passed;
+- all 10 workflow validators and repository-policy steps: `PASS`;
+- schema/governed-document validation: `PASS`; 32 schemas and 121 governed documents;
+- repository content policy: `PASS`; no prohibited source detected;
+- `git diff --check`: `PASS`; and
+- staged index: empty; no commit, push, PR, attestation publication, or closure transition claimed.
+
+These results validate only the unstaged local candidate. They identify the new snapshot bytes but
+do not satisfy the pending immutable-subject, remote-CI, findings, attestation, or carrier-verification
+steps required for current-snapshot closure.
+
 The prior exact-snapshot `PASS` is retained only as a historical assertion. It has no actor ID, UTC
 timestamp, immutable evidence reference, or event-chain link and therefore grants no closure state.
 It must not be silently upgraded by adding invented metadata after the fact.
 
-## Required path to closure
+## Historical path to closure
 
 The preferred default path remains:
 
@@ -302,11 +374,28 @@ When no eligible independent reviewer is reasonably available, the alternative p
 5. [complete in this local candidate] update only this out-of-manifest carrier to reference the second event and record
    `CLOSED_WITH_SINGLE_MAINTAINER_EXCEPTION`, without altering a subject file.
 
-Every selected-path evidence step is satisfied for the unchanged exact subject snapshot, so its
-package state is `CLOSED_WITH_SINGLE_MAINTAINER_EXCEPTION`. Any hash, event-chain, immutable-object,
-CI, finding-disposition, or authority-boundary mismatch fails closed to `NOT_CLOSED`. This closure
-state does not authorize publication, implementation, network/provider use, real-company data,
-attachments, or a later milestone.
+Every selected-path evidence step remains satisfied for historical snapshot `1c3754e7…a918`, so
+that exact historical package remains `CLOSED_WITH_SINGLE_MAINTAINER_EXCEPTION`. It does not close
+the current snapshot or authorize publication, implementation, network/provider use, real-company
+data, attachments, or a later milestone.
+
+## Required path for current reclosure
+
+1. [complete in this local candidate] synchronize only the three high-level status subjects,
+   preserve both contract-governance subjects, record the new manifest/snapshot ID, and add
+   recomputation and history-preservation regressions;
+2. [pending separate authorization] review the complete unstaged candidate and confirm no blocking,
+   high, or medium documentation/governance finding;
+3. [pending separate authorization] stage and commit the exact subject and carrier bytes, then push
+   and obtain successful exact-head Python 3.10/3.12 CI;
+4. [pending separate authorization] publish a new immutable `snapshot_closure_attestation` bound to
+   the current snapshot ID, subject commit, CI, validation, finding disposition, shared-actor
+   disclosure, residual-risk acceptance, prior event chain, and authority boundary; and
+5. [pending separate authorization] update only this out-of-manifest carrier to verify the new Git
+   object and transition the current snapshot to `CLOSED_WITH_SINGLE_MAINTAINER_EXCEPTION`.
+
+Until all five steps are complete, any missing hash, event-chain, immutable-object, CI,
+finding-disposition, or authority-boundary evidence fails closed to `NOT_CLOSED`.
 
 ## Source boundary
 
