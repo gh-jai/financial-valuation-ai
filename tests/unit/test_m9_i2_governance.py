@@ -43,6 +43,7 @@ CURRENT_ATTESTATION_EVENT_HASH = (
     "d203f487fd9a6c1623f71d5ed0a68828c586956ebdb739c1cf5aa6e6569117c1"
 )
 CURRENT_ATTESTATION_CI_RUN_ID = "31524034663"
+STATUS_SUMMARY_PATHS = ("PROJECT_STATUS.md", "ROADMAP.md", "README.md")
 HASH_RE = re.compile(r"^[0-9a-f]{64}$")
 
 
@@ -125,7 +126,7 @@ def test_frozen_contract_hash_is_unchanged() -> None:
     assert f"Contract SHA-256: `{CONTRACT_SHA256}`" in approval
 
 
-def test_subject_manifest_and_snapshot_id_recompute() -> None:
+def test_last_attested_subject_manifest_is_preserved_and_new_status_bytes_fail_closed() -> None:
     text = closure_text()
     entries = manifest_entries(text)
     assert [path for _, path in entries] == [
@@ -135,8 +136,14 @@ def test_subject_manifest_and_snapshot_id_recompute() -> None:
         "ROADMAP.md",
         "README.md",
     ]
-    for expected_digest, relative_path in entries:
-        assert sha256(ROOT / relative_path) == expected_digest
+    manifest = {relative_path: digest for digest, relative_path in entries}
+    for relative_path in (
+        "docs/milestones/M9-I2-issuer-resolution-contract-lock.md",
+        "docs/milestones/M9-I2-contract-lock-review-approval-record.md",
+    ):
+        assert sha256(ROOT / relative_path) == manifest[relative_path]
+    for relative_path in STATUS_SUMMARY_PATHS:
+        assert sha256(ROOT / relative_path) != manifest[relative_path]
 
     expected_snapshot = hashlib.sha256(manifest_block(text).encode("utf-8")).hexdigest()
     match = re.search(r"^Current subject snapshot ID: `([0-9a-f]{64})`$", text, re.MULTILINE)
@@ -227,7 +234,7 @@ def test_historical_assertions_cannot_satisfy_actor_separation_or_ordering() -> 
 def test_status_summaries_advance_without_transferring_historical_closure() -> None:
     summaries = {
         path: (ROOT / path).read_text(encoding="utf-8")
-        for path in ("PROJECT_STATUS.md", "ROADMAP.md", "README.md")
+        for path in STATUS_SUMMARY_PATHS
     }
     for text in summaries.values():
         assert "`owner_approved_with_exception`" in text
@@ -248,8 +255,18 @@ def test_status_summaries_advance_without_transferring_historical_closure() -> N
     assert "M9-I2 runtime and M9-I3 through M9-I6 remain unauthorized" not in combined
     assert "M9-I2 implementation has not started" not in combined
     assert "does not yet provide M9-I2 issuer resolution" not in combined
-    assert "M9-I4 through M9-I6" in combined
+    assert "M9-I4 implementation" in combined
+    assert "M9-I5 through M9-I6" in combined
     assert "Validate run #81" in combined
+    assert "PR #30" in combined
+    assert "e26f55ef3e9b8babecb42f41f25be20dd918ea1e" in combined
+    assert "Validate run #92" in combined
+    assert "COMMENTED_PASS" in combined
+    assert "587fa892cefb1397c7854c93698799fa88e18f8e" in combined
+    assert "M9-I4 is contract-only" in combined
+    assert "M9-I4 disabled offline implementation" in combined
+    assert "M9-I5 cannot begin" in combined
+    assert "live request" in combined
 
 
 def test_single_maintainer_exception_is_explicit_and_narrow() -> None:
@@ -637,8 +654,14 @@ def test_current_reclosure_is_hash_bound_and_closes_only_the_attested_snapshot()
         "Carrier update state: `immutable_current_attestation_verified`"
         in closure
     )
-    for expected_digest, relative_path in manifest_entries(closure):
-        assert sha256(ROOT / relative_path) == expected_digest
+    manifest = {relative_path: digest for digest, relative_path in manifest_entries(closure)}
+    for relative_path in (
+        "docs/milestones/M9-I2-issuer-resolution-contract-lock.md",
+        "docs/milestones/M9-I2-contract-lock-review-approval-record.md",
+    ):
+        assert sha256(ROOT / relative_path) == manifest[relative_path]
+    for relative_path in STATUS_SUMMARY_PATHS:
+        assert sha256(ROOT / relative_path) != manifest[relative_path]
     assert snapshot_attestation()["event"]["subject_commit_sha"] == SNAPSHOT_COMMIT_SHA
     assert snapshot_attestation()["event"]["snapshot_id"] == HISTORICAL_SNAPSHOT_ID
     assert CURRENT_SNAPSHOT_ID != HISTORICAL_SNAPSHOT_ID
@@ -651,6 +674,13 @@ def test_current_reclosure_is_hash_bound_and_closes_only_the_attested_snapshot()
     assert "All six selected-path steps are satisfied for the exact current snapshot" in normalized
     assert "any subject-file change starts a new snapshot lineage" in normalized
     assert "grants no additional runtime, data, provider, publication, release" in normalized
+    summaries = " ".join(
+        (ROOT / relative_path).read_text(encoding="utf-8")
+        for relative_path in STATUS_SUMMARY_PATHS
+    )
+    assert "eb726009ac6afeebd5b15618ff03796c73790175f6360a3823f7c411dafde705" in summaries
+    assert "distinct current snapshot" in summaries
+    assert "`NOT_CLOSED`" in summaries
 
 
 def test_hook_count_includes_repository_policy_once() -> None:
