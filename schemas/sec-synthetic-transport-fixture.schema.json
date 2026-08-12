@@ -1,0 +1,36 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://fvi.example/schemas/sec-synthetic-transport-fixture.schema.json",
+  "title": "FVI M9-I4 Synthetic SEC Transport Fixture",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "canonicalization_version", "fixture_id", "synthetic", "network_state", "capture_provenance", "provider_id", "capability", "endpoint_id", "identifiers", "user_agent_policy_valid", "events", "expected_result_hash", "fixture_hash"],
+  "properties": {
+    "schema_version": {"const": "0.1.0"}, "canonicalization_version": {"const": "fvi-canonical-json-v1"},
+    "fixture_id": {"type": "string", "pattern": "^STF-[A-Z0-9-]+$"}, "synthetic": {"const": true},
+    "network_state": {"const": "denied"}, "capture_provenance": {"const": "original_fixture"},
+    "provider_id": {"enum": ["sec-identity", "sec-submissions", "sec-filings", "sec-xbrl"]},
+    "capability": {"enum": ["identity", "submissions", "filings", "companyfacts"]},
+    "endpoint_id": {"enum": ["sec-company-tickers-v1", "sec-submissions-by-cik-v1", "sec-filing-document-v1", "sec-companyfacts-by-cik-v1"]},
+    "identifiers": {"type": "object", "additionalProperties": false, "properties": {"cik": {"type": "string", "pattern": "^[0-9]{10}$"}, "accession": {"type": "string", "pattern": "^[0-9]{10}-[0-9]{2}-[0-9]{6}$"}, "document": {"type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$"}}},
+    "user_agent_policy_valid": {"type": "boolean"},
+    "events": {"type": "array", "minItems": 1, "maxItems": 16, "items": {"$ref": "#/$defs/event"}},
+    "expected_result_hash": {"$ref": "#/$defs/hash"}, "fixture_hash": {"$ref": "#/$defs/hash"}
+  },
+  "allOf": [
+    {"if": {"properties": {"capability": {"const": "identity"}}, "required": ["capability"]}, "then": {"properties": {"provider_id": {"const": "sec-identity"}, "endpoint_id": {"const": "sec-company-tickers-v1"}, "identifiers": {"maxProperties": 0}}}},
+    {"if": {"properties": {"capability": {"const": "submissions"}}, "required": ["capability"]}, "then": {"properties": {"provider_id": {"const": "sec-submissions"}, "endpoint_id": {"const": "sec-submissions-by-cik-v1"}, "identifiers": {"required": ["cik"], "maxProperties": 1}}}},
+    {"if": {"properties": {"capability": {"const": "filings"}}, "required": ["capability"]}, "then": {"properties": {"provider_id": {"const": "sec-filings"}, "endpoint_id": {"const": "sec-filing-document-v1"}, "identifiers": {"required": ["cik", "accession", "document"], "minProperties": 3, "maxProperties": 3}}}},
+    {"if": {"properties": {"capability": {"const": "companyfacts"}}, "required": ["capability"]}, "then": {"properties": {"provider_id": {"const": "sec-xbrl"}, "endpoint_id": {"const": "sec-companyfacts-by-cik-v1"}, "identifiers": {"required": ["cik"], "maxProperties": 1}}}}
+  ],
+  "$defs": {
+    "hash": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+    "event": {
+      "oneOf": [
+        {"type": "object", "additionalProperties": false, "required": ["kind", "seconds"], "properties": {"kind": {"const": "advance_time"}, "seconds": {"type": "integer", "minimum": 0, "maximum": 60}}},
+        {"type": "object", "additionalProperties": false, "required": ["kind"], "properties": {"kind": {"enum": ["connection_reset_before_response", "timeout"]}}},
+        {"type": "object", "additionalProperties": false, "required": ["kind", "status", "headers", "body_encoding", "body"], "properties": {"kind": {"const": "response"}, "status": {"type": "integer", "minimum": 100, "maximum": 599}, "headers": {"type": "object", "propertyNames": {"enum": ["Content-Length", "Content-Type", "Retry-After"]}, "additionalProperties": {"type": "string", "maxLength": 8192}, "maxProperties": 3}, "body_encoding": {"enum": ["base64", "utf-8"]}, "body": {"type": "string", "maxLength": 65536}}}
+      ]
+    }
+  }
+}
