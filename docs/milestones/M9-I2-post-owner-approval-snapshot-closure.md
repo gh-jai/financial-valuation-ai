@@ -1,9 +1,9 @@
 # M9-I2 Post-Owner-Approval Exact-Snapshot Closure
 
-Status: `NOT_CLOSED`; post-merge status-snapshot reclosure candidate
+Status: `CLOSED_WITH_SINGLE_MAINTAINER_EXCEPTION`; carrier-only reclosure candidate
 Historical snapshot status: `CLOSED_WITH_SINGLE_MAINTAINER_EXCEPTION`; both ordered immutable
 exception events remain verified for snapshot `1c3754e7…a918`
-Carrier update state: `published_subject_pending_finding_disposition_and_attestation`
+Carrier update state: `immutable_current_attestation_verified`
 Evidence assessment date: 2026-08-12
 Review baseline: `3945e90559ec2e10771489078c9e8f52036209b7`
 Status synchronization baseline: `c4dcf9ef4780249f7a9a3a12a515cf4e07ce64b3`
@@ -23,11 +23,12 @@ contract and review/approval bytes are unchanged; only `PROJECT_STATUS.md`, `ROA
 
 No review, approval, event, or closure transfers between snapshot IDs. The historical attestation
 continues to close only historical snapshot
-`1c3754e724f98ff8324c567237070b68fe20514e678de3d1787e51d47f9da918`. The current snapshot fails
-closed to `NOT_CLOSED`. Its immutable subject commit and exact-subject remote CI now exist, but the
-formal review disposition remains `COMMENTED_BLOCKING`. Closure still requires a no-unresolved-
-blocking/high/medium finding disposition, a separately authorized immutable
-`snapshot_closure_attestation`, and independent verification in a later carrier-only transition.
+`1c3754e724f98ff8324c567237070b68fe20514e678de3d1787e51d47f9da918`. The current snapshot is
+separately closed as `CLOSED_WITH_SINGLE_MAINTAINER_EXCEPTION`: its immutable subject commit,
+exact-subject remote CI, `COMMENTED_PASS` disposition with the only finding resolved, ordered
+immutable `snapshot_closure_attestation`, and successful exact-attestation-commit CI are all
+verified below. This carrier-only candidate performs the final transition without changing a
+subject byte or immutable event.
 
 Closure is valid only when:
 
@@ -255,10 +256,42 @@ steps and 426 tests. Formal exact-head review recorded `COMMENTED_BLOCKING` agai
 identified one current-evidence inconsistency in this out-of-manifest carrier. This carrier-only
 follow-up corrects the inconsistency without changing any subject byte or the current snapshot ID.
 
-The authoritative current-snapshot state remains `NOT_CLOSED`. Successful subject publication and
-CI do not supply a no-unresolved-blocking/high/medium finding disposition, and no new immutable
-closure attestation exists. No hash match, prior attestation, merged implementation, review
-remediation, or status prose may advance the current snapshot to a closed state.
+PR #27's carrier remediation was subsequently published in main subject commit
+`3b2a7adec3fb2c9c8d4d9ce2eb9aa61e75f5379c`. Its Git tree is byte-identical to the reviewed
+`ff0767f145867f08a4386d1d8e5d7342663fed7c` head. Validate run #85 (`31519855793`) succeeded for
+that exact main commit, the formal disposition is `COMMENTED_PASS`, and the only authoritative
+finding thread `PRRT_kwDOTqKoFc6YUcz-` is resolved. No unresolved blocking, high, or medium finding
+remains against the current subject bytes.
+
+The ordered current `snapshot_closure_attestation` is now immutable in main commit
+`1a3a33646e963525c952f7af735d8806369f6a70`. Its fixed Git blob is
+`15b4654d22450665a1e5fd16c465e55a19837b27`, its file SHA-256 is
+`36d24d8ed7a58adaf62e5d25426bbc891f9129e365f6224cc9dfa51ac2b248c3`, and canonical event hash
+`d203f487fd9a6c1623f71d5ed0a68828c586956ebdb739c1cf5aa6e6569117c1` recomputes. The immutable
+reference is
+`https://github.com/gh-jai/financial-valuation-ai/blob/1a3a33646e963525c952f7af735d8806369f6a70/docs/milestones/M9-I2-current-snapshot-closure-attestation.md`.
+The event links to prior event hash
+`288270085de0794ed954ef10ab41746a85fe357e6c02d5ff1a43adb949aabcea`, binds current snapshot
+`eb726009ac6afeebd5b15618ff03796c73790175f6360a3823f7c411dafde705` and main subject commit
+`3b2a7adec3fb2c9c8d4d9ce2eb9aa61e75f5379c`, preserves the shared-actor disclosure and bounded
+separation waiver, accepts the residual risk, and grants no additional runtime, data, provider,
+publication, release, or qualified-review authority.
+
+Main Validate run [#87](https://github.com/gh-jai/financial-valuation-ai/actions/runs/31524034663)
+verified the exact immutable-attestation commit. Job
+[`93887825384`](https://github.com/gh-jai/financial-valuation-ai/actions/runs/31524034663/job/93887825384)
+on Python 3.10.20 and job
+[`93887825359`](https://github.com/gh-jai/financial-valuation-ai/actions/runs/31524034663/job/93887825359)
+on Python 3.12.13 completed successfully; each passed all 10 validation and repository-policy
+steps and 429 tests. The complete current exception path is therefore mechanically verifiable,
+and this out-of-manifest carrier-only candidate records the current snapshot as
+`CLOSED_WITH_SINGLE_MAINTAINER_EXCEPTION`.
+
+The `NOT_CLOSED` wording inside the five-file subject snapshot is retained as immutable subject
+history; modifying those bytes would create a different snapshot and invalidate this attestation.
+The out-of-manifest carrier is the authoritative closure record for the exact attested snapshot.
+No hash match, prior attestation, merged implementation, review remediation, or status prose alone
+may advance a snapshot; closure here depends on the complete ordered evidence chain above.
 
 ## Historical validation and attestation assertions
 
@@ -353,10 +386,27 @@ on Python 3.12.13 with pytest 8.4.2, jsonschema 4.26.0, and PyYAML 6.0.3:
 
 These results first validated the unstaged local candidate. Commit
 `f571c1426181107d50f84e59fed051fb11c9c94e` subsequently published the exact current subject bytes,
-and exact-head Validate run #83 (`31518237790`) supplied successful remote CI. Formal review of that
-head returned `COMMENTED_BLOCKING`; therefore the required no-unresolved-blocking/high/medium
-finding disposition, immutable attestation, and later carrier-verification steps remain
-unsatisfied.
+and exact-head Validate run #83 (`31518237790`) supplied successful remote CI. The carrier-only
+finding was remediated, exact-head run #84 passed, and formal re-review returned `COMMENTED_PASS`.
+Main subject run #85 then verified the reviewed subject tree. The immutable current attestation was
+published in commit `1a3a33646e963525c952f7af735d8806369f6a70`, and main run #87
+(`31524034663`) verified that exact commit on Python 3.10.20 and 3.12.13 with 429 tests per job.
+
+Current local validation for this carrier-only reclosure candidate completed on Python 3.12.13
+with pytest 8.4.2, jsonschema 4.26.0, and PyYAML 6.0.3:
+
+- focused M9-I2 governance regressions: `PASS`; 23 tests passed;
+- complete repository suite: `PASS`; 430 tests passed;
+- all 10 workflow validators and repository-policy steps: `PASS`;
+- schema/governed-document validation: `PASS`; 32 schemas and 121 governed documents;
+- immutable current-attestation SHA-256 and canonical event hash: `PASS`;
+- current and historical subject manifests and the complete three-event chain: `PASS`;
+- `git diff --check`: `PASS`; and
+- staged index: empty; no staging, commit, push, PR, or publication is claimed.
+
+These results validate only the unstaged local carrier candidate. The transition becomes the
+published repository state only after separately authorized publication and exact-head remote
+verification; those future actions do not alter the already immutable attestation event.
 
 The prior exact-snapshot `PASS` is retained only as a historical assertion. It has no actor ID, UTC
 timestamp, immutable evidence reference, or event-chain link and therefore grants no closure state.
@@ -400,17 +450,18 @@ data, attachments, or a later milestone.
    current manifest and snapshot ID without declaring closure;
 3. [complete] obtain successful exact-subject Python 3.10/3.12 CI in Validate run #83
    (`31518237790`);
-4. [in progress; blocking disposition recorded] correct the carrier-only current-evidence finding,
+4. [complete] correct the carrier-only current-evidence finding,
    obtain successful exact-head CI for the correction, and complete formal re-review with no
    unresolved blocking, high, or medium finding;
-5. [pending separate authorization] publish a new immutable `snapshot_closure_attestation` bound to
+5. [complete] publish a new immutable `snapshot_closure_attestation` bound to
    the current snapshot ID, subject commit, CI, validation, finding disposition, shared-actor
    disclosure, residual-risk acceptance, prior event chain, and authority boundary; and
-6. [pending separate authorization] update only this out-of-manifest carrier to verify the new Git
+6. [complete in this local candidate] update only this out-of-manifest carrier to verify the new Git
    object and transition the current snapshot to `CLOSED_WITH_SINGLE_MAINTAINER_EXCEPTION`.
 
-Until all six steps are complete, any missing hash, event-chain, immutable-object, CI,
-finding-disposition, or authority-boundary evidence fails closed to `NOT_CLOSED`.
+All six selected-path steps are satisfied for the exact current snapshot. Any later mismatch in a
+subject hash, event-chain link, immutable object, CI, finding disposition, or authority boundary
+fails closed to `NOT_CLOSED`; any subject-file change starts a new snapshot lineage.
 
 ## Source boundary
 
