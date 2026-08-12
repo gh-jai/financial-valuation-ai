@@ -40,8 +40,10 @@ Status: Cross-functional design review complete. The project owner authorized M9
 planning with the seven recorded conditions on 2026-08-08. The M9 planning baseline is merged;
 the separately approved M9-I1 offline foundation was subsequently reviewed, hardened, validated,
 and merged through PR #20. The bounded synthetic offline M9-I2 issuer resolver and M9-I3 immutable
-storage/manual-import slice were subsequently merged through PRs #24-#26. These post-M7 checkpoints
-do not advance the current operational implementation milestone beyond M7.
+storage/manual-import slice were subsequently merged through PRs #24-#26. The M9-I4 disabled SEC
+adapter contract lock was subsequently merged through PR #30; it is contract-only and grants no
+implementation or live-data authority. These post-M7 checkpoints do not advance the current
+operational implementation milestone beyond M7.
 
 ## M9 Public data ingestion and accounting normalization
 
@@ -58,20 +60,27 @@ implementation was reviewed, remediated, validated, and merged through PR #24 as
 `58a6031427ace8ce61b48884753ca732943ea2ca`. M9-I3's bounded offline immutable store and safe manual
 JSON/CSV import were reviewed, remediated, validated, and merged through PR #26 as
 `c4dcf9ef4780249f7a9a3a12a515cf4e07ce64b3`. Validate run #81 passed every Python 3.10 and 3.12
-job at the exact M9-I3 head. The frozen M9-I2 contract remains
+job at the exact M9-I3 head. M9-I4's disabled SEC adapter contract lock was reviewed, remediated,
+and merged through PR #30 as `e26f55ef3e9b8babecb42f41f25be20dd918ea1e`. Formal same-maintainer
+review recorded `COMMENTED_PASS` at exact head
+`587fa892cefb1397c7854c93698799fa88e18f8e`; post-merge Validate run #92 passed every Python 3.10
+and 3.12 job at the exact main commit. This is contract evidence only: M9-I4 adapters, injected
+transport, limiter, retry, circuit-breaker, cache, fixtures, and independent validator have not
+been implemented. The frozen M9-I2 contract remains
 `owner_approved_with_exception`; the disclosed single-maintainer path does not claim independent
 human or GitHub platform approval and does not weaken M1-M7 runtime separation or later qualified
 review gates.
 
-The previously attested M9-I2 documentation snapshot remains historical
-`CLOSED_WITH_SINGLE_MAINTAINER_EXCEPTION` evidence. Synchronizing these post-merge facts changes
-three files in that subject set, so the new recomputable status snapshot is fail-closed as
-`NOT_CLOSED` pending its own immutable subject commit, exact-head CI, findings disposition, and new
-snapshot-closure attestation. The historical and current manifests are preserved in
-`docs/milestones/M9-I2-post-owner-approval-snapshot-closure.md`. M9-I4 through M9-I6, live SEC or
-provider access, provider activation, real-company fixtures, normalization, API, LLM, UI, and
-release work remain separately unauthorized. The next bounded checkpoint is an M9-I4 contract
-lock; it must not perform a live request.
+The previously attested synchronized M9-I2 documentation snapshot `eb726009…de705` remains exact
+`CLOSED_WITH_SINGLE_MAINTAINER_EXCEPTION` evidence. Synchronizing the M9-I4 post-merge facts changes
+three files in that subject set, so the resulting current snapshot is fail-closed as `NOT_CLOSED`
+pending its own immutable subject commit, exact-head CI, findings disposition, and new
+snapshot-closure attestation. The preserved manifests and attestation evidence remain in
+`docs/milestones/M9-I2-post-owner-approval-snapshot-closure.md`. M9-I4 implementation, M9-I5 through
+M9-I6, live SEC or provider access, provider activation, real-company fixtures, normalization, API,
+LLM, UI, and release work remain separately unauthorized. The next bounded checkpoint is a
+separately authorized M9-I4 disabled offline implementation; it must use only original synthetic
+fixtures and an injected network-denied transport and must not perform a live request.
 
 ## M10 Assumption, routing, and scenario engine
 
