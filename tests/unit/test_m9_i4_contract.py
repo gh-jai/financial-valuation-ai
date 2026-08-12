@@ -44,8 +44,9 @@ def test_m9_i4_contract_separates_all_four_capabilities_and_fixed_endpoints() ->
         "`companyfacts` | `sec-xbrl` | `sec-companyfacts-by-cik-v1`",
         "https://www.sec.gov/files/company_tickers.json",
         "https://data.sec.gov/submissions/CIK{cik}.json",
-        "https://www.sec.gov/Archives/edgar/data/{cik}/{accession_compact}/{document}",
+        "https://www.sec.gov/Archives/edgar/data/{cik}/{accession}/{document}",
         "https://data.sec.gov/api/xbrl/companyfacts/CIK{cik}.json",
+        "filled only with that derived `accession_compact` value",
     ):
         assert expected in text
     assert "Permission for one capability\nnever grants another" in text
@@ -66,8 +67,11 @@ def test_m9_i4_contract_locks_network_resilience_and_resource_limits() -> None:
         "read-idle timeout is 20 seconds",
         "total request deadline is 30 seconds",
         "five consecutive countable failures open the circuit for 60 seconds",
-        "identity | 8,388,608 bytes",
-        "companyfacts | 33,554,432 bytes",
+        "identity | 1,048,576 bytes",
+        "submissions | 1,048,576 bytes",
+        "filings | 1,048,576 bytes",
+        "companyfacts | 1,048,576 bytes",
+        "inherited M9-I3 maximum raw input and stored-record size",
     ):
         assert requirement in normalized
 
@@ -125,6 +129,9 @@ def test_policy_schema_locks_disabled_state_and_numeric_controls() -> None:
     assert properties["timeout_policy"]["properties"]["total_seconds"] == {"const": 30}
     assert properties["circuit_breaker"]["properties"]["failure_threshold"] == {"const": 5}
     assert properties["circuit_breaker"]["properties"]["open_seconds"] == {"const": 60}
+    assert schema["$defs"]["capability"]["properties"]["max_decoded_body_bytes"] == {
+        "const": 1048576
+    }
     capability_rules = schema["$defs"]["capability"]["allOf"]
     assert len(capability_rules) == 4
     mappings = {
@@ -139,6 +146,16 @@ def test_policy_schema_locks_disabled_state_and_numeric_controls() -> None:
         "submissions": ("sec-submissions", "sec-submissions-by-cik-v1"),
         "filings": ("sec-filings", "sec-filing-document-v1"),
         "companyfacts": ("sec-xbrl", "sec-companyfacts-by-cik-v1"),
+    }
+    for rule in capability_rules:
+        assert rule["then"]["properties"]["max_decoded_body_bytes"] == {"const": 1048576}
+    filings_rule = next(
+        rule
+        for rule in capability_rules
+        if rule["if"]["properties"]["capability"]["const"] == "filings"
+    )
+    assert filings_rule["then"]["properties"]["endpoint_template"] == {
+        "const": "https://www.sec.gov/Archives/edgar/data/{cik}/{accession}/{document}"
     }
 
 
@@ -156,6 +173,7 @@ def test_result_fixture_and_validation_schemas_preserve_offline_boundary() -> No
     assert validation["properties"]["network_state"] == {"const": "denied"}
     assert len(result["allOf"]) == 6
     assert len(fixture["allOf"]) == 4
+    assert result["$defs"]["rawRecord"]["properties"]["byte_count"]["maximum"] == 1048576
 
 
 def test_review_checklist_has_no_preselected_verdict() -> None:
@@ -167,6 +185,8 @@ def test_review_checklist_has_no_preselected_verdict() -> None:
 
 def test_existing_provider_registry_remains_default_deny_contract_input() -> None:
     text = PROVIDER_REGISTRY.read_text(encoding="utf-8")
+    assert "https://www.sec.gov/Archives/edgar/data/{cik}/{accession}/{document}" in text
+    assert "{accession_compact}" not in text
     assert text.count("status: pending") == 4
     assert text.count("live_activation: disabled") == 4
     for right in ("storage", "display", "export", "redistribution"):

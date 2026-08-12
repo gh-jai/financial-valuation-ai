@@ -70,7 +70,7 @@ order:
 |---:|---|---|---|---|---|
 | 0 | `identity` | `sec-identity` | `sec-company-tickers-v1` | `https://www.sec.gov/files/company_tickers.json` | `www.sec.gov` |
 | 1 | `submissions` | `sec-submissions` | `sec-submissions-by-cik-v1` | `https://data.sec.gov/submissions/CIK{cik}.json` | `data.sec.gov` |
-| 2 | `filings` | `sec-filings` | `sec-filing-document-v1` | `https://www.sec.gov/Archives/edgar/data/{cik}/{accession_compact}/{document}` | `www.sec.gov` |
+| 2 | `filings` | `sec-filings` | `sec-filing-document-v1` | `https://www.sec.gov/Archives/edgar/data/{cik}/{accession}/{document}` | `www.sec.gov` |
 | 3 | `companyfacts` | `sec-xbrl` | `sec-companyfacts-by-cik-v1` | `https://data.sec.gov/api/xbrl/companyfacts/CIK{cik}.json` | `data.sec.gov` |
 
 Each capability has an independent kill switch fixed to `disabled`. Permission for one capability
@@ -85,8 +85,10 @@ permit a request. Under this contract candidate every such decision remains deni
 - CIK is exactly ten ASCII digits. For path construction it is normalized only to its decimal
   no-leading-zero form where the fixed endpoint requires it; the canonical identity remains the
   ten-digit value.
-- Accession is exactly `##########-##-######`; `accession_compact` is those 18 digits with hyphens
-  removed. The filing `document` is an allowlisted basename matching
+- Accession input is exactly `##########-##-######`; `accession_compact` is those 18 digits with
+  hyphens removed. The authoritative registry template's `{accession}` placeholder is inherited
+  verbatim and is filled only with that derived `accession_compact` value, never with caller text or
+  the hyphenated input. The filing `document` is an allowlisted basename matching
   `[A-Za-z0-9][A-Za-z0-9._-]{0,127}` with no slash, backslash, percent escape, dot segment, control
   character, Unicode normalization, or empty extension trick.
 - Schemes are fixed to `https`; ports, fragments, userinfo, arbitrary queries, proxies, environment
@@ -175,10 +177,14 @@ The future injected transport must stream into a bounded sink and stop before ac
 
 | Capability | Maximum decoded body | Required media family |
 |---|---:|---|
-| identity | 8,388,608 bytes | JSON |
-| submissions | 16,777,216 bytes | JSON |
-| filings | 25,165,824 bytes | HTML, text, or XBRL/XML selected by fixed policy |
-| companyfacts | 33,554,432 bytes | JSON |
+| identity | 1,048,576 bytes | JSON |
+| submissions | 1,048,576 bytes | JSON |
+| filings | 1,048,576 bytes | HTML, text, or XBRL/XML selected by fixed policy |
+| companyfacts | 1,048,576 bytes | JSON |
+
+The 1,048,576-byte ceiling is the inherited M9-I3 maximum raw input and stored-record size. A
+decoded body exceeding it stops with `SEC-RESPONSE-OVERSIZE` before acceptance or publication; no
+capability may accept bytes that the required M9-I3 store cannot record.
 
 Header bytes are capped at 65,536, header count at 128, one header value at 8,192 bytes, and status
 lines at 1,024 bytes. Transfer/content-length disagreement, unsupported encoding, truncation,

@@ -15,8 +15,8 @@ Review baseline: `main@cd804db1126a45d8082f081f086b463d382566ba`
 ## Endpoint and network policy
 
 - [ ] Callers cannot supply URL, scheme, host, port, path, query, fragment, headers, proxy, or redirect target.
-- [ ] Four exact HTTPS templates, endpoint IDs, registry IDs, and hosts are locked.
-- [ ] CIK, accession, compact accession, and document-basename transformations are unambiguous.
+- [ ] Four exact HTTPS templates, endpoint IDs, registry IDs, and hosts close byte-for-byte to the unchanged provider registry.
+- [ ] CIK, accession, compact accession, registry-placeholder substitution, and document-basename transformations are unambiguous.
 - [ ] Redirects are denied without following `Location`.
 - [ ] Host parsing, public-address checks, DNS-rebinding, private/link-local/loopback/reserved ranges, and proxy inheritance fail closed.
 - [ ] Only internally constructed `Accept`, `Host`, and `User-Agent` headers are permitted.
@@ -30,11 +30,11 @@ Review baseline: `main@cd804db1126a45d8082f081f086b463d382566ba`
 - [ ] Connect/read/total timeouts are 5s/20s/30s and outer deadlines never reset.
 - [ ] Circuit states, five-failure threshold, 60s open interval, and one half-open probe are locked.
 - [ ] Global and capability kill switches are checked at every authority-sensitive transition.
-- [ ] Header and capability-specific body limits, media, encoding, length, and truncation rules stop safely.
+- [ ] Header and body limits, media, encoding, length, and truncation rules stop safely; every accepted body is at most the M9-I3 1,048,576-byte record ceiling.
 
 ## Cache, fixtures, and errors
 
-- [ ] Cache bytes use only M9-I3 write-once storage; no mutable secondary cache is introduced.
+- [ ] Cache bytes use only M9-I3 write-once storage; its 1,048,576-byte input/record ceiling is preserved and no mutable secondary cache is introduced.
 - [ ] Cache fingerprint/index/hash/reference/rights/expiry/tamper checks are complete and no fallback hides a finding.
 - [ ] Fixtures are original, compact, synthetic, network-denied, and never captured provider data.
 - [ ] Fixtures contain no real issuer, credential, actual User-Agent, PDF, ebook, private extract, or attachment material.
