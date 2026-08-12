@@ -1,0 +1,28 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://fvi.example/schemas/sec-adapter-validation-result.schema.json",
+  "title": "FVI M9-I4 Independent SEC Adapter Validation Result",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "canonicalization_version", "validation_result_id", "created_at", "implementation_separation", "network_state", "subjects", "checks", "status", "findings", "validation_result_hash"],
+  "properties": {
+    "schema_version": {"const": "0.1.0"}, "canonicalization_version": {"const": "fvi-canonical-json-v1"},
+    "validation_result_id": {"type": "string", "pattern": "^SAV-[A-Z0-9-]+$"},
+    "created_at": {"type": "string", "format": "date-time", "pattern": "Z$"},
+    "implementation_separation": {"const": "independent"}, "network_state": {"const": "denied"},
+    "subjects": {"type": "array", "minItems": 4, "uniqueItems": true, "items": {"$ref": "#/$defs/subject"}},
+    "checks": {"type": "array", "minItems": 8, "uniqueItems": true, "items": {"enum": ["authority_and_registry", "cache_reference_closure", "capability_endpoint_closure", "circuit_breaker_replay", "fixture_provenance", "hash_and_reference_closure", "limiter_and_attempt_accounting", "request_fingerprint", "retry_timeout_replay", "safe_error_redaction", "stored_record_rehash"]}},
+    "status": {"enum": ["failed", "passed"]},
+    "findings": {"type": "array", "uniqueItems": true, "items": {"$ref": "#/$defs/finding"}},
+    "validation_result_hash": {"$ref": "#/$defs/hash"}
+  },
+  "allOf": [
+    {"if": {"properties": {"status": {"const": "passed"}}, "required": ["status"]}, "then": {"properties": {"findings": {"maxItems": 0}}}},
+    {"if": {"properties": {"status": {"const": "failed"}}, "required": ["status"]}, "then": {"properties": {"findings": {"minItems": 1}}}}
+  ],
+  "$defs": {
+    "hash": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+    "subject": {"type": "object", "additionalProperties": false, "required": ["kind", "identifier", "hash"], "properties": {"kind": {"enum": ["adapter_policy", "adapter_result", "cache_index", "provider_registry", "raw_record", "synthetic_fixture"]}, "identifier": {"type": "string", "minLength": 1, "maxLength": 128}, "hash": {"$ref": "#/$defs/hash"}}},
+    "finding": {"type": "object", "additionalProperties": false, "required": ["code", "message", "subject"], "properties": {"code": {"type": "string", "pattern": "^M9I4-[A-Z0-9-]+$"}, "message": {"type": "string", "minLength": 1, "maxLength": 240}, "subject": {"type": "string", "minLength": 1, "maxLength": 128}}}
+  }
+}
