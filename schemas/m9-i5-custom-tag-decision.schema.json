@@ -1,0 +1,177 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://fvi.example/schemas/m9-i5-custom-tag-decision.schema.json",
+  "title": "FVI M9-I5 Synthetic Custom-Tag Mapping Decision",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "canonicalization_version",
+    "decision_id",
+    "company_cik",
+    "taxonomy_version",
+    "custom_namespace",
+    "custom_local_name",
+    "source_fact_hash",
+    "mapping_hash",
+    "concept_id",
+    "standard_anchor_local_name",
+    "period_type",
+    "unit",
+    "currency",
+    "polarity",
+    "calculation_relationship_ref",
+    "scope",
+    "reviewer_actor_id",
+    "reviewer_actor_type",
+    "reviewed_at",
+    "decision",
+    "network_state",
+    "synthetic_only",
+    "decision_hash"
+  ],
+  "properties": {
+    "schema_version": {"const": "0.1.0"},
+    "canonicalization_version": {"const": "fvi-canonical-json-v1"},
+    "decision_id": {
+      "type": "string",
+      "maxLength": 128,
+      "pattern": "^CMD-[A-Z0-9-]+$"
+    },
+    "company_cik": {"type": "string", "pattern": "^[0-9]{10}$"},
+    "taxonomy_version": {"type": "string", "pattern": "^[0-9]{4}$"},
+    "custom_namespace": {"type": "string", "pattern": "^synthetic:[a-z][a-z0-9.-]{0,63}$"},
+    "custom_local_name": {"type": "string", "pattern": "^[A-Za-z][A-Za-z0-9]{0,127}$"},
+    "source_fact_hash": {"$ref": "#/$defs/hash"},
+    "mapping_hash": {"$ref": "#/$defs/hash"},
+    "concept_id": {"$ref": "#/$defs/conceptId"},
+    "standard_anchor_local_name": {
+      "type": "string",
+      "pattern": "^[A-Za-z][A-Za-z0-9]{0,127}$"
+    },
+    "period_type": {"enum": ["instant", "duration"]},
+    "unit": {"enum": ["USD", "shares", "ratio"]},
+    "currency": {"enum": ["USD", null]},
+    "polarity": {"enum": [-1, 1]},
+    "calculation_relationship_ref": {
+      "type": "string",
+      "maxLength": 128,
+      "pattern": "^CALC-[A-Z0-9-]+$"
+    },
+    "scope": {"const": "exact-company-taxonomy-source-fact"},
+    "reviewer_actor_id": {
+      "type": "string",
+      "maxLength": 128,
+      "pattern": "^HUMAN-[A-Z0-9-]+$"
+    },
+    "reviewer_actor_type": {"const": "human"},
+    "reviewed_at": {"type": "string", "maxLength": 64, "format": "date-time"},
+    "decision": {"enum": ["approved", "rejected"]},
+    "network_state": {"const": "denied"},
+    "synthetic_only": {"const": true},
+    "decision_hash": {"$ref": "#/$defs/hash"}
+  },
+  "allOf": [
+    {
+      "if": {"properties": {"unit": {"const": "USD"}}, "required": ["unit"]},
+      "then": {"properties": {"currency": {"const": "USD"}}}
+    },
+    {
+      "if": {"properties": {"unit": {"enum": ["shares", "ratio"]}}, "required": ["unit"]},
+      "then": {"properties": {"currency": {"type": "null"}}}
+    },
+    {
+      "if": {
+        "properties": {"concept_id": {"const": "statutory-tax-rate"}},
+        "required": ["concept_id"]
+      },
+      "then": {
+        "properties": {
+          "period_type": {"const": "duration"},
+          "unit": {"const": "ratio"},
+          "currency": {"type": "null"}
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {"concept_id": {"const": "diluted-shares"}},
+        "required": ["concept_id"]
+      },
+      "then": {
+        "properties": {
+          "period_type": {"const": "duration"},
+          "unit": {"const": "shares"},
+          "currency": {"type": "null"}
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "concept_id": {
+            "enum": [
+              "revenue",
+              "operating-income",
+              "cash-taxes",
+              "depreciation-amortization",
+              "capital-expenditure"
+            ]
+          }
+        },
+        "required": ["concept_id"]
+      },
+      "then": {
+        "properties": {
+          "period_type": {"const": "duration"},
+          "unit": {"const": "USD"},
+          "currency": {"const": "USD"}
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "concept_id": {
+            "enum": [
+              "noncash-working-capital",
+              "debt",
+              "cash",
+              "nonoperating-assets",
+              "minority-interest",
+              "other-claims"
+            ]
+          }
+        },
+        "required": ["concept_id"]
+      },
+      "then": {
+        "properties": {
+          "period_type": {"const": "instant"},
+          "unit": {"const": "USD"},
+          "currency": {"const": "USD"}
+        }
+      }
+    }
+  ],
+  "$defs": {
+    "hash": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+    "conceptId": {
+      "enum": [
+        "revenue",
+        "operating-income",
+        "statutory-tax-rate",
+        "cash-taxes",
+        "depreciation-amortization",
+        "capital-expenditure",
+        "noncash-working-capital",
+        "debt",
+        "cash",
+        "nonoperating-assets",
+        "minority-interest",
+        "other-claims",
+        "diluted-shares"
+      ]
+    }
+  }
+}
