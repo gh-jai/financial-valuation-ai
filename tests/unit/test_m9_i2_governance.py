@@ -263,10 +263,17 @@ def test_status_summaries_advance_without_transferring_historical_closure() -> N
     assert "Validate run #92" in combined
     assert "COMMENTED_PASS" in combined
     assert "587fa892cefb1397c7854c93698799fa88e18f8e" in combined
-    assert "M9-I4 is contract-only" in combined
     assert "M9-I4 disabled offline implementation" in combined
-    assert "M9-I5 cannot begin" in combined
+    assert "PR #32" in combined
+    assert "e5055afe312f7d83341eda2a172300a6a0f5bddb" in combined
+    assert "c8c1b7bb5b8f63a77ea933e4c68c800e1fa0cbb1" in combined
+    assert "Validate run #96" in combined
+    assert "31700614399" in combined
+    assert "505 tests per job" in combined
+    assert "M9-I5 contract lock" in combined
     assert "live request" in combined
+    assert "M9-I4 is contract-only" not in combined
+    assert "No M9-I4 runtime implementation" not in combined
 
 
 def test_single_maintainer_exception_is_explicit_and_narrow() -> None:
