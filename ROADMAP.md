@@ -41,9 +41,9 @@ planning with the seven recorded conditions on 2026-08-08. The M9 planning basel
 the separately approved M9-I1 offline foundation was subsequently reviewed, hardened, validated,
 and merged through PR #20. The bounded synthetic offline M9-I2 issuer resolver and M9-I3 immutable
 storage/manual-import slice were subsequently merged through PRs #24-#26. The M9-I4 disabled SEC
-adapter contract lock was subsequently merged through PR #30; it is contract-only and grants no
-implementation or live-data authority. These post-M7 checkpoints do not advance the current
-operational implementation milestone beyond M7.
+adapter contract lock was merged through PR #30, followed by the disabled offline implementation
+through PR #32. It remains network-denied and grants no live-data authority. These post-M7
+checkpoints do not advance the current operational implementation milestone beyond M7.
 
 ## M9 Public data ingestion and accounting normalization
 
@@ -64,23 +64,30 @@ job at the exact M9-I3 head. M9-I4's disabled SEC adapter contract lock was revi
 and merged through PR #30 as `e26f55ef3e9b8babecb42f41f25be20dd918ea1e`. Formal same-maintainer
 review recorded `COMMENTED_PASS` at exact head
 `587fa892cefb1397c7854c93698799fa88e18f8e`; post-merge Validate run #92 passed every Python 3.10
-and 3.12 job at the exact main commit. This is contract evidence only: M9-I4 adapters, injected
-transport, limiter, retry, circuit-breaker, cache, fixtures, and independent validator have not
-been implemented. The frozen M9-I2 contract remains
+and 3.12 job at the exact main commit. M9-I4's disabled offline implementation was then formally
+reviewed, remediated, and merged through PR #32 as
+`c8c1b7bb5b8f63a77ea933e4c68c800e1fa0cbb1`. Same-maintainer review recorded
+`COMMENTED_PASS` at exact head `e5055afe312f7d83341eda2a172300a6a0f5bddb`; post-merge Validate
+run #96 (`31700614399`) passed every Python 3.10 and 3.12 step with 505 tests per job. Four disabled
+adapters, injected network-denied synthetic replay, limiter/retry/timeouts/breaker, tamper-evident
+cache references, locked original fixtures, and an independent validator are implemented. Public
+adapters still stop before transport. The frozen M9-I2 contract remains
 `owner_approved_with_exception`; the disclosed single-maintainer path does not claim independent
 human or GitHub platform approval and does not weaken M1-M7 runtime separation or later qualified
 review gates.
 
 The previously attested synchronized M9-I2 documentation snapshot `eb726009…de705` remains exact
-`CLOSED_WITH_SINGLE_MAINTAINER_EXCEPTION` evidence. Synchronizing the M9-I4 post-merge facts changes
-three files in that subject set, so the resulting current snapshot is fail-closed as `NOT_CLOSED`
-pending its own immutable subject commit, exact-head CI, findings disposition, and new
+`CLOSED_WITH_SINGLE_MAINTAINER_EXCEPTION` evidence. Synchronizing the M9-I4 implementation
+post-merge facts changes three files in that subject set, so the resulting current snapshot is
+fail-closed as `NOT_CLOSED` pending its own immutable subject commit, exact-head CI, findings
+disposition, and new
 snapshot-closure attestation. The preserved manifests and attestation evidence remain in
-`docs/milestones/M9-I2-post-owner-approval-snapshot-closure.md`. M9-I4 implementation, M9-I5 through
+`docs/milestones/M9-I2-post-owner-approval-snapshot-closure.md`. M9-I5 through
 M9-I6, live SEC or provider access, provider activation, real-company fixtures, normalization, API,
-LLM, UI, and release work remain separately unauthorized. The next bounded checkpoint is a
-separately authorized M9-I4 disabled offline implementation; it must use only original synthetic
-fixtures and an injected network-denied transport and must not perform a live request.
+LLM, UI, and release work remain separately unauthorized. The next separately gated slice is an
+M9-I5 contract lock for US-GAAP normalization and reconciliation; it cannot
+activate M9-I4 transport, use real-company data, or perform a live request. The current summary
+snapshot separately remains `NOT_CLOSED` pending its own immutable governance path.
 
 ## M10 Assumption, routing, and scenario engine
 

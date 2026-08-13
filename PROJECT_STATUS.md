@@ -1,6 +1,6 @@
 # Financial Valuation Intelligence — Project Status
 
-Last updated: 2026-08-12
+Last updated: 2026-08-13
 
 Repository: `gh-jai/financial-valuation-ai`
 
@@ -37,10 +37,13 @@ through PR #24 as `3ea93c8`, and its completion carrier was merged through PR #2
 M9-I3's bounded offline immutable store and safe manual JSON/CSV import were merged through PR #26
 as `c4dcf9e`. The complete merged suite at the M9-I3 exact head reports 425 passing tests, and
 Validate run #81 passed on Python 3.10 and 3.12. M9-I4's disabled SEC adapter contract lock was
-merged through PR #30 as `e26f55ef3e9b8babecb42f41f25be20dd918ea1e` after formal exact-head
-`COMMENTED_PASS`. Post-merge Validate run #92 passed on Python 3.10 and 3.12 at that exact main
-commit. M9-I4 is contract-only; no adapter, transport, provider activation, fixture payload, cache
-runtime, or independent runtime validator has been implemented. These checkpoints still do not
+merged through PR #30; the disabled offline implementation was then reviewed, remediated, and
+merged through PR #32 as `c8c1b7bb5b8f63a77ea933e4c68c800e1fa0cbb1`. Exact-head review recorded
+same-maintainer `COMMENTED_PASS`, and post-merge Validate run #96 (`31700614399`) passed on Python
+3.10 and 3.12 with 505 tests per job. Four adapters, injected network-denied replay, bounded
+resilience controls, tamper-evident cache references, locked original synthetic fixtures, and an
+implementation-separated validator are implemented. Public adapters remain stopped before
+transport. These checkpoints still do not
 form the complete M9 ingestion/normalization handoff, so the project current operational state
 remains M7.
 
@@ -50,9 +53,10 @@ events preserve historical exact snapshot
 `1c3754e724f98ff8324c567237070b68fe20514e678de3d1787e51d47f9da918`; a later attestation closed the
 M9-I3 synchronized exact snapshot
 `eb726009ac6afeebd5b15618ff03796c73790175f6360a3823f7c411dafde705`. Synchronizing the M9-I4
-post-merge facts changes `PROJECT_STATUS.md`, `ROADMAP.md`, and `README.md` again, so these new bytes
-form a distinct current snapshot that is fail-closed as `NOT_CLOSED` until it receives its own
-immutable subject commit, exact-head CI, findings disposition, and closure attestation. Preserved
+implementation post-merge facts changes `PROJECT_STATUS.md`, `ROADMAP.md`, and `README.md` again,
+so these new bytes form a distinct current snapshot that is fail-closed as `NOT_CLOSED` until it
+receives its own immutable subject commit, exact-head CI, findings disposition, and closure
+attestation. Preserved
 manifests and evidence remain in
 `docs/milestones/M9-I2-post-owner-approval-snapshot-closure.md`. Qualified legal/compliance,
 provider-license, privacy, security, accessibility, live-provider, and real-company evidence remain
@@ -62,10 +66,9 @@ State terms used below are intentionally distinct:
 
 - **Current operational state:** M7 is the latest complete end-to-end implementation milestone.
 - **Merged post-M7 checkpoints:** M8's contract/review, the M9 planning baseline, M9-I1's bounded
-  offline foundation, M9-I2's synthetic offline issuer resolution, and M9-I3's immutable local
-  storage/manual import are on `main`; M9-I4's disabled SEC adapter contract lock is also on `main`
-  without runtime implementation. They do not yet form the complete M9 handoff or advance the
-  current operational state.
+  offline foundation, M9-I2's synthetic offline issuer resolution, M9-I3's immutable local
+  storage/manual import, and M9-I4's disabled network-denied offline SEC adapters are on `main`.
+  They do not yet form the complete M9 handoff or advance the current operational state.
 - **Frozen M9-I2 contract:** the revised issuer-resolution contract defines a bounded
   single-maintainer documentation-governance exception. Its exact SHA-256 is authoritative in the
   review/approval record. Its governance state is `owner_approved_with_exception`; the bounded
@@ -75,9 +78,9 @@ State terms used below are intentionally distinct:
   evidence and are not rewritten.
 - **Last attested synchronized snapshot:** exact snapshot `eb726009…de705` is
   `CLOSED_WITH_SINGLE_MAINTAINER_EXCEPTION`; that verdict applies only to its exact bytes.
-- **Current M9-I4 status-synchronization snapshot:** `NOT_CLOSED`. It has no immutable subject
-  commit, exact-head CI, findings disposition, or closure attestation yet.
-- **Unauthorized:** M9-I4 implementation, M9-I5 through M9-I6, live SEC/provider access, provider
+- **Current M9-I4 implementation status-synchronization snapshot:** `NOT_CLOSED`. It has no
+  immutable subject commit, exact-head CI, findings disposition, or closure attestation yet.
+- **Unauthorized:** M9-I4 live readiness, M9-I5 through M9-I6, live SEC/provider access, provider
   activation, real-company acquisition, normalization, and every later product or release
   capability.
 
@@ -99,9 +102,9 @@ Evidence
 → Exact-hash Human-Gated Agent Review and Memo
 ```
 
-The merged M9-I1 through M9-I3 slices add this bounded offline path before any provider adapter or
-accounting normalization. M9-I4 currently adds only a reviewed contract/schema boundary after this
-path, not executable adapter behavior:
+The merged M9-I1 through M9-I4 slices add this bounded offline path before accounting normalization.
+M9-I4 supplies executable synthetic-only adapter mechanics while keeping every public path disabled
+before transport:
 
 ```text
 Safe structured errors and bounded redaction
@@ -113,8 +116,11 @@ Safe structured errors and bounded redaction
 → Safe local JSON/CSV import and content-addressed write-once storage
 → Source snapshot and exact-reference manifest
 ↔ Implementation-separated storage-graph validation
-→ M9-I4 disabled SEC adapter contract/schema boundary only
-  (no adapter, injected transport, provider activation, or live request)
+→ Four capability-isolated M9-I4 disabled SEC adapters
+→ Injected network-denied original-synthetic replay and bounded resilience controls
+→ M9-I3-compatible tamper-evident cache references
+↔ Implementation-separated SEC-adapter validation
+  (no provider activation, live transport, or live request)
 ```
 
 The project remains pre-v1.0 and is not investment advice.
@@ -499,8 +505,8 @@ authorized that planning on 2026-08-08; the decision did not authorize implement
 
 ### M9 — Public data ingestion and accounting normalization
 
-Status: Planning baseline and bounded offline M9-I1, M9-I2, and M9-I3 slices merged; M9-I4
-contract lock merged without implementation authority; revised M9-I2 exact-SHA contract is
+Status: Planning baseline and bounded offline M9-I1 through M9-I4 slices merged; M9-I4 remains
+disabled and network-denied; revised M9-I2 exact-SHA contract is
 `owner_approved_with_exception`; operational state remains M7
 
 M9-I1 merge commit: `7b2b2d2481a6a95e76156fedf39975381811fdea`
@@ -508,6 +514,7 @@ M9-I2 implementation merge commit: `3ea93c8751bfaa558d3597a91b978f986dac6412`
 M9-I2 completion-carrier merge commit: `58a6031427ace8ce61b48884753ca732943ea2ca`
 M9-I3 implementation merge commit: `c4dcf9ef4780249f7a9a3a12a515cf4e07ce64b3`
 M9-I4 contract-lock merge commit: `e26f55ef3e9b8babecb42f41f25be20dd918ea1e`
+M9-I4 disabled offline implementation merge commit: `c8c1b7bb5b8f63a77ea933e4c68c800e1fa0cbb1`
 
 M9-I4 contract-lock evidence:
 
@@ -520,7 +527,19 @@ M9-I4 contract-lock evidence:
   merge commit `e26f55ef3e9b8babecb42f41f25be20dd918ea1e`
 - Contract SHA-256: `2393cc1aae931fb7027843e7985a847948ae80f0b72fd12118375d5adfa7059b`
 - Authority: contract/schema/checklist/test boundary only; implementation and live readiness remain
-  unauthorized
+  were separately gated at contract merge
+
+M9-I4 implementation evidence:
+
+- Pull request: PR #32
+- Reviewed exact head: `e5055afe312f7d83341eda2a172300a6a0f5bddb`
+- Formal same-maintainer disposition: `COMMENTED_PASS` (review #4927028546); not independent
+  approval
+- Merge method: expected-head-locked squash
+- Main validation: Validate run #96 (`31700614399`), `success` on Python 3.10 and 3.12 at exact
+  merge commit `c8c1b7bb5b8f63a77ea933e4c68c800e1fa0cbb1`; 505 tests per job
+- Authority: disabled original-synthetic offline implementation only; provider/network activation,
+  credentials, actual User-Agent values, live requests, and real-company data remain unauthorized
 
 Planning artifact:
 
@@ -538,9 +557,9 @@ Revised M9-I2 contract lock and governance record:
 - Historical snapshot `1c3754e7…a918`: `CLOSED_WITH_SINGLE_MAINTAINER_EXCEPTION`
 - Last attested synchronized snapshot `eb726009…de705`:
   `CLOSED_WITH_SINGLE_MAINTAINER_EXCEPTION`, applying only to its exact bytes
-- Current M9-I4 post-merge status-synchronization snapshot: `NOT_CLOSED`; these three changed
-  summary files require a new immutable subject commit, exact-head CI, findings disposition, and
-  closure attestation before any closure claim
+- Current M9-I4 implementation post-merge status-synchronization snapshot: `NOT_CLOSED`; these
+  three changed summary files require a new immutable subject commit, exact-head CI, findings
+  disposition, and closure attestation before any closure claim
 
 The approved baseline ends M9 at an independently validated normalized-financials handoff. It divides
 implementation into six separately approved slices covering primitives and registries, issuer
@@ -553,13 +572,16 @@ implementation-separated hash recomputation, a strict provider/license registry,
 FCFF/equity-bridge concept vocabulary. M9-I2 adds deterministic synthetic issuer resolution,
 exact-hash human selection, structural scope pre-screening, and an implementation-separated
 validator. M9-I3 adds hostile-input-safe local JSON/CSV import, atomic content-addressed write-once
-storage, deterministic snapshots/manifests, and independent graph validation. M9-I4 now contributes
-only the merged disabled-adapter contract, four strict interface schemas, review checklist, and
-contract regressions. SEC entries remain pending, all storage/display/export/redistribution rights
-are false, and `live_activation` remains `disabled`. There is still no SEC adapter implementation,
-provider transport or payload, credential use, live request, real-company fixture, accounting
-normalization, API, CLI, LLM, UI, or valuation behavior. M9-I4 implementation and M9-I5 through
-M9-I6 remain unauthorized.
+storage, deterministic snapshots/manifests, and independent graph validation. M9-I4 adds four
+capability-isolated disabled adapters, fixed endpoints, injected network-denied synthetic replay,
+global limiting, retry/backoff, connect/read-idle/total timeouts, a circuit breaker,
+M9-I3-compatible tamper-evident cache references, safe errors, locked original fixtures, and an
+implementation-separated validator. SEC entries remain pending, all
+storage/display/export/redistribution rights are false,
+and `live_activation` remains `disabled`. There is still no live SEC transport or payload,
+credential use, actual User-Agent value, live request, real-company fixture, accounting
+normalization, API, CLI, LLM, UI, or valuation behavior. M9-I5 through M9-I6 and M9-I4 live readiness
+remain unauthorized.
 
 ## Current governed artifact graph
 
@@ -698,33 +720,31 @@ The repository does not yet provide:
 - Statistical failure-probability estimation
 - Automated extraction from private source PDFs
 
-It also does not yet provide live issuer/data retrieval, M9-I4 disabled SEC adapter
-implementations, M9-I5 normalization/reconciliation, or the M9-I6 end-to-end validator. M9-I2
-issuer resolution and M9-I3 storage/manual import are bounded offline implementations using only
-synthetic fixtures; they are not live ingestion capability.
+It also does not yet provide live issuer/data retrieval, enabled M9-I4 SEC transport,
+M9-I5 normalization/reconciliation, or the M9-I6 end-to-end validator. M9-I2 through M9-I4 are
+bounded offline implementations using only synthetic fixtures; they are not live ingestion
+capability.
 
 M3 failure probabilities and recovery values are deterministic reviewed assumptions rather than statistical forecasts.
 
 ## Recommended next milestone
 
-M8's internal review, the M9 planning merge, the bounded M9-I1 through M9-I3 offline slices, and the
-M9-I4 disabled SEC adapter contract lock are complete. The project current state remains M7 because
-no SEC provider adapter, accounting normalization, or end-to-end M9 data handoff exists. M9-I2 and
-M9-I3 are merged only for synthetic offline operation; M9-I4 is contract-only. None authorizes live
+M8's internal review, the M9 planning merge, and the bounded M9-I1 through M9-I4 offline slices are
+complete. The project current state remains M7 because no live SEC provider adapter, accounting
+normalization, or end-to-end M9 data handoff exists. M9-I2 through M9-I4 are merged only for
+synthetic offline operation. None authorizes live
 data, provider enablement, real issuer acquisition, pilot, or report distribution. The frozen M9-I2
 contract remains `owner_approved_with_exception`. Attested exact snapshot `eb726009…de705` remains
-`CLOSED_WITH_SINGLE_MAINTAINER_EXCEPTION` evidence for its exact bytes, while this M9-I4 post-merge
-status synchronization creates a distinct current snapshot that remains `NOT_CLOSED` pending its
-own immutable subject commit, exact-head CI, findings disposition, and closure attestation.
+`CLOSED_WITH_SINGLE_MAINTAINER_EXCEPTION` evidence for its exact bytes, while this M9-I4
+implementation post-merge status synchronization creates a distinct current snapshot that remains
+`NOT_CLOSED` pending its own immutable subject commit, exact-head CI, findings disposition, and
+closure attestation.
 
-The next bounded checkpoint is a separately authorized M9-I4 disabled offline implementation of
-the merged contract: four capability-isolated interfaces; original synthetic fixtures; injected
-network-denied transport; deterministic limiting, retry/backoff, timeout, and circuit-breaker state;
-M9-I3-compatible tamper-evident cache behavior; safe errors/redaction; and an
-implementation-separated validator. It must not change the provider registry, add credentials or
-an actual User-Agent value, activate a provider, use real-company data, or perform a live SEC
-request. M9-I5 cannot begin until the M9-I4 implementation receives its own authorization, review,
-validation, and merge decision.
+The next separately gated slice is an M9-I5 contract lock for US-GAAP normalization and
+reconciliation. It must preserve the disabled M9-I4 boundary and cannot change
+the provider registry, add credentials or an actual User-Agent value, activate a provider, use
+real-company data, or perform a live SEC request. The current documentation snapshot separately
+requires an immutable subject commit, exact-head CI, findings disposition, and closure attestation.
 
 Recommended sequencing:
 
@@ -742,9 +762,11 @@ M7: Merged implementation and remote Python 3.10/3.12 validation complete
 → M9-I4 disabled SEC adapter contract lock merged through PR #30
 → Exact-head formal review COMMENTED_PASS; main Validate run #92 passed
 → Attested M9-I2 synchronized snapshot eb726009…de705 remains closed exact-byte evidence
-→ M9-I4 post-merge status synchronization creates a new current snapshot: NOT_CLOSED
+→ M9-I4 disabled offline implementation merged through PR #32
+→ Exact-head formal review COMMENTED_PASS; main Validate run #96 passed
+→ M9-I4 implementation post-merge status synchronization creates a new current snapshot: NOT_CLOSED
 → Current operational implementation state remains M7
-→ Next: separately authorize M9-I4 disabled offline implementation; no live request
+→ Next separately gated slice: M9-I5 contract lock; no live request
 ```
 
 M8 has locked:
@@ -796,15 +818,15 @@ Do not commit private source material.
 Preserve composition with WFL-NAR-001, WFL-VAL-001, WFL-YNG-001,
 WFL-GRW-001, WFL-DST-001, WFL-CYC-001, and WFL-AGT-001.
 Do not treat draft M8 schemas as implemented ingestion or a retail-ready release.
-Treat M9-I1 through M9-I3 only as merged bounded offline implementations and M9-I4 only as a merged
-contract lock. The current operational implementation state remains M7. Treat the revised M9-I2
+Treat M9-I1 through M9-I4 only as merged bounded offline implementations; M9-I4 remains disabled
+and network-denied. The current operational implementation state remains M7. Treat the revised M9-I2
 contract lock at the exact SHA recorded in its review/approval record as frozen and
 `owner_approved_with_exception`; never describe its single-maintainer path as independent review.
 Preserve historical snapshot `1c3754e724f98ff8324c567237070b68fe20514e678de3d1787e51d47f9da918`
 and attested synchronized snapshot `eb726009ac6afeebd5b15618ff03796c73790175f6360a3823f7c411dafde705`
-as closed evidence only for their exact bytes. Treat the current M9-I4 post-merge status snapshot as
-`NOT_CLOSED` until its own immutable subject commit, exact-head CI, findings disposition, and
-closure attestation exist. The next bounded checkpoint is M9-I4 disabled offline implementation.
-Do not infer implementation, provider activation, live-network authority, normalization, or release
-authority from the M9-I4 contract or any prior snapshot closure state.
+as closed evidence only for their exact bytes. Treat the current M9-I4 implementation post-merge
+status snapshot as `NOT_CLOSED` until its own immutable subject commit, exact-head CI, findings
+disposition, and closure attestation exist. The next separately gated slice is an M9-I5 contract
+lock. Do not infer provider activation, live-network authority, normalization, or release authority
+from the M9-I4 offline implementation or any prior snapshot closure state.
 ```
