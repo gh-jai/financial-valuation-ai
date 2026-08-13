@@ -1,0 +1,467 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://fvi.example/schemas/m9-i5-normalization-result.schema.json",
+  "title": "FVI M9-I5 Offline Normalization and Reconciliation Result",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "canonicalization_version",
+    "normalization_id",
+    "source_snapshot_id",
+    "source_snapshot_hash",
+    "mapping_id",
+    "mapping_hash",
+    "period_graph_id",
+    "period_graph_hash",
+    "company_cik",
+    "network_state",
+    "synthetic_only",
+    "facts",
+    "reconciliations",
+    "findings",
+    "quality",
+    "normalization_hash"
+  ],
+  "properties": {
+    "schema_version": {"const": "0.1.0"},
+    "canonicalization_version": {"const": "fvi-canonical-json-v1"},
+    "normalization_id": {"type": "string", "pattern": "^NRM-[A-F0-9]{24}$"},
+    "source_snapshot_id": {
+      "type": "string",
+      "maxLength": 128,
+      "pattern": "^SNP-[A-Z0-9-]+$"
+    },
+    "source_snapshot_hash": {"$ref": "#/$defs/hash"},
+    "mapping_id": {"type": "string", "pattern": "^MAP-[A-F0-9]{24}$"},
+    "mapping_hash": {"$ref": "#/$defs/hash"},
+    "period_graph_id": {"type": "string", "pattern": "^PGR-[A-F0-9]{24}$"},
+    "period_graph_hash": {"$ref": "#/$defs/hash"},
+    "company_cik": {"type": "string", "pattern": "^[0-9]{10}$"},
+    "network_state": {"const": "denied"},
+    "synthetic_only": {"const": true},
+    "facts": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 4096,
+      "uniqueItems": true,
+      "items": {"$ref": "#/$defs/fact"}
+    },
+    "reconciliations": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 2048,
+      "uniqueItems": true,
+      "items": {"$ref": "#/$defs/reconciliation"},
+      "allOf": [
+        {"contains": {"properties": {"check_type": {"const": "balance-sheet"}}, "required": ["check_type"]}},
+        {"contains": {"properties": {"check_type": {"const": "cash-flow"}}, "required": ["check_type"]}},
+        {"contains": {"properties": {"check_type": {"const": "annual-quarterly"}}, "required": ["check_type"]}},
+        {"contains": {"properties": {"check_type": {"const": "unit-scale"}}, "required": ["check_type"]}},
+        {"contains": {"properties": {"check_type": {"const": "currency"}}, "required": ["check_type"]}},
+        {"contains": {"properties": {"check_type": {"const": "shares-split"}}, "required": ["check_type"]}},
+        {"contains": {"properties": {"check_type": {"const": "amendment"}}, "required": ["check_type"]}},
+        {"contains": {"properties": {"check_type": {"const": "duplicate-fact"}}, "required": ["check_type"]}},
+        {"contains": {"properties": {"check_type": {"const": "custom-tag"}}, "required": ["check_type"]}},
+        {"contains": {"properties": {"check_type": {"const": "fcff-completeness"}}, "required": ["check_type"]}}
+      ]
+    },
+    "findings": {
+      "type": "array",
+      "maxItems": 2048,
+      "uniqueItems": true,
+      "items": {"$ref": "#/$defs/finding"}
+    },
+    "quality": {"$ref": "#/$defs/quality"},
+    "normalization_hash": {"$ref": "#/$defs/hash"}
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {"quality": {"properties": {"status": {"const": "complete"}}}},
+        "required": ["quality"]
+      },
+      "then": {
+        "properties": {
+          "facts": {
+            "items": {"properties": {"review_status": {"const": "approved"}}},
+            "allOf": [
+              {"contains": {"properties": {"concept_id": {"const": "revenue"}}, "required": ["concept_id"]}},
+              {"contains": {"properties": {"concept_id": {"const": "operating-income"}}, "required": ["concept_id"]}},
+              {"contains": {"properties": {"concept_id": {"const": "statutory-tax-rate"}}, "required": ["concept_id"]}},
+              {"contains": {"properties": {"concept_id": {"const": "cash-taxes"}}, "required": ["concept_id"]}},
+              {"contains": {"properties": {"concept_id": {"const": "depreciation-amortization"}}, "required": ["concept_id"]}},
+              {"contains": {"properties": {"concept_id": {"const": "capital-expenditure"}}, "required": ["concept_id"]}},
+              {"contains": {"properties": {"concept_id": {"const": "noncash-working-capital"}}, "required": ["concept_id"]}},
+              {"contains": {"properties": {"concept_id": {"const": "debt"}}, "required": ["concept_id"]}},
+              {"contains": {"properties": {"concept_id": {"const": "cash"}}, "required": ["concept_id"]}},
+              {"contains": {"properties": {"concept_id": {"const": "nonoperating-assets"}}, "required": ["concept_id"]}},
+              {"contains": {"properties": {"concept_id": {"const": "minority-interest"}}, "required": ["concept_id"]}},
+              {"contains": {"properties": {"concept_id": {"const": "other-claims"}}, "required": ["concept_id"]}},
+              {"contains": {"properties": {"concept_id": {"const": "diluted-shares"}}, "required": ["concept_id"]}}
+            ]
+          },
+          "reconciliations": {
+            "not": {
+              "contains": {
+                "properties": {"status": {"enum": ["review", "failed"]}},
+                "required": ["status"]
+              }
+            }
+          },
+          "findings": {
+            "not": {
+              "contains": {
+                "properties": {"severity": {"enum": ["review", "blocking"]}},
+                "required": ["severity"]
+              }
+            }
+          },
+          "quality": {
+            "properties": {
+              "material_missing_concepts": {"maxItems": 0},
+              "blocking_codes": {"maxItems": 0},
+              "review_codes": {"maxItems": 0}
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {"quality": {"properties": {"status": {"const": "needs_review"}}}},
+        "required": ["quality"]
+      },
+      "then": {
+        "properties": {
+          "reconciliations": {
+            "not": {
+              "contains": {
+                "properties": {"status": {"const": "failed"}},
+                "required": ["status"]
+              }
+            }
+          },
+          "quality": {"properties": {"blocking_codes": {"maxItems": 0}}}
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {"quality": {"properties": {"status": {"const": "unsupported"}}}},
+        "required": ["quality"]
+      },
+      "then": {
+        "properties": {"quality": {"properties": {"blocking_codes": {"minItems": 1}}}}
+      }
+    }
+  ],
+  "$defs": {
+    "hash": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+    "decimal": {
+      "type": "string",
+      "maxLength": 256,
+      "pattern": "^(?:0|-?(?:[1-9][0-9]*)(?:\\.[0-9]*[1-9])?|0\\.[0-9]*[1-9]|-0\\.[0-9]*[1-9])$"
+    },
+    "nonnegativeDecimal": {
+      "type": "string",
+      "maxLength": 256,
+      "pattern": "^(?:0|(?:[1-9][0-9]*)(?:\\.[0-9]*[1-9])?|0\\.[0-9]*[1-9])$"
+    },
+    "conceptId": {
+      "enum": [
+        "revenue",
+        "operating-income",
+        "statutory-tax-rate",
+        "cash-taxes",
+        "depreciation-amortization",
+        "capital-expenditure",
+        "noncash-working-capital",
+        "debt",
+        "cash",
+        "nonoperating-assets",
+        "minority-interest",
+        "other-claims",
+        "diluted-shares"
+      ]
+    },
+    "refList": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 64,
+      "uniqueItems": true,
+      "items": {"type": "string", "pattern": "^[A-Z][A-Z0-9-]{1,127}$"}
+    },
+    "fact": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "fact_id",
+        "concept_id",
+        "value_decimal",
+        "unit",
+        "currency",
+        "period_id",
+        "provenance_kind",
+        "source_fact_refs",
+        "calculation_rule",
+        "custom_mapping_decision_ref",
+        "review_status"
+      ],
+      "properties": {
+        "fact_id": {
+          "type": "string",
+          "maxLength": 128,
+          "pattern": "^FACT-[A-Z0-9-]+$"
+        },
+        "concept_id": {"$ref": "#/$defs/conceptId"},
+        "value_decimal": {"$ref": "#/$defs/decimal"},
+        "unit": {"enum": ["USD", "shares", "ratio"]},
+        "currency": {"enum": ["USD", null]},
+        "period_id": {
+          "type": "string",
+          "maxLength": 128,
+          "pattern": "^PER-[A-Z0-9-]+$"
+        },
+        "provenance_kind": {"enum": ["filing_fact", "custom_tag", "derived_calculation"]},
+        "source_fact_refs": {"$ref": "#/$defs/refList"},
+        "calculation_rule": {
+          "enum": [null, "sum-components", "delta-instants", "ratio", "split-adjusted", "ttm-rollup"]
+        },
+        "custom_mapping_decision_ref": {
+          "type": ["string", "null"],
+          "maxLength": 128,
+          "pattern": "^CMD-[A-Z0-9-]+$"
+        },
+        "review_status": {"enum": ["unreviewed", "reviewed", "approved", "rejected"]}
+      },
+      "allOf": [
+        {
+          "if": {"properties": {"unit": {"const": "USD"}}, "required": ["unit"]},
+          "then": {"properties": {"currency": {"const": "USD"}}}
+        },
+        {
+          "if": {"properties": {"unit": {"enum": ["shares", "ratio"]}}, "required": ["unit"]},
+          "then": {"properties": {"currency": {"type": "null"}}}
+        },
+        {
+          "if": {
+            "properties": {"provenance_kind": {"const": "custom_tag"}},
+            "required": ["provenance_kind"]
+          },
+          "then": {
+            "properties": {
+              "custom_mapping_decision_ref": {"type": "string", "pattern": "^CMD-[A-Z0-9-]+$"}
+            }
+          },
+          "else": {"properties": {"custom_mapping_decision_ref": {"type": "null"}}}
+        },
+        {
+          "if": {
+            "properties": {"provenance_kind": {"const": "derived_calculation"}},
+            "required": ["provenance_kind"]
+          },
+          "then": {
+            "properties": {
+              "calculation_rule": {
+                "enum": [
+                  "sum-components",
+                  "delta-instants",
+                  "ratio",
+                  "split-adjusted",
+                  "ttm-rollup"
+                ]
+              }
+            }
+          },
+          "else": {"properties": {"calculation_rule": {"type": "null"}}}
+        },
+        {
+          "if": {
+            "properties": {"concept_id": {"const": "statutory-tax-rate"}},
+            "required": ["concept_id"]
+          },
+          "then": {
+            "properties": {"unit": {"const": "ratio"}, "currency": {"type": "null"}}
+          }
+        },
+        {
+          "if": {
+            "properties": {"concept_id": {"const": "diluted-shares"}},
+            "required": ["concept_id"]
+          },
+          "then": {
+            "properties": {"unit": {"const": "shares"}, "currency": {"type": "null"}}
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "concept_id": {
+                "enum": [
+                  "revenue",
+                  "operating-income",
+                  "cash-taxes",
+                  "depreciation-amortization",
+                  "capital-expenditure",
+                  "noncash-working-capital",
+                  "debt",
+                  "cash",
+                  "nonoperating-assets",
+                  "minority-interest",
+                  "other-claims"
+                ]
+              }
+            },
+            "required": ["concept_id"]
+          },
+          "then": {
+            "properties": {"unit": {"const": "USD"}, "currency": {"const": "USD"}}
+          }
+        }
+      ]
+    },
+    "reconciliation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "check_id",
+        "check_type",
+        "applicability",
+        "status",
+        "difference_decimal",
+        "tolerance_decimal",
+        "fact_refs",
+        "message_code",
+        "exclusion_reason_code"
+      ],
+      "properties": {
+        "check_id": {
+          "type": "string",
+          "maxLength": 128,
+          "pattern": "^RECCHK-[A-Z0-9-]+$"
+        },
+        "check_type": {
+          "enum": [
+            "balance-sheet",
+            "cash-flow",
+            "annual-quarterly",
+            "unit-scale",
+            "currency",
+            "shares-split",
+            "amendment",
+            "duplicate-fact",
+            "custom-tag",
+            "fcff-completeness"
+          ]
+        },
+        "applicability": {"enum": ["applicable", "not_applicable"]},
+        "status": {"enum": ["passed", "review", "failed", "not_applicable"]},
+        "difference_decimal": {
+          "oneOf": [{"$ref": "#/$defs/decimal"}, {"type": "null"}]
+        },
+        "tolerance_decimal": {"$ref": "#/$defs/nonnegativeDecimal"},
+        "fact_refs": {
+          "type": "array",
+          "maxItems": 64,
+          "uniqueItems": true,
+          "items": {"type": "string", "pattern": "^[A-Z][A-Z0-9-]{1,127}$"}
+        },
+        "message_code": {
+          "type": "string",
+          "maxLength": 128,
+          "pattern": "^NORM-[A-Z0-9-]+$"
+        },
+        "exclusion_reason_code": {
+          "type": ["string", "null"],
+          "maxLength": 128,
+          "pattern": "^NORM-[A-Z0-9-]+$"
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {"applicability": {"const": "applicable"}},
+            "required": ["applicability"]
+          },
+          "then": {
+            "properties": {
+              "status": {"enum": ["passed", "review", "failed"]},
+              "difference_decimal": {"$ref": "#/$defs/decimal"},
+              "fact_refs": {"minItems": 1},
+              "exclusion_reason_code": {"type": "null"}
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {"applicability": {"const": "not_applicable"}},
+            "required": ["applicability"]
+          },
+          "then": {
+            "properties": {
+              "status": {"const": "not_applicable"},
+              "difference_decimal": {"type": "null"},
+              "tolerance_decimal": {"const": "0"},
+              "fact_refs": {"maxItems": 0},
+              "exclusion_reason_code": {
+                "type": "string",
+                "maxLength": 128,
+                "pattern": "^NORM-[A-Z0-9-]+$"
+              }
+            }
+          }
+        }
+      ]
+    },
+    "finding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["code", "severity", "message", "subject_refs"],
+      "properties": {
+        "code": {
+          "type": "string",
+          "maxLength": 128,
+          "pattern": "^NORM-[A-Z0-9-]+$"
+        },
+        "severity": {"enum": ["info", "review", "blocking"]},
+        "message": {"type": "string", "minLength": 1, "maxLength": 256},
+        "subject_refs": {"$ref": "#/$defs/refList"}
+      }
+    },
+    "quality": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "material_missing_concepts", "blocking_codes", "review_codes"],
+      "properties": {
+        "status": {"enum": ["complete", "needs_review", "unsupported"]},
+        "material_missing_concepts": {
+          "type": "array",
+          "maxItems": 13,
+          "uniqueItems": true,
+          "items": {"$ref": "#/$defs/conceptId"}
+        },
+        "blocking_codes": {
+          "type": "array",
+          "maxItems": 64,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "maxLength": 128,
+            "pattern": "^NORM-[A-Z0-9-]+$"
+          }
+        },
+        "review_codes": {
+          "type": "array",
+          "maxItems": 64,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "maxLength": 128,
+            "pattern": "^NORM-[A-Z0-9-]+$"
+          }
+        }
+      }
+    }
+  }
+}

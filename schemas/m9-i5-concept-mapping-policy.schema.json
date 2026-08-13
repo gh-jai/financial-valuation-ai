@@ -1,0 +1,313 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://fvi.example/schemas/m9-i5-concept-mapping-policy.schema.json",
+  "title": "FVI M9-I5 US-GAAP Concept Mapping Policy",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "canonicalization_version",
+    "mapping_id",
+    "mapping_version",
+    "concept_registry_id",
+    "concept_registry_hash",
+    "taxonomy_namespace",
+    "taxonomy_version",
+    "network_state",
+    "synthetic_only",
+    "mappings",
+    "review_decision_ref",
+    "review_decision_hash",
+    "mapping_hash"
+  ],
+  "properties": {
+    "schema_version": {"const": "0.1.0"},
+    "canonicalization_version": {"const": "fvi-canonical-json-v1"},
+    "mapping_id": {"type": "string", "pattern": "^MAP-[A-F0-9]{24}$"},
+    "mapping_version": {
+      "type": "string",
+      "maxLength": 32,
+      "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"
+    },
+    "concept_registry_id": {"const": "m9-concepts"},
+    "concept_registry_hash": {
+      "const": "6d4e0331a709e2b4152fd6e846bfe84cb22978cc3bd0de19599e80847edb7fa9"
+    },
+    "taxonomy_namespace": {"const": "us-gaap"},
+    "taxonomy_version": {"type": "string", "pattern": "^[0-9]{4}$"},
+    "network_state": {"const": "denied"},
+    "synthetic_only": {"const": true},
+    "mappings": {
+      "type": "array",
+      "minItems": 13,
+      "maxItems": 13,
+      "uniqueItems": true,
+      "prefixItems": [
+        {"allOf": [{"$ref": "#/$defs/mapping"}, {"$ref": "#/$defs/revenueMapping"}]},
+        {"allOf": [{"$ref": "#/$defs/mapping"}, {"$ref": "#/$defs/operatingIncomeMapping"}]},
+        {"allOf": [{"$ref": "#/$defs/mapping"}, {"$ref": "#/$defs/statutoryTaxRateMapping"}]},
+        {"allOf": [{"$ref": "#/$defs/mapping"}, {"$ref": "#/$defs/cashTaxesMapping"}]},
+        {"allOf": [{"$ref": "#/$defs/mapping"}, {"$ref": "#/$defs/depreciationAmortizationMapping"}]},
+        {"allOf": [{"$ref": "#/$defs/mapping"}, {"$ref": "#/$defs/capitalExpenditureMapping"}]},
+        {"allOf": [{"$ref": "#/$defs/mapping"}, {"$ref": "#/$defs/noncashWorkingCapitalMapping"}]},
+        {"allOf": [{"$ref": "#/$defs/mapping"}, {"$ref": "#/$defs/debtMapping"}]},
+        {"allOf": [{"$ref": "#/$defs/mapping"}, {"$ref": "#/$defs/cashMapping"}]},
+        {"allOf": [{"$ref": "#/$defs/mapping"}, {"$ref": "#/$defs/nonoperatingAssetsMapping"}]},
+        {"allOf": [{"$ref": "#/$defs/mapping"}, {"$ref": "#/$defs/minorityInterestMapping"}]},
+        {"allOf": [{"$ref": "#/$defs/mapping"}, {"$ref": "#/$defs/otherClaimsMapping"}]},
+        {"allOf": [{"$ref": "#/$defs/mapping"}, {"$ref": "#/$defs/dilutedSharesMapping"}]}
+      ],
+      "items": false
+    },
+    "review_decision_ref": {
+      "type": ["string", "null"],
+      "maxLength": 128,
+      "pattern": "^MREV-[A-Z0-9-]+$"
+    },
+    "review_decision_hash": {"oneOf": [{"$ref": "#/$defs/hash"}, {"type": "null"}]},
+    "mapping_hash": {"$ref": "#/$defs/hash"}
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "mappings": {
+            "contains": {
+              "properties": {"mapping_status": {"const": "approved"}},
+              "required": ["mapping_status"]
+            }
+          }
+        },
+        "required": ["mappings"]
+      },
+      "then": {
+        "properties": {
+          "review_decision_ref": {
+            "type": "string",
+            "maxLength": 128,
+            "pattern": "^MREV-[A-Z0-9-]+$"
+          },
+          "review_decision_hash": {"$ref": "#/$defs/hash"}
+        }
+      },
+      "else": {
+        "properties": {
+          "review_decision_ref": {"type": "null"},
+          "review_decision_hash": {"type": "null"}
+        }
+      }
+    }
+  ],
+  "$defs": {
+    "hash": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+    "conceptId": {
+      "enum": [
+        "revenue",
+        "operating-income",
+        "statutory-tax-rate",
+        "cash-taxes",
+        "depreciation-amortization",
+        "capital-expenditure",
+        "noncash-working-capital",
+        "debt",
+        "cash",
+        "nonoperating-assets",
+        "minority-interest",
+        "other-claims",
+        "diluted-shares"
+      ]
+    },
+    "sourceTag": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["namespace", "local_name"],
+      "properties": {
+        "namespace": {"const": "us-gaap"},
+        "local_name": {"type": "string", "pattern": "^[A-Za-z][A-Za-z0-9]{0,127}$"}
+      }
+    },
+    "revenueMapping": {
+      "properties": {
+        "concept_id": {"const": "revenue"},
+        "kind": {"const": "monetary"},
+        "allowed_unit": {"const": "USD"},
+        "period_type": {"const": "duration"}
+      }
+    },
+    "operatingIncomeMapping": {
+      "properties": {
+        "concept_id": {"const": "operating-income"},
+        "kind": {"const": "monetary"},
+        "allowed_unit": {"const": "USD"},
+        "period_type": {"const": "duration"}
+      }
+    },
+    "statutoryTaxRateMapping": {
+      "properties": {
+        "concept_id": {"const": "statutory-tax-rate"},
+        "kind": {"const": "rate"},
+        "allowed_unit": {"const": "ratio"},
+        "period_type": {"const": "duration"}
+      }
+    },
+    "cashTaxesMapping": {
+      "properties": {
+        "concept_id": {"const": "cash-taxes"},
+        "kind": {"const": "monetary"},
+        "allowed_unit": {"const": "USD"},
+        "period_type": {"const": "duration"}
+      }
+    },
+    "depreciationAmortizationMapping": {
+      "properties": {
+        "concept_id": {"const": "depreciation-amortization"},
+        "kind": {"const": "monetary"},
+        "allowed_unit": {"const": "USD"},
+        "period_type": {"const": "duration"}
+      }
+    },
+    "capitalExpenditureMapping": {
+      "properties": {
+        "concept_id": {"const": "capital-expenditure"},
+        "kind": {"const": "monetary"},
+        "allowed_unit": {"const": "USD"},
+        "period_type": {"const": "duration"}
+      }
+    },
+    "noncashWorkingCapitalMapping": {
+      "properties": {
+        "concept_id": {"const": "noncash-working-capital"},
+        "kind": {"const": "monetary"},
+        "allowed_unit": {"const": "USD"},
+        "period_type": {"const": "instant"}
+      }
+    },
+    "debtMapping": {
+      "properties": {
+        "concept_id": {"const": "debt"},
+        "kind": {"const": "monetary"},
+        "allowed_unit": {"const": "USD"},
+        "period_type": {"const": "instant"}
+      }
+    },
+    "cashMapping": {
+      "properties": {
+        "concept_id": {"const": "cash"},
+        "kind": {"const": "monetary"},
+        "allowed_unit": {"const": "USD"},
+        "period_type": {"const": "instant"}
+      }
+    },
+    "nonoperatingAssetsMapping": {
+      "properties": {
+        "concept_id": {"const": "nonoperating-assets"},
+        "kind": {"const": "monetary"},
+        "allowed_unit": {"const": "USD"},
+        "period_type": {"const": "instant"}
+      }
+    },
+    "minorityInterestMapping": {
+      "properties": {
+        "concept_id": {"const": "minority-interest"},
+        "kind": {"const": "monetary"},
+        "allowed_unit": {"const": "USD"},
+        "period_type": {"const": "instant"}
+      }
+    },
+    "otherClaimsMapping": {
+      "properties": {
+        "concept_id": {"const": "other-claims"},
+        "kind": {"const": "monetary"},
+        "allowed_unit": {"const": "USD"},
+        "period_type": {"const": "instant"}
+      }
+    },
+    "dilutedSharesMapping": {
+      "properties": {
+        "concept_id": {"const": "diluted-shares"},
+        "kind": {"const": "shares"},
+        "allowed_unit": {"const": "shares"},
+        "period_type": {"const": "duration"}
+      }
+    },
+    "mapping": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "concept_id",
+        "kind",
+        "allowed_unit",
+        "period_type",
+        "polarity",
+        "aggregation_rule",
+        "source_tags",
+        "mapping_status"
+      ],
+      "properties": {
+        "concept_id": {"$ref": "#/$defs/conceptId"},
+        "kind": {"enum": ["monetary", "rate", "shares"]},
+        "allowed_unit": {"enum": ["USD", "ratio", "shares"]},
+        "period_type": {"enum": ["instant", "duration"]},
+        "polarity": {"enum": [-1, 1]},
+        "aggregation_rule": {
+          "enum": ["direct", "sum-components", "delta-instants", "ratio"]
+        },
+        "source_tags": {
+          "type": "object",
+          "minProperties": 1,
+          "maxProperties": 32,
+          "additionalProperties": false,
+          "properties": {
+            "01": {"$ref": "#/$defs/sourceTag"},
+            "02": {"$ref": "#/$defs/sourceTag"},
+            "03": {"$ref": "#/$defs/sourceTag"},
+            "04": {"$ref": "#/$defs/sourceTag"},
+            "05": {"$ref": "#/$defs/sourceTag"},
+            "06": {"$ref": "#/$defs/sourceTag"},
+            "07": {"$ref": "#/$defs/sourceTag"},
+            "08": {"$ref": "#/$defs/sourceTag"},
+            "09": {"$ref": "#/$defs/sourceTag"},
+            "10": {"$ref": "#/$defs/sourceTag"},
+            "11": {"$ref": "#/$defs/sourceTag"},
+            "12": {"$ref": "#/$defs/sourceTag"},
+            "13": {"$ref": "#/$defs/sourceTag"},
+            "14": {"$ref": "#/$defs/sourceTag"},
+            "15": {"$ref": "#/$defs/sourceTag"},
+            "16": {"$ref": "#/$defs/sourceTag"},
+            "17": {"$ref": "#/$defs/sourceTag"},
+            "18": {"$ref": "#/$defs/sourceTag"},
+            "19": {"$ref": "#/$defs/sourceTag"},
+            "20": {"$ref": "#/$defs/sourceTag"},
+            "21": {"$ref": "#/$defs/sourceTag"},
+            "22": {"$ref": "#/$defs/sourceTag"},
+            "23": {"$ref": "#/$defs/sourceTag"},
+            "24": {"$ref": "#/$defs/sourceTag"},
+            "25": {"$ref": "#/$defs/sourceTag"},
+            "26": {"$ref": "#/$defs/sourceTag"},
+            "27": {"$ref": "#/$defs/sourceTag"},
+            "28": {"$ref": "#/$defs/sourceTag"},
+            "29": {"$ref": "#/$defs/sourceTag"},
+            "30": {"$ref": "#/$defs/sourceTag"},
+            "31": {"$ref": "#/$defs/sourceTag"},
+            "32": {"$ref": "#/$defs/sourceTag"}
+          }
+        },
+        "mapping_status": {"enum": ["candidate", "approved", "rejected"]}
+      },
+      "allOf": [
+        {
+          "if": {"properties": {"kind": {"const": "monetary"}}, "required": ["kind"]},
+          "then": {"properties": {"allowed_unit": {"const": "USD"}}}
+        },
+        {
+          "if": {"properties": {"kind": {"const": "rate"}}, "required": ["kind"]},
+          "then": {"properties": {"allowed_unit": {"const": "ratio"}}}
+        },
+        {
+          "if": {"properties": {"kind": {"const": "shares"}}, "required": ["kind"]},
+          "then": {"properties": {"allowed_unit": {"const": "shares"}}}
+        }
+      ]
+    }
+  }
+}
