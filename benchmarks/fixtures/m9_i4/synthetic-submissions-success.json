@@ -1,0 +1,24 @@
+{
+  "schema_version": "0.1.0",
+  "canonicalization_version": "fvi-canonical-json-v1",
+  "fixture_id": "STF-SYNTH-SUBMISSIONS-SUCCESS",
+  "synthetic": true,
+  "network_state": "denied",
+  "capture_provenance": "original_fixture",
+  "provider_id": "sec-submissions",
+  "capability": "submissions",
+  "endpoint_id": "sec-submissions-by-cik-v1",
+  "identifiers": {"cik": "9000000001"},
+  "user_agent_policy_valid": true,
+  "events": [
+    {
+      "kind": "response",
+      "status": 200,
+      "headers": {"Content-Type": "application/json"},
+      "body_encoding": "utf-8",
+      "body": "{\"synthetic\":true,\"submissions\":[]}"
+    }
+  ],
+  "expected_result_hash": "0d3f5c443db41cc0921910faddf202bf38fa214a78100c60d000330ee6670168",
+  "fixture_hash": "e5b1441fc32d091d2ffe65ef12a57ca83889b18e134d845666b1c71bbb70c3ad"
+}

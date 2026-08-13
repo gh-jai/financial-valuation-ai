@@ -1,0 +1,28 @@
+{
+  "schema_version": "0.1.0",
+  "canonicalization_version": "fvi-canonical-json-v1",
+  "fixture_id": "STF-SYNTH-FILING-SUCCESS",
+  "synthetic": true,
+  "network_state": "denied",
+  "capture_provenance": "original_fixture",
+  "provider_id": "sec-filings",
+  "capability": "filings",
+  "endpoint_id": "sec-filing-document-v1",
+  "identifiers": {
+    "cik": "9000000002",
+    "accession": "9000000002-26-000001",
+    "document": "synthetic-report.txt"
+  },
+  "user_agent_policy_valid": true,
+  "events": [
+    {
+      "kind": "response",
+      "status": 200,
+      "headers": {"Content-Type": "text/plain"},
+      "body_encoding": "utf-8",
+      "body": "SYNTHETIC TEST PAYLOAD - NO PROVIDER DATA"
+    }
+  ],
+  "expected_result_hash": "30816673b55fa577f84a42466fc443802b8b440b66b57d3b7ddb5106d29ab4c9",
+  "fixture_hash": "4d9e9c7728d0240eab7b8e509f296ff0f53294bbc2d721157903adea1b5c1086"
+}

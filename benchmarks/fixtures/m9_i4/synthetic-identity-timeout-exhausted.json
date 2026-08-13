@@ -1,0 +1,16 @@
+{
+  "schema_version": "0.1.0",
+  "canonicalization_version": "fvi-canonical-json-v1",
+  "fixture_id": "STF-SYNTH-IDENTITY-TIMEOUT-EXHAUSTED",
+  "synthetic": true,
+  "network_state": "denied",
+  "capture_provenance": "original_fixture",
+  "provider_id": "sec-identity",
+  "capability": "identity",
+  "endpoint_id": "sec-company-tickers-v1",
+  "identifiers": {},
+  "user_agent_policy_valid": true,
+  "events": [{"kind": "timeout"}, {"kind": "timeout"}, {"kind": "timeout"}],
+  "expected_result_hash": "fc058e5c920ef222a931b4c2899cd535207c98bb7f550eca7cf3f578cb6d1736",
+  "fixture_hash": "dd4331f82ca608f06d3fe1ffadf4f769459cc975fc33cb9a7657260fdca1f4f8"
+}
