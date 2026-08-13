@@ -1,0 +1,24 @@
+{
+  "schema_version": "0.1.0",
+  "canonicalization_version": "fvi-canonical-json-v1",
+  "fixture_id": "STF-SYNTH-IDENTITY-UPSTREAM-REJECTED",
+  "synthetic": true,
+  "network_state": "denied",
+  "capture_provenance": "original_fixture",
+  "provider_id": "sec-identity",
+  "capability": "identity",
+  "endpoint_id": "sec-company-tickers-v1",
+  "identifiers": {},
+  "user_agent_policy_valid": true,
+  "events": [
+    {
+      "kind": "response",
+      "status": 404,
+      "headers": {"Content-Type": "application/json"},
+      "body_encoding": "utf-8",
+      "body": "{}"
+    }
+  ],
+  "expected_result_hash": "6938750a008294190b441dc8357dbbef6862d67711b17557aa3e3bda3a082079",
+  "fixture_hash": "25a4b779dfa394d2ba76a20107d59acfcdc73282186440ee2970afb6c331d871"
+}

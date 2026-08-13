@@ -1,0 +1,31 @@
+{
+  "schema_version": "0.1.0",
+  "canonicalization_version": "fvi-canonical-json-v1",
+  "fixture_id": "STF-SYNTH-COMPANYFACTS-RETRY-SUCCESS",
+  "synthetic": true,
+  "network_state": "denied",
+  "capture_provenance": "original_fixture",
+  "provider_id": "sec-xbrl",
+  "capability": "companyfacts",
+  "endpoint_id": "sec-companyfacts-by-cik-v1",
+  "identifiers": {"cik": "9000000003"},
+  "user_agent_policy_valid": true,
+  "events": [
+    {
+      "kind": "response",
+      "status": 500,
+      "headers": {"Content-Type": "application/json"},
+      "body_encoding": "utf-8",
+      "body": "{}"
+    },
+    {
+      "kind": "response",
+      "status": 200,
+      "headers": {"Content-Type": "application/json"},
+      "body_encoding": "utf-8",
+      "body": "{\"synthetic\":true,\"facts\":{}}"
+    }
+  ],
+  "expected_result_hash": "283238523eb8607030030d722b4fd58f0863b6c6d4f73c274e1834cb7da31650",
+  "fixture_hash": "437f3cb589a4867728604346a183d8dc3633ce8a62d963b8d800215d12a58544"
+}
