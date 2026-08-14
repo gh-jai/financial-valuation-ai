@@ -1,13 +1,14 @@
 # M9-I2 Post-Owner-Approval Exact-Snapshot Closure
 
-Status: `CLOSED_WITH_SINGLE_MAINTAINER_EXCEPTION`; M9-I4 implementation status-snapshot
-carrier-only closure-transition candidate
-Last attested snapshot status: `CLOSED_WITH_SINGLE_MAINTAINER_EXCEPTION` for exact snapshot
+Status: `NOT_CLOSED`; M9-I5 contract-lock status-snapshot attestation/carrier candidate
+Last closed snapshot status: `CLOSED_WITH_SINGLE_MAINTAINER_EXCEPTION` for exact M9-I4 snapshot
 `8996b5c370576a09b556823ed61e5f025f8640aa2c9d061e29895e9384886f9d`
+Current M9-I5 status snapshot: `NOT_CLOSED` for exact snapshot
+`126ad4fc548b897546ebe9c09832b3e79283bab5fae860be3a264b6c30055980`
 Historical snapshot status: `CLOSED_WITH_SINGLE_MAINTAINER_EXCEPTION`; both ordered immutable
 exception events remain verified for snapshot `1c3754e7…a918`
-Carrier update state: `immutable_m9_i4_status_attestation_verified`
-Evidence assessment date: 2026-08-14
+Carrier update state: `m9_i5_status_attestation_local_candidate`
+Evidence assessment date: 2026-08-15
 Review baseline: `3945e90559ec2e10771489078c9e8f52036209b7`
 Status synchronization baseline: `c4dcf9ef4780249f7a9a3a12a515cf4e07ce64b3`
 Current operational implementation milestone: M7
@@ -42,6 +43,14 @@ published, and verified in immutable main commit
 `35d36fd74f0850b55fd833699f39cd091509fa72`; exact-main Validate #100 succeeded. This
 out-of-manifest carrier-only candidate verifies the immutable object and complete event chain and
 records only that exact third-lineage snapshot as `CLOSED_WITH_SINGLE_MAINTAINER_EXCEPTION`.
+
+The M9-I5 contract-lock post-merge synchronization changed the same three status subjects once
+more and was merge-committed through PR #37 as immutable main subject commit
+`fe2131721ea20c89ca3b452c0a7ef80dac37b236`. The fourth manifest below starts a new lineage and
+does not alter or inherit any prior closure verdict. Its new attestation is only an unstaged local
+candidate. Until that attestation is separately reviewed, published, verified by exact-main CI,
+and referenced by a later carrier-only transition, this exact M9-I5 status snapshot remains
+`NOT_CLOSED`.
 
 Closure is valid only when:
 
@@ -118,11 +127,39 @@ END M9-I4 STATUS SUBJECT MANIFEST
 M9-I4 implementation status subject snapshot ID:
 `8996b5c370576a09b556823ed61e5f025f8640aa2c9d061e29895e9384886f9d`
 
-All five hashes and the snapshot ID must recompute exactly. A match alone identifies only the
-candidate subject and does not close it. The append-only attestation is
-`docs/milestones/M9-I4-status-snapshot-closure-attestation.md`; its exact bytes are now immutable,
-validated on the reviewed head and exact main commit, and verified by this carrier-only transition.
-The closure verdict applies only to snapshot
+All five recorded hashes and the M9-I4 snapshot ID recompute exactly for its immutable historical
+subject bytes. The append-only attestation is
+`docs/milestones/M9-I4-status-snapshot-closure-attestation.md`; its exact bytes are immutable,
+validated on the reviewed head and exact main commit, and verified by the published carrier
+transition. The closure verdict applies only to snapshot
+`8996b5c370576a09b556823ed61e5f025f8640aa2c9d061e29895e9384886f9d`. The three status hashes no
+longer match the current repository because the later M9-I5 synchronization starts a new lineage;
+that expected difference does not transfer or invalidate the historical M9-I4 verdict.
+
+## M9-I5 contract-lock status-snapshot candidate manifest
+
+This fourth manifest uses the same canonical hashing rule and preserves all three prior manifests
+unchanged. Its five subject files are exact bytes from main commit
+`fe2131721ea20c89ca3b452c0a7ef80dac37b236`; this carrier and the new attestation candidate remain
+outside the manifest.
+
+```text
+BEGIN M9-I5 STATUS SUBJECT MANIFEST
+9326b6c76dcfe3061c5e356b5141d9f458d57694cb4e6b01b6470b0bf044d84e docs/milestones/M9-I2-issuer-resolution-contract-lock.md
+4734260f5946f57d08bb502919091025c49c7368d683d4334997e132d48ce969 docs/milestones/M9-I2-contract-lock-review-approval-record.md
+874a16e7dcc5ea8364b60f840245cdfd52036679c106d1b5185add9ec0bd0460 PROJECT_STATUS.md
+646c11664a2f6246165655eaf86cb130604c0725e0fd5e1cfaff1dbdb03453b2 ROADMAP.md
+2222ce4054c090b5fafcb04ceb19b8d2f7978ed956c67da4aee3827c82476b62 README.md
+END M9-I5 STATUS SUBJECT MANIFEST
+```
+
+M9-I5 contract-lock status subject snapshot ID:
+`126ad4fc548b897546ebe9c09832b3e79283bab5fae860be3a264b6c30055980`
+
+All five hashes and the snapshot ID recompute exactly. A match identifies only the new candidate
+subject and does not close it. The append-only attestation candidate is
+`docs/milestones/M9-I5-status-snapshot-closure-attestation.md`. Its local existence grants no
+closure state. The M9-I4 verdict remains bound only to snapshot
 `8996b5c370576a09b556823ed61e5f025f8640aa2c9d061e29895e9384886f9d`.
 
 Recompute from the repository root:
@@ -132,14 +169,14 @@ sha256sum \
   docs/milestones/M9-I2-issuer-resolution-contract-lock.md \
   docs/milestones/M9-I2-contract-lock-review-approval-record.md \
   PROJECT_STATUS.md ROADMAP.md README.md
-sed -n '/^BEGIN SUBJECT MANIFEST$/,/^END SUBJECT MANIFEST$/p' \
+sed -n '/^BEGIN M9-I5 STATUS SUBJECT MANIFEST$/,/^END M9-I5 STATUS SUBJECT MANIFEST$/p' \
   docs/milestones/M9-I2-post-owner-approval-snapshot-closure.md \
   | sed '1d;$d' | sha256sum
 ```
 
 The two contract-governance subjects intentionally retain their historical hashes. The three
-status subjects must match the current repository bytes. A mismatch in either current hashes or
-the current snapshot ID fails closed to `NOT_CLOSED`; matching hashes establish only the candidate
+M9-I5 status subjects must match the current repository bytes. A mismatch in either M9-I5 hashes
+or its snapshot ID fails closed to `NOT_CLOSED`; matching hashes establish only the candidate
 identity, not closure.
 
 ## Required durable event record
@@ -374,6 +411,39 @@ and invalidate this verdict. This out-of-manifest carrier is the authoritative c
 after its own separately authorized publication; until then these local carrier bytes are a
 validated closure-transition candidate.
 
+## M9-I5 contract-lock status-snapshot attestation candidate evidence
+
+PR #37 synchronized the M9-I5 contract-lock post-merge status through reviewed exact head
+`f44905584c88a1476a05c07e3e01adb46457b6f0`. Validate #105
+([`31803048721`](https://github.com/gh-jai/financial-valuation-ai/actions/runs/31803048721))
+succeeded at that exact head. Python 3.10 job `94775314595` and Python 3.12 job `94775314423`
+each passed every validation, repository-policy, and test step with 526 tests. Formal
+same-maintainer review `4937392887`, node `PRR_kwDOTqKoFc8AAAABJkqi9w`, recorded
+`COMMENTED_PASS` with no findings and did not claim independent approval.
+
+PR #37 was merge-committed as exact main subject commit
+`fe2131721ea20c89ca3b452c0a7ef80dac37b236`, whose parent list is exactly
+`98536ff27a80bd8ddb4dd9e651ca7217c1c0d582` followed by
+`f44905584c88a1476a05c07e3e01adb46457b6f0`. The reviewed and merged subject tree is
+byte-identical at `914cdbc87b8e5eea07a1bffe21a492d51a018d3f`. Post-merge Validate #106
+([`31830905746`](https://github.com/gh-jai/financial-valuation-ai/actions/runs/31830905746))
+succeeded at that exact main commit. Python 3.10 job `94866073988` and Python 3.12 job
+`94866074048` each passed every validation, repository-policy, and test step with 526 tests.
+
+The append-only M9-I5 status `snapshot_closure_attestation` exists only as an unstaged local
+candidate at `docs/milestones/M9-I5-status-snapshot-closure-attestation.md`. Its canonical event
+links to predecessor event hash `a2ab8b45dcd40605eba3a680322be3da5318fccac97424356ca94364bfca17d1`,
+binds exact snapshot `126ad4fc548b897546ebe9c09832b3e79283bab5fae860be3a264b6c30055980`
+and subject commit `fe2131721ea20c89ca3b452c0a7ef80dac37b236`, discloses the shared
+owner/author/remediator identity, accepts the bounded residual risk, and grants no runtime,
+provider, data, publication, release, or qualified-review authority.
+
+Because this attestation is not yet an immutable Git object and has no exact-attestation-main CI,
+the event cannot yet advance the new snapshot. The current M9-I5 status snapshot remains
+`NOT_CLOSED`. A separately authorized publication and a later separately authorized carrier-only
+verification are both still required. Neither the closed M9-I4 snapshot nor any earlier closure
+verdict transfers to these changed summary bytes.
+
 ## Historical validation and attestation assertions
 
 The prior carrier recorded 325 passing tests and all 16 configured pre-commit hooks for the earlier
@@ -570,6 +640,30 @@ subject or attestation byte. Its later publication remains separately gated. Nei
 verdict nor the prior closure states authorize provider/network activation, live SEC access,
 real-company data, M9-I5 implementation, or release activity.
 
+## Required path for M9-I5 contract-lock status-snapshot closure
+
+1. [complete] preserve the three synchronized status subjects and two unchanged contract-governance
+   subjects in immutable main commit `fe2131721ea20c89ca3b452c0a7ef80dac37b236`;
+2. [complete] recompute all five subject hashes and candidate snapshot
+   `126ad4fc548b897546ebe9c09832b3e79283bab5fae860be3a264b6c30055980` while preserving all prior
+   manifests and attestations;
+3. [complete] obtain successful exact-reviewed-head Validate #105 (`31803048721`), exact-main
+   Validate #106 (`31830905746`), and same-maintainer exact-head `COMMENTED_PASS` review
+   `4937392887` with no findings;
+4. [complete in this local candidate] create a new append-only `snapshot_closure_attestation`
+   bound to the new snapshot ID, main subject commit, CI, review, finding disposition, shared-actor
+   disclosure, residual-risk acceptance, prior event hash, and narrow authority boundary;
+5. [pending separate authorization] publish the exact attestation candidate as an immutable main
+   commit and obtain successful exact-attestation-main Validate; and
+6. [pending separate authorization] update only this out-of-manifest carrier to verify the immutable
+   attestation object, file SHA-256, event hash, chain link, and CI before transitioning only the
+   exact M9-I5 status snapshot to `CLOSED_WITH_SINGLE_MAINTAINER_EXCEPTION`.
+
+The first four selected-path steps identify and validate only a local attestation candidate. They
+do not close the snapshot. Any later mismatch in a subject hash, event-chain link, immutable
+object, CI, finding disposition, or authority boundary fails closed to `NOT_CLOSED`; any
+subject-file change starts another snapshot lineage.
+
 Local validation for this 2026-08-13 closure-attestation candidate completed on Python 3.12.13
 with pytest 8.4.2, jsonschema 4.26.0, and PyYAML 6.0.3:
 
@@ -600,6 +694,23 @@ These results validate only the unstaged carrier-transition candidate bytes. The
 staging, committing, pushing, PR creation, merge, or any capability outside the narrow closure
 record. The carrier becomes the authoritative published transition only after those later actions
 are separately authorized and exact-head evidence is verified.
+
+Local validation for this 2026-08-15 M9-I5 status-snapshot attestation/carrier candidate completed
+on Python 3.12.13 with pytest 8.4.2, jsonschema 4.26.0, and PyYAML 6.0.3:
+
+- focused M9-I2/M9-I4/M9-I5 governance regressions: `PASS`; 33 tests passed;
+- all nine artifact validators plus repository policy: `PASS`;
+- schema/governed-document validation: `PASS`; 41 schemas and 121 governed documents;
+- repository policy: `PASS`; 418 candidate files and no prohibited sources;
+- full pytest suite: `PASS`; 530 tests passed;
+- all-candidate pre-commit: `PASS`; all 16 configured hooks passed without rewriting files;
+- new subject manifest, snapshot ID, attestation event hash, prior-event link, exact head/main tree
+  identity, Validate #105/#106 evidence, and M9-I5 contract SHA-256: `PASS`; and
+- `git diff --check`: `PASS`.
+
+These results validate only the unstaged local attestation/carrier candidate bytes. They do not
+authorize staging, committing, pushing, PR creation, publication, closure transition, runtime,
+provider/network activation, real-company data, M9-I5 runtime, M9-I6, or release activity.
 
 ## Source boundary
 
