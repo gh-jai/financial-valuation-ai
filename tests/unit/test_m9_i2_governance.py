@@ -18,6 +18,9 @@ CURRENT_SNAPSHOT_ATTESTATION = (
 M9_I4_STATUS_SNAPSHOT_ATTESTATION = (
     ROOT / "docs/milestones/M9-I4-status-snapshot-closure-attestation.md"
 )
+M9_I5_STATUS_SNAPSHOT_ATTESTATION = (
+    ROOT / "docs/milestones/M9-I5-status-snapshot-closure-attestation.md"
+)
 M9_I5_CONTRACT = (
     ROOT / "docs/milestones/M9-I5-us-gaap-normalization-reconciliation-contract-lock.md"
 )
@@ -71,6 +74,13 @@ M9_I5_CONTRACT_SHA256 = (
 M9_I5_REVIEWED_HEAD_SHA = "c4715930a59b6e2f79000cffdb7c0ebbec7cf217"
 M9_I5_MERGE_SHA = "98536ff27a80bd8ddb4dd9e651ca7217c1c0d582"
 M9_I5_SUBJECT_TREE_SHA = "a10327d7057c3478a38c9230667bc0529ceb6c21"
+M9_I5_STATUS_SNAPSHOT_ID = "126ad4fc548b897546ebe9c09832b3e79283bab5fae860be3a264b6c30055980"
+M9_I5_STATUS_SUBJECT_COMMIT_SHA = "fe2131721ea20c89ca3b452c0a7ef80dac37b236"
+M9_I5_STATUS_REVIEWED_HEAD_SHA = "f44905584c88a1476a05c07e3e01adb46457b6f0"
+M9_I5_STATUS_SUBJECT_TREE_SHA = "914cdbc87b8e5eea07a1bffe21a492d51a018d3f"
+M9_I5_PRE_ATTESTATION_CARRIER_SHA256 = (
+    "13d0e784b7b64de0c5979303f789194201c5fb76154649d9936cb0fe41dce4b9"
+)
 STATUS_SUMMARY_PATHS = ("PROJECT_STATUS.md", "ROADMAP.md", "README.md")
 HASH_RE = re.compile(r"^[0-9a-f]{64}$")
 
@@ -108,6 +118,14 @@ def m9_i4_status_manifest_block(text: str) -> str:
         text,
         "BEGIN M9-I4 STATUS SUBJECT MANIFEST",
         "END M9-I4 STATUS SUBJECT MANIFEST",
+    )
+
+
+def m9_i5_status_manifest_block(text: str) -> str:
+    return delimited_block(
+        text,
+        "BEGIN M9-I5 STATUS SUBJECT MANIFEST",
+        "END M9-I5 STATUS SUBJECT MANIFEST",
     )
 
 
@@ -174,6 +192,15 @@ def m9_i4_status_snapshot_attestation() -> dict[str, object]:
     return parsed
 
 
+def m9_i5_status_snapshot_attestation() -> dict[str, object]:
+    text = M9_I5_STATUS_SNAPSHOT_ATTESTATION.read_text(encoding="utf-8")
+    match = re.search(r"```yaml\n(.*?)\n```", text, re.DOTALL)
+    assert match
+    parsed = yaml.safe_load(match.group(1))
+    assert isinstance(parsed, dict)
+    return parsed
+
+
 def test_frozen_contract_hash_is_unchanged() -> None:
     assert sha256(CONTRACT) == CONTRACT_SHA256
     approval = APPROVAL.read_text(encoding="utf-8")
@@ -232,8 +259,8 @@ def test_completed_snapshot_closure_preserves_fail_closed_schema() -> None:
 
     assert "Status: `owner_approved_with_exception`" in approval
     assert "Post-owner-approval package closure: `NOT_CLOSED`" in approval
-    assert "Status: `CLOSED_WITH_SINGLE_MAINTAINER_EXCEPTION`; M9-I4 implementation" in closure
-    assert "Last attested snapshot status: `CLOSED_WITH_SINGLE_MAINTAINER_EXCEPTION`" in closure
+    assert "Status: `NOT_CLOSED`; M9-I5 contract-lock status-snapshot" in closure
+    assert "Last closed snapshot status: `CLOSED_WITH_SINGLE_MAINTAINER_EXCEPTION`" in closure
     assert "Historical snapshot status: `CLOSED_WITH_SINGLE_MAINTAINER_EXCEPTION`" in closure
     assert "both ordered immutable\nexception events remain verified" in closure
     assert "Any later mismatch in a\nsubject hash, event-chain link, immutable object" in closure
@@ -415,9 +442,9 @@ def test_exception_states_are_distinct_and_fail_closed_on_change() -> None:
     assert "`CLOSED_WITH_SINGLE_MAINTAINER_EXCEPTION`" in closure
     assert closure.startswith(
         "# M9-I2 Post-Owner-Approval Exact-Snapshot Closure\n\n"
-        "Status: `CLOSED_WITH_SINGLE_MAINTAINER_EXCEPTION`"
+        "Status: `NOT_CLOSED`"
     )
-    assert "Last attested snapshot status: `CLOSED_WITH_SINGLE_MAINTAINER_EXCEPTION`" in closure
+    assert "Last closed snapshot status: `CLOSED_WITH_SINGLE_MAINTAINER_EXCEPTION`" in closure
     assert (
         "The unqualified states `independently_reviewed`, `owner_approved`, and `CLOSED` are forbidden"
         in normalized
@@ -700,10 +727,7 @@ def test_current_snapshot_attestation_preserves_narrow_authority_after_publicati
     assert "live or provider access" in normalized
     assert "real-company data" in normalized
     assert "attachment use" in normalized
-    assert closure_text().startswith(
-        "# M9-I2 Post-Owner-Approval Exact-Snapshot Closure\n\n"
-        "Status: `CLOSED_WITH_SINGLE_MAINTAINER_EXCEPTION`"
-    )
+    assert "records the current snapshot as\n`CLOSED_WITH_SINGLE_MAINTAINER_EXCEPTION`" in closure_text()
 
 
 def test_current_attestation_immutable_object_and_main_ci_are_bound() -> None:
@@ -730,8 +754,8 @@ def test_current_reclosure_is_hash_bound_and_closes_only_the_attested_snapshot()
     closure = closure_text()
     normalized = " ".join(closure.split())
 
-    assert "Carrier update state: `immutable_m9_i4_status_attestation_verified`" in closure
-    assert "Last attested snapshot status: `CLOSED_WITH_SINGLE_MAINTAINER_EXCEPTION`" in closure
+    assert "M9-I4 status `snapshot_closure_attestation` is now immutable" in closure
+    assert "Last closed snapshot status: `CLOSED_WITH_SINGLE_MAINTAINER_EXCEPTION`" in closure
     manifest = {relative_path: digest for digest, relative_path in manifest_entries(closure)}
     for relative_path in (
         "docs/milestones/M9-I2-issuer-resolution-contract-lock.md",
@@ -859,7 +883,7 @@ def test_m9_i4_status_attestation_candidate_remains_fail_closed_and_narrow() -> 
     assert "M9-I5 through M9-I6" in normalized
     assert closure.startswith(
         "# M9-I2 Post-Owner-Approval Exact-Snapshot Closure\n\n"
-        "Status: `CLOSED_WITH_SINGLE_MAINTAINER_EXCEPTION`"
+        "Status: `NOT_CLOSED`"
     )
     assert "All six selected-path steps are satisfied" in closure
     assert HISTORICAL_SNAPSHOT_ID in closure
@@ -894,12 +918,8 @@ def test_m9_i4_status_immutable_attestation_object_and_main_ci_are_bound() -> No
 def test_m9_i4_status_carrier_transition_closes_only_exact_attested_snapshot() -> None:
     closure = closure_text()
     normalized = " ".join(closure.split())
-    assert closure.startswith(
-        "# M9-I2 Post-Owner-Approval Exact-Snapshot Closure\n\n"
-        "Status: `CLOSED_WITH_SINGLE_MAINTAINER_EXCEPTION`"
-    )
-    assert "Carrier update state: `immutable_m9_i4_status_attestation_verified`" in closure
-    assert f"Last attested snapshot status: `CLOSED_WITH_SINGLE_MAINTAINER_EXCEPTION` for exact snapshot\n`{M9_I4_STATUS_SNAPSHOT_ID}`" in closure
+    assert "M9-I4 status `snapshot_closure_attestation` is now immutable" in closure
+    assert f"Last closed snapshot status: `CLOSED_WITH_SINGLE_MAINTAINER_EXCEPTION` for exact M9-I4 snapshot\n`{M9_I4_STATUS_SNAPSHOT_ID}`" in closure
     assert "records the exact M9-I4 implementation status snapshot as `CLOSED_WITH_SINGLE_MAINTAINER_EXCEPTION`" in normalized
     assert "All six selected-path steps are satisfied for the exact M9-I4 implementation status snapshot" in normalized
     assert "without altering any subject or attestation byte" in normalized
@@ -918,3 +938,107 @@ def test_m9_i4_status_carrier_transition_closes_only_exact_attested_snapshot() -
         assert M9_I5_MERGE_SHA in text
         assert "Validate #104" in text
         assert "`COMMENTED_PASS`" in text
+
+
+def test_m9_i5_status_manifest_recomputes_exact_main_subject() -> None:
+    closure = closure_text()
+    block = m9_i5_status_manifest_block(closure)
+    entries = []
+    for line in block.splitlines():
+        digest, relative_path = line.split(" ", 1)
+        assert HASH_RE.fullmatch(digest)
+        entries.append((digest, relative_path))
+
+    expected_paths = [
+        "docs/milestones/M9-I2-issuer-resolution-contract-lock.md",
+        "docs/milestones/M9-I2-contract-lock-review-approval-record.md",
+        "PROJECT_STATUS.md",
+        "ROADMAP.md",
+        "README.md",
+    ]
+    assert [relative_path for _, relative_path in entries] == expected_paths
+    assert all(sha256(ROOT / relative_path) == digest for digest, relative_path in entries)
+    assert hashlib.sha256(block.encode("utf-8")).hexdigest() == M9_I5_STATUS_SNAPSHOT_ID
+    assert (
+        "M9-I5 contract-lock status subject snapshot ID:\n"
+        f"`{M9_I5_STATUS_SNAPSHOT_ID}`"
+    ) in closure
+
+
+def test_m9_i5_status_attestation_recomputes_and_extends_event_chain() -> None:
+    attestation = m9_i5_status_snapshot_attestation()
+    event = attestation["event"]
+    assert isinstance(event, dict)
+    canonical = json.dumps(
+        event, sort_keys=True, separators=(",", ":"), ensure_ascii=False
+    ).encode("utf-8")
+    event_hash = hashlib.sha256(canonical).hexdigest()
+    assert HASH_RE.fullmatch(attestation["event_hash"])
+    assert attestation["event_hash"] == event_hash
+    assert event["previous_event_hash"] == M9_I4_STATUS_ATTESTATION_EVENT_HASH
+    assert event["subject_id"] == M9_I5_STATUS_SNAPSHOT_ID
+    assert event["snapshot_id"] == M9_I5_STATUS_SNAPSHOT_ID
+    assert event["subject_commit_sha"] == M9_I5_STATUS_SUBJECT_COMMIT_SHA
+    assert event["evidence_sha256"] == M9_I5_PRE_ATTESTATION_CARRIER_SHA256
+    assert sha256(CLOSURE) != M9_I5_PRE_ATTESTATION_CARRIER_SHA256
+
+
+def test_m9_i5_status_attestation_binds_review_ci_and_contract_evidence() -> None:
+    event = m9_i5_status_snapshot_attestation()["event"]
+    ci = event["ci_evidence"]
+    assert ci["workflow_run_id"] == 31830905746
+    assert ci["workflow_run_number"] == 106
+    assert ci["head_sha"] == M9_I5_STATUS_SUBJECT_COMMIT_SHA
+    assert {job["job_id"] for job in ci["matrix_jobs"]} == {94866073988, 94866074048}
+    assert all(job["full_suite"] == "526 passed" for job in ci["matrix_jobs"])
+
+    exact_head_ci = event["exact_head_ci_evidence"]
+    assert exact_head_ci["workflow_run_id"] == 31803048721
+    assert exact_head_ci["workflow_run_number"] == 105
+    assert exact_head_ci["head_sha"] == M9_I5_STATUS_REVIEWED_HEAD_SHA
+    assert {job["job_id"] for job in exact_head_ci["matrix_jobs"]} == {
+        94775314423,
+        94775314595,
+    }
+
+    review = event["review_evidence"]
+    assert review["pull_request_number"] == 37
+    assert review["base_sha"] == M9_I5_MERGE_SHA
+    assert review["reviewed_head_sha"] == M9_I5_STATUS_REVIEWED_HEAD_SHA
+    assert review["reviewed_tree_sha"] == M9_I5_STATUS_SUBJECT_TREE_SHA
+    assert review["main_subject_tree_sha"] == M9_I5_STATUS_SUBJECT_TREE_SHA
+    assert review["review_id"] == 4937392887
+    assert review["review_node_id"] == "PRR_kwDOTqKoFc8AAAABJkqi9w"
+    assert review["disposition"] == "COMMENTED_PASS"
+    assert review["finding_resolution"] == "no_findings"
+
+    milestone_contract = event["milestone_contract_evidence"]
+    assert milestone_contract["sha256"] == M9_I5_CONTRACT_SHA256
+    assert milestone_contract["merge_commit_sha"] == M9_I5_MERGE_SHA
+
+
+def test_m9_i5_status_candidate_and_carrier_remain_fail_closed_and_narrow() -> None:
+    attestation = M9_I5_STATUS_SNAPSHOT_ATTESTATION.read_text(encoding="utf-8")
+    normalized_attestation = " ".join(attestation.split())
+    closure = closure_text()
+    normalized_closure = " ".join(closure.split())
+
+    assert "Artifact state: `local_candidate_not_yet_immutable`" in attestation
+    assert "Current snapshot state before immutable publication: `NOT_CLOSED`" in attestation
+    assert "Its existence does not close the current snapshot" in normalized_attestation
+    assert "this event is not independent review" in normalized_attestation
+    assert "does not authorize staging, committing, pushing, PR creation or state changes" in normalized_attestation
+    assert "network/provider activation" in normalized_attestation
+    assert "M9-I5 runtime" in normalized_attestation
+    assert "M9-I6" in normalized_attestation
+
+    assert closure.startswith(
+        "# M9-I2 Post-Owner-Approval Exact-Snapshot Closure\n\n"
+        "Status: `NOT_CLOSED`"
+    )
+    assert "Carrier update state: `m9_i5_status_attestation_local_candidate`" in closure
+    assert f"Current M9-I5 status snapshot: `NOT_CLOSED` for exact snapshot\n`{M9_I5_STATUS_SNAPSHOT_ID}`" in closure
+    assert "The first four selected-path steps identify and validate only a local attestation candidate" in normalized_closure
+    assert "They do not close the snapshot" in normalized_closure
+    assert "[pending separate authorization] publish the exact attestation candidate" in normalized_closure
+    assert "[pending separate authorization] update only this out-of-manifest carrier" in normalized_closure
