@@ -18,6 +18,9 @@ CURRENT_SNAPSHOT_ATTESTATION = (
 M9_I4_STATUS_SNAPSHOT_ATTESTATION = (
     ROOT / "docs/milestones/M9-I4-status-snapshot-closure-attestation.md"
 )
+M9_I5_CONTRACT = (
+    ROOT / "docs/milestones/M9-I5-us-gaap-normalization-reconciliation-contract-lock.md"
+)
 CONTRACT_SHA256 = "9326b6c76dcfe3061c5e356b5141d9f458d57694cb4e6b01b6470b0bf044d84e"
 SUBJECT_COMMIT_SHA = "743159d08ab05541a8d4fe25859bc9f9a49c5287"
 ATTESTATION_COMMIT_SHA = "a406b5fc5cfded19f116cc42309da13cea42c713"
@@ -62,6 +65,12 @@ M9_I4_STATUS_ATTESTATION_SHA256 = (
     "60e97e1eb35fdd303a5b6e705e5fe9c3b0ac67771a4a7bff626b77b3efdb0918"
 )
 M9_I4_STATUS_ATTESTATION_CI_RUN_ID = "31704722307"
+M9_I5_CONTRACT_SHA256 = (
+    "99ee481383eece5d21f45e22dc2ced16f3e04f3bd8ae169ac7c58279c8121949"
+)
+M9_I5_REVIEWED_HEAD_SHA = "c4715930a59b6e2f79000cffdb7c0ebbec7cf217"
+M9_I5_MERGE_SHA = "98536ff27a80bd8ddb4dd9e651ca7217c1c0d582"
+M9_I5_SUBJECT_TREE_SHA = "a10327d7057c3478a38c9230667bc0529ceb6c21"
 STATUS_SUMMARY_PATHS = ("PROJECT_STATUS.md", "ROADMAP.md", "README.md")
 HASH_RE = re.compile(r"^[0-9a-f]{64}$")
 
@@ -283,6 +292,13 @@ def test_status_summaries_advance_without_transferring_historical_closure() -> N
         assert "`owner_approved_with_exception`" in text
         assert "`NOT_CLOSED`" in text
         assert "M9-I3" in text
+        assert "PR #36" in text
+        assert M9_I5_REVIEWED_HEAD_SHA in text
+        assert M9_I5_MERGE_SHA in text
+        assert "Validate #104" in text
+        assert "`COMMENTED_PASS`" in text
+        assert "M9-I5 normalization runtime" in text
+        assert "M9-I6" in text
 
     closure = closure_text()
     normalized = " ".join(closure.split())
@@ -299,7 +315,6 @@ def test_status_summaries_advance_without_transferring_historical_closure() -> N
     assert "M9-I2 implementation has not started" not in combined
     assert "does not yet provide M9-I2 issuer resolution" not in combined
     assert "M9-I4 implementation" in combined
-    assert "M9-I5 through M9-I6" in combined
     assert "Validate run #81" in combined
     assert "PR #30" in combined
     assert "e26f55ef3e9b8babecb42f41f25be20dd918ea1e" in combined
@@ -313,7 +328,21 @@ def test_status_summaries_advance_without_transferring_historical_closure() -> N
     assert "Validate run #96" in combined
     assert "31700614399" in combined
     assert "505 tests per job" in combined
-    assert "M9-I5 contract lock" in combined
+    assert "M9-I5" in combined
+    assert "disabled-offline" in combined
+    assert M9_I5_SUBJECT_TREE_SHA in combined
+    assert "Validate #103" in combined
+    assert "31728378287" in combined
+    assert "94542365764" in combined
+    assert "94542365886" in combined
+    assert "31730656034" in combined
+    assert "94550030252" in combined
+    assert "94550030257" in combined
+    assert "526 tests" in combined
+    assert "4930291093" in combined
+    assert "PRR_kwDOTqKoFc8AAAABJd5FlQ" in combined
+    assert M9_I5_CONTRACT_SHA256 in combined
+    assert sha256(M9_I5_CONTRACT) == M9_I5_CONTRACT_SHA256
     assert "live request" in combined
     assert "M9-I4 is contract-only" not in combined
     assert "No M9-I4 runtime implementation" not in combined
@@ -746,7 +775,7 @@ def test_hook_count_includes_repository_policy_once() -> None:
     )
 
 
-def test_m9_i4_status_manifest_matches_exact_main_subject_bytes() -> None:
+def test_m9_i4_status_manifest_is_preserved_but_does_not_close_new_summary_bytes() -> None:
     closure = closure_text()
     entries = m9_i4_status_manifest_entries(closure)
     expected_paths = [
@@ -757,7 +786,11 @@ def test_m9_i4_status_manifest_matches_exact_main_subject_bytes() -> None:
         "README.md",
     ]
     assert [path for _, path in entries] == expected_paths
-    assert all(sha256(ROOT / path) == digest for digest, path in entries)
+    manifest_digests = {path: digest for digest, path in entries}
+    for unchanged_path in expected_paths[:2]:
+        assert sha256(ROOT / unchanged_path) == manifest_digests[unchanged_path]
+    for changed_summary_path in expected_paths[2:]:
+        assert sha256(ROOT / changed_summary_path) != manifest_digests[changed_summary_path]
     snapshot_id = hashlib.sha256(
         m9_i4_status_manifest_block(closure).encode("utf-8")
     ).hexdigest()
@@ -872,9 +905,16 @@ def test_m9_i4_status_carrier_transition_closes_only_exact_attested_snapshot() -
     assert "without altering any subject or attestation byte" in normalized
     assert "authoritative closure record only after its own separately authorized publication" in normalized
     assert "grants no runtime, provider, data, publication, release" in normalized
-    summaries = " ".join(
-        (ROOT / relative_path).read_text(encoding="utf-8")
+    summaries = {
+        relative_path: (ROOT / relative_path).read_text(encoding="utf-8")
         for relative_path in STATUS_SUMMARY_PATHS
-    )
-    assert M9_I4_STATUS_SNAPSHOT_ID not in summaries
-    assert "`NOT_CLOSED`" in summaries
+    }
+    for text in summaries.values():
+        assert M9_I4_STATUS_SNAPSHOT_ID in text
+        assert "`CLOSED_WITH_SINGLE_MAINTAINER_EXCEPTION`" in text
+        assert "original exact bytes" in text
+        assert "`NOT_CLOSED`" in text
+        assert "PR #36" in text
+        assert M9_I5_MERGE_SHA in text
+        assert "Validate #104" in text
+        assert "`COMMENTED_PASS`" in text
