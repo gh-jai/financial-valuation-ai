@@ -70,18 +70,27 @@ approval. Validate #103 (`31728378287`) passed jobs `94542365764` (Python 3.10) 
 (Python 3.12), and post-merge Validate #104 (`31730656034`) passed jobs `94550030252` (Python 3.10)
 and `94550030257` (Python 3.12), with 526 tests per job. The exact contract SHA-256 is
 `99ee481383eece5d21f45e22dc2ced16f3e04f3bd8ae169ac7c58279c8121949`.
-This merge locks contract, schema, checklist, and adversarial-governance bytes only; no M9-I5
-normalization runtime exists or is authorized. These checkpoints do not advance the latest complete
-end-to-end operational milestone beyond M7. The revised M9-I2 contract remains
-`owner_approved_with_exception`, without weakening runtime separation or later qualified-review
-gates. The M9-I4 implementation status snapshot
+The separately authorized disabled-offline runtime was then reviewed and merged through PR #40 as
+`1bfe3707b0b0fd6302f9f212894c9a0afa8254e2`. Reviewed exact head
+`8a864a71b28ee67d579fc946ec82abc07db0e125` and the merge commit share tree
+`c709b3231a740c9815e9e24b5dca27b1b6bb8fa0`. Same-maintainer review #4942961896, node
+`PRR_kwDOTqKoFc8AAAABJp-c6A`, recorded `COMMENTED_PASS` with no findings and is not independent
+approval. Validate #111 (`31867065910`) passed jobs `94969739732` (Python 3.10) and `94969739789`
+(Python 3.12); post-merge Validate #112 (`31867408735`) passed jobs `94970557404` (Python 3.10) and
+`94970557341` (Python 3.12) at the exact merge commit. Each job completed 585 tests. The runtime is
+limited to repository synthetic fixtures and remains network-denied. These checkpoints do not
+advance the latest complete end-to-end operational milestone beyond M7. The revised M9-I2 contract
+remains `owner_approved_with_exception`, without weakening runtime separation or later qualified
+review gates. The M9-I4 implementation status snapshot
 `8996b5c370576a09b556823ed61e5f025f8640aa2c9d061e29895e9384886f9d` remains
-`CLOSED_WITH_SINGLE_MAINTAINER_EXCEPTION` evidence only for its exact original bytes. Changing the
-three summary files for this M9-I5 contract-lock synchronization creates a distinct recomputable
-snapshot that is `NOT_CLOSED` until separately committed, validated, reviewed, and attested.
-M9-I4 live readiness, M9-I5 normalization runtime, M9-I6, and every live-data capability remain
-separately gated. The authoritative
-snapshot history and closure evidence are recorded in
+`CLOSED_WITH_SINGLE_MAINTAINER_EXCEPTION` evidence only for its exact original bytes. The later
+M9-I5 contract-lock status snapshot
+`126ad4fc548b897546ebe9c09832b3e79283bab5fae860be3a264b6c30055980` is likewise closed only for
+its original exact bytes. Changing the three summary files for this M9-I5 runtime post-merge
+synchronization creates a distinct recomputable snapshot that is `NOT_CLOSED` until separately
+committed, validated, reviewed, and attested. M9-I4 live readiness, M9-I6, provider/network
+activation, real-company data, and every live-data capability remain separately gated. The
+authoritative snapshot history and closure evidence are recorded in
 `docs/milestones/M9-I2-post-owner-approval-snapshot-closure.md`, not by this summary. M9-M14 are the
 retail-product delivery path; no live issuer ingestion or user interface exists. See
 [ROADMAP.md](ROADMAP.md) and [PROJECT_STATUS.md](PROJECT_STATUS.md).
@@ -143,14 +152,22 @@ Run `pre-commit install` once to enable local checks. See [CONTRIBUTING.md](CONT
   `98536ff27a80bd8ddb4dd9e651ca7217c1c0d582` after same-maintainer `COMMENTED_PASS`; Validate #103
   and post-merge Validate #104 passed all four Python 3.10/3.12 jobs with 526 tests per job. The
   exact contract SHA-256 is `99ee481383eece5d21f45e22dc2ced16f3e04f3bd8ae169ac7c58279c8121949`.
-  This is a contract lock only, not an implemented normalization runtime.
-- M9-I4 status snapshot: exact snapshot `8996b5c3…6f9d` remains
-  `CLOSED_WITH_SINGLE_MAINTAINER_EXCEPTION` evidence only for its original exact bytes. This M9-I5
-  contract-lock synchronization changes three subject files and therefore creates a distinct
+  That merge locked the contract only; runtime authority was granted separately.
+- M9-I5 merged disabled-offline runtime: PR #40 merged reviewed exact head
+  `8a864a71b28ee67d579fc946ec82abc07db0e125` as
+  `1bfe3707b0b0fd6302f9f212894c9a0afa8254e2`, with byte-identical tree
+  `c709b3231a740c9815e9e24b5dca27b1b6bb8fa0`. Same-maintainer review #4942961896, node
+  `PRR_kwDOTqKoFc8AAAABJp-c6A`, recorded `COMMENTED_PASS` with no findings. Validate #111 and
+  post-merge Validate #112 passed all four Python 3.10/3.12 jobs with 585 tests per job. Runtime
+  scope is repository synthetic fixtures only and network-denied.
+- M9-I5 status snapshot: exact contract-lock snapshot
+  `126ad4fc548b897546ebe9c09832b3e79283bab5fae860be3a264b6c30055980` remains
+  `CLOSED_WITH_SINGLE_MAINTAINER_EXCEPTION` evidence only for its original exact bytes. This
+  runtime post-merge synchronization changes three subject files and therefore creates a distinct
   current snapshot that is `NOT_CLOSED` pending an immutable subject commit, exact-head CI,
   findings disposition, and closure attestation.
 
-M9-I5 normalization runtime, M9-I6, live access, provider activation, and real-company data remain
-unauthorized.
+M9-I6, live access, provider/network activation, and real-company data remain unauthorized. The
+M9-I5 runtime is authorized only in its merged disabled-offline, synthetic-only form.
 
 FVI remains pre-v1.0 and is not investment advice. Interfaces and schemas may change before release.

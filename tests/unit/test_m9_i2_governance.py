@@ -75,6 +75,15 @@ M9_I5_REVIEWED_HEAD_SHA = "c4715930a59b6e2f79000cffdb7c0ebbec7cf217"
 M9_I5_MERGE_SHA = "98536ff27a80bd8ddb4dd9e651ca7217c1c0d582"
 M9_I5_SUBJECT_TREE_SHA = "a10327d7057c3478a38c9230667bc0529ceb6c21"
 M9_I5_STATUS_SNAPSHOT_ID = "126ad4fc548b897546ebe9c09832b3e79283bab5fae860be3a264b6c30055980"
+M9_I5_RUNTIME_REVIEWED_HEAD_SHA = "8a864a71b28ee67d579fc946ec82abc07db0e125"
+M9_I5_RUNTIME_TREE_SHA = "c709b3231a740c9815e9e24b5dca27b1b6bb8fa0"
+M9_I5_RUNTIME_MERGE_SHA = "1bfe3707b0b0fd6302f9f212894c9a0afa8254e2"
+M9_I5_RUNTIME_EXACT_HEAD_CI_RUN_ID = "31867065910"
+M9_I5_RUNTIME_MAIN_CI_RUN_ID = "31867408735"
+M9_I5_RUNTIME_REVIEW_ID = "4942961896"
+M9_I5_RUNTIME_REVIEW_NODE_ID = "PRR_kwDOTqKoFc8AAAABJp-c6A"
+M9_I5_RUNTIME_EXACT_HEAD_JOB_IDS = ("94969739732", "94969739789")
+M9_I5_RUNTIME_MAIN_JOB_IDS = ("94970557404", "94970557341")
 M9_I5_STATUS_SUBJECT_COMMIT_SHA = "fe2131721ea20c89ca3b452c0a7ef80dac37b236"
 M9_I5_STATUS_REVIEWED_HEAD_SHA = "f44905584c88a1476a05c07e3e01adb46457b6f0"
 M9_I5_STATUS_SUBJECT_TREE_SHA = "914cdbc87b8e5eea07a1bffe21a492d51a018d3f"
@@ -337,7 +346,9 @@ def test_status_summaries_advance_without_transferring_historical_closure() -> N
         assert M9_I5_MERGE_SHA in text
         assert "Validate #104" in text
         assert "`COMMENTED_PASS`" in text
-        assert "M9-I5 normalization runtime" in text
+        assert "M9-I5" in text
+        assert "normalization" in text
+        assert "runtime" in text
         assert "M9-I6" in text
 
     closure = closure_text()
@@ -953,7 +964,46 @@ def test_m9_i4_status_carrier_transition_closes_only_exact_attested_snapshot() -
         assert "`COMMENTED_PASS`" in text
 
 
-def test_m9_i5_status_manifest_recomputes_exact_main_subject() -> None:
+def test_m9_i5_runtime_post_merge_status_sync_is_exact_and_bounded() -> None:
+    summaries = {
+        relative_path: (ROOT / relative_path).read_text(encoding="utf-8")
+        for relative_path in STATUS_SUMMARY_PATHS
+    }
+    exact_evidence = (
+        M9_I5_RUNTIME_REVIEWED_HEAD_SHA,
+        M9_I5_RUNTIME_TREE_SHA,
+        M9_I5_RUNTIME_MERGE_SHA,
+        M9_I5_RUNTIME_EXACT_HEAD_CI_RUN_ID,
+        M9_I5_RUNTIME_MAIN_CI_RUN_ID,
+        M9_I5_RUNTIME_REVIEW_ID,
+        M9_I5_RUNTIME_REVIEW_NODE_ID,
+        *M9_I5_RUNTIME_EXACT_HEAD_JOB_IDS,
+        *M9_I5_RUNTIME_MAIN_JOB_IDS,
+    )
+    for text in summaries.values():
+        for required in exact_evidence:
+            assert required in text
+        assert M9_I5_STATUS_SNAPSHOT_ID in text
+        assert "PR #40" in text
+        assert "Validate #111" in text
+        assert "Validate #112" in text
+        assert "585 tests" in text or "585-test suite" in text
+        assert "`COMMENTED_PASS`" in text
+        assert "`CLOSED_WITH_SINGLE_MAINTAINER_EXCEPTION`" in text
+        assert "`NOT_CLOSED`" in text
+        normalized = text.lower().replace("_", "-")
+        assert "synthetic" in normalized
+        assert "network-denied" in normalized
+        assert "m9-i6" in normalized
+        assert "unauthorized" in normalized
+
+    combined = "\n".join(summaries.values())
+    assert "no M9-I5 normalization runtime exists or is authorized" not in combined
+    assert "M9-I5 normalization runtime, M9-I6" not in combined
+    assert "next separately gated implementation slice is\nthe M9-I5" not in combined
+
+
+def test_m9_i5_status_manifest_preserves_exact_historical_subject() -> None:
     closure = closure_text()
     block = m9_i5_status_manifest_block(closure)
     entries = []
@@ -970,7 +1020,11 @@ def test_m9_i5_status_manifest_recomputes_exact_main_subject() -> None:
         "README.md",
     ]
     assert [relative_path for _, relative_path in entries] == expected_paths
-    assert all(sha256(ROOT / relative_path) == digest for digest, relative_path in entries)
+    immutable_paths = expected_paths[:2]
+    current_summary_paths = expected_paths[2:]
+    manifest = {relative_path: digest for digest, relative_path in entries}
+    assert all(sha256(ROOT / path) == manifest[path] for path in immutable_paths)
+    assert all(sha256(ROOT / path) != manifest[path] for path in current_summary_paths)
     assert hashlib.sha256(block.encode("utf-8")).hexdigest() == M9_I5_STATUS_SNAPSHOT_ID
     assert (
         "M9-I5 contract-lock status subject snapshot ID:\n"
@@ -1105,5 +1159,5 @@ def test_m9_i5_status_carrier_transition_closes_only_exact_attested_snapshot() -
         )
     }
     for relative_path, text in summaries.items():
-        assert sha256(ROOT / relative_path) == manifest[relative_path]
+        assert sha256(ROOT / relative_path) != manifest[relative_path]
         assert "`NOT_CLOSED`" in text

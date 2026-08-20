@@ -88,19 +88,29 @@ approval. Validate #103 (`31728378287`) passed jobs `94542365764` (Python 3.10) 
 `94550030257` (Python 3.12). Each job completed the 526-test suite. The exact contract SHA-256 is
 `99ee481383eece5d21f45e22dc2ced16f3e04f3bd8ae169ac7c58279c8121949`.
 
-The exact M9-I4 implementation status snapshot
-`8996b5c370576a09b556823ed61e5f025f8640aa2c9d061e29895e9384886f9d` remains
+The separately authorized M9-I5 disabled-offline runtime was reviewed and merged through PR #40.
+Reviewed exact head `8a864a71b28ee67d579fc946ec82abc07db0e125` and merge commit
+`1bfe3707b0b0fd6302f9f212894c9a0afa8254e2` share tree
+`c709b3231a740c9815e9e24b5dca27b1b6bb8fa0`. Same-maintainer review #4942961896, node
+`PRR_kwDOTqKoFc8AAAABJp-c6A`, recorded `COMMENTED_PASS` with no findings and is not independent
+approval. Validate #111 (`31867065910`) passed jobs `94969739732` (Python 3.10) and `94969739789`
+(Python 3.12); post-merge Validate #112 (`31867408735`) passed jobs `94970557404` (Python 3.10) and
+`94970557341` (Python 3.12) at the exact merge commit. Each job completed the 585-test suite.
+
+The exact M9-I5 contract-lock status snapshot
+`126ad4fc548b897546ebe9c09832b3e79283bab5fae860be3a264b6c30055980` remains
 `CLOSED_WITH_SINGLE_MAINTAINER_EXCEPTION` evidence only for its original exact bytes. Synchronizing
-the M9-I5 contract-lock facts changes three files in that subject set, so the resulting distinct
-current snapshot is fail-closed as `NOT_CLOSED` pending its own immutable subject commit,
-exact-head CI, findings disposition, and new snapshot-closure attestation. The preserved manifests
-and attestation evidence remain in
-`docs/milestones/M9-I2-post-owner-approval-snapshot-closure.md`. M9-I5 normalization runtime,
-M9-I6, live SEC or provider access, provider activation, real-company fixtures, API, LLM, UI, and
+the M9-I5 runtime post-merge facts changes the three summary subjects, so these new bytes form a
+distinct current snapshot that is fail-closed as `NOT_CLOSED` pending its own immutable subject
+commit, exact-head CI, findings disposition, and closure attestation. The preserved manifests and
+attestation evidence remain in `docs/milestones/M9-I2-post-owner-approval-snapshot-closure.md`.
+The merged runtime is limited to repository synthetic fixtures and remains network-denied. M9-I6,
+live SEC or provider access, provider/network activation, real-company data, API, LLM, UI, and
 release work remain separately unauthorized. The next separately gated implementation slice is
-the M9-I5 disabled-offline normalization runtime; it cannot activate M9-I4 transport, use
-real-company data, or perform a live request. The current summary snapshot separately remains
-`NOT_CLOSED` pending its own immutable governance path.
+M9-I6's offline end-to-end validator; it remains unauthorized and cannot weaken those boundaries.
+The earlier M9-I4 implementation status snapshot
+`8996b5c370576a09b556823ed61e5f025f8640aa2c9d061e29895e9384886f9d` likewise remains closed
+evidence only for its original exact bytes.
 
 ## M10 Assumption, routing, and scenario engine
 
