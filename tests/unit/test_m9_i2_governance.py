@@ -118,6 +118,19 @@ M9_I5_RUNTIME_STATUS_PRE_ATTESTATION_CARRIER_SHA256 = (
 M9_I5_RUNTIME_STATUS_ATTESTATION_EVENT_HASH = (
     "b94532a148372195f3aed05937460aef699fd44531714cd79ff537c9ac48861c"
 )
+M9_I5_RUNTIME_STATUS_ATTESTATION_REVIEWED_HEAD_SHA = (
+    "d6bc41fd8e638bae0cb6ca637369b6ac96a86927"
+)
+M9_I5_RUNTIME_STATUS_ATTESTATION_COMMIT_SHA = (
+    "78e2d99b4cf860e88a83e0801bef808de8535497"
+)
+M9_I5_RUNTIME_STATUS_ATTESTATION_TREE_SHA = "db395d5f8e34626ae9f8aa168b8942e7bf10a099"
+M9_I5_RUNTIME_STATUS_ATTESTATION_BLOB_SHA = "d003c604e32ca34880bc906c1ce4c47b14692588"
+M9_I5_RUNTIME_STATUS_ATTESTATION_SHA256 = (
+    "faa1890ad01f8e8fd33ba5029c34d6192cd6b18d35cafb0c0e3da2f986c70d6f"
+)
+M9_I5_RUNTIME_STATUS_ATTESTATION_EXACT_HEAD_CI_RUN_ID = "32573515227"
+M9_I5_RUNTIME_STATUS_ATTESTATION_MAIN_CI_RUN_ID = "32574298634"
 STATUS_SUMMARY_PATHS = ("PROJECT_STATUS.md", "ROADMAP.md", "README.md")
 HASH_RE = re.compile(r"^[0-9a-f]{64}$")
 
@@ -1270,6 +1283,45 @@ def test_m9_i5_runtime_status_attestation_binds_review_and_ci() -> None:
     assert review["finding_resolution"] == "no_findings"
 
 
+def test_m9_i5_runtime_status_immutable_attestation_object_review_and_main_ci_are_bound() -> None:
+    closure = closure_text()
+    normalized = " ".join(closure.split())
+    assert (
+        sha256(M9_I5_RUNTIME_STATUS_SNAPSHOT_ATTESTATION)
+        == M9_I5_RUNTIME_STATUS_ATTESTATION_SHA256
+    )
+    assert (
+        m9_i5_runtime_status_snapshot_attestation()["event_hash"]
+        == M9_I5_RUNTIME_STATUS_ATTESTATION_EVENT_HASH
+    )
+    for required in (
+        M9_I5_RUNTIME_STATUS_ATTESTATION_REVIEWED_HEAD_SHA,
+        M9_I5_RUNTIME_STATUS_ATTESTATION_COMMIT_SHA,
+        M9_I5_RUNTIME_STATUS_ATTESTATION_TREE_SHA,
+        M9_I5_RUNTIME_STATUS_ATTESTATION_BLOB_SHA,
+        M9_I5_RUNTIME_STATUS_ATTESTATION_SHA256,
+        M9_I5_RUNTIME_STATUS_ATTESTATION_EVENT_HASH,
+        M9_I5_RUNTIME_STATUS_ATTESTATION_EXACT_HEAD_CI_RUN_ID,
+        M9_I5_RUNTIME_STATUS_ATTESTATION_MAIN_CI_RUN_ID,
+        "97032381395",
+        "97032381469",
+        "97034253680",
+        "97034253526",
+        "5000199090",
+        "PRR_kwDOTqKoFc8AAAABKgj7sg",
+    ):
+        assert required in closure
+    assert (
+        f"blob/{M9_I5_RUNTIME_STATUS_ATTESTATION_COMMIT_SHA}/docs/milestones/"
+        "M9-I5-runtime-status-snapshot-closure-attestation.md"
+    ) in closure
+    assert "Post-merge Validate #116" in closure
+    assert (
+        "each passed every validator, repository-policy, and test step with 590 tests"
+        in normalized
+    )
+
+
 def test_m9_i5_runtime_status_attestation_candidate_is_fail_closed_and_bounded() -> None:
     attestation = M9_I5_RUNTIME_STATUS_SNAPSHOT_ATTESTATION.read_text(encoding="utf-8")
     normalized_attestation = " ".join(attestation.split())
@@ -1297,11 +1349,37 @@ def test_m9_i5_runtime_status_attestation_candidate_is_fail_closed_and_bounded()
     ):
         assert denied in normalized_attestation
 
-    assert f"Current M9-I5 runtime status snapshot: `NOT_CLOSED` for exact snapshot `{M9_I5_RUNTIME_STATUS_SNAPSHOT_ID}`" in normalized_closure
-    assert "M9-I5 runtime status attestation state: `local_candidate_not_yet_immutable`" in closure
+    assert f"Current M9-I5 runtime status snapshot: `CLOSED_WITH_SINGLE_MAINTAINER_EXCEPTION` for exact snapshot `{M9_I5_RUNTIME_STATUS_SNAPSHOT_ID}`" in normalized_closure
+    assert "M9-I5 runtime status attestation state: `immutable_main_attestation_verified`" in closure
+    assert "Carrier update state: `immutable_m9_i5_status_attestation_verified`" in closure
+    assert (
+        "M9-I5 runtime carrier update state: "
+        "`immutable_m9_i5_runtime_status_attestation_verified`"
+    ) in closure
     assert "## Required path for M9-I5 runtime status-snapshot closure" in closure
-    assert "[pending separate authorization] publish these exact attestation bytes" in normalized_closure
-    assert "[pending separate authorization] update only this out-of-manifest carrier" in normalized_closure
-    assert "The fifth-lineage snapshot remains `NOT_CLOSED`" in closure
+    assert "publish these exact attestation bytes as immutable main commit" in normalized_closure
+    assert "[complete in this local candidate] update only this out-of-manifest carrier" in normalized_closure
+    assert "All six selected-path steps are satisfied for the exact M9-I5 runtime status snapshot" in normalized_closure
+    assert "without altering any subject or attestation byte" in normalized_closure
+    assert "Its later publication remains separately gated" in normalized_closure
+    assert "At that pre-publication stage" in normalized_closure
+    assert "At that stage it was not yet immutable" in normalized_closure
+    assert "the following section verifies their later publication" in normalized_closure
+    assert "it remains local and is not yet an immutable public event" not in normalized_closure
     assert M9_I5_STATUS_SNAPSHOT_ID in closure
     assert M9_I5_STATUS_ATTESTATION_EVENT_HASH in closure
+
+    summaries = {
+        relative_path: (ROOT / relative_path).read_text(encoding="utf-8")
+        for relative_path in STATUS_SUMMARY_PATHS
+    }
+    manifest = {
+        relative_path: digest
+        for digest, relative_path in (
+            line.split(" ", 1)
+            for line in m9_i5_runtime_status_manifest_block(closure).splitlines()
+        )
+    }
+    for relative_path, text in summaries.items():
+        assert sha256(ROOT / relative_path) == manifest[relative_path]
+        assert "`NOT_CLOSED`" in text
